@@ -1,4 +1,5 @@
-﻿using PingCastle.Healthcheck;
+﻿using PingCastle.Addition;
+using PingCastle.Healthcheck;
 using PingCastle.Rules;
 using System;
 using System.Collections.Generic;
@@ -44,25 +45,35 @@ namespace PingCastle.Report
 			GenerateSubIndicator("Trusts", data.GlobalScore, data.TrustScore, rules, RiskRuleCategory.Trusts, "It is about links between two Active Directories");
 			GenerateSubIndicator("Privileged Accounts", data.GlobalScore, data.PrivilegiedGroupScore, rules, RiskRuleCategory.PrivilegedAccounts, "It is about administrators of the Active Directory");
 			GenerateSubIndicator("Anomalies", data.GlobalScore, data.AnomalyScore, rules, RiskRuleCategory.Anomalies, "It is about specific security control points");
-			//Here Add Custom Risk Rule Categories Sub Indicators
+			if(CustomData != null)
+            {
+				foreach (var category in CustomData.Categories)
+				{
+					GenerateSubIndicator(category.Name, data.GlobalScore, category.Score, CustomData.CountCategoryHealthRules(category.Id), category.Explanation);
+				}
+			}
 			Add(@"
 		</div>
 ");
         }
 
-        void GenerateSubIndicator(string category, int globalScore, int score, IList<IRuleScore> rules, RiskRuleCategory RiskRuleCategory, string explanation)
-        {
-            int numrules = 0;
-            if (rules != null)
+		void GenerateSubIndicator(string category, int globalScore, int score, IList<IRuleScore> rules, RiskRuleCategory RiskRuleCategory, string explanation)
+		{
+			int numrules = 0;
+			if (rules != null)
+			{
+				foreach (var rule in rules)
+				{
+					if (rule.Category == RiskRuleCategory)
+						numrules++;
+				}
+			}
+			if(CustomData != null)
             {
-                foreach (var rule in rules)
-                {
-                    if (rule.Category == RiskRuleCategory)
-                        numrules++;
-                }
+				numrules += CustomData.CountCategoryHealthRules(Enum.GetName(typeof(RiskRuleCategory), RiskRuleCategory));
             }
-            GenerateSubIndicator(category, globalScore, score, numrules, explanation);
-        }
+			GenerateSubIndicator(category, globalScore, score, numrules, explanation);
+		}
 
         protected void GenerateSubIndicator(string category, int globalScore, int score, int numrules, string explanation)
         {
@@ -132,7 +143,7 @@ namespace PingCastle.Report
 						break;
 				}
 			}
-			// Add here All Custom RIsk Model Categories By Custom RiskRuleCategoryId
+			// Add here All Custom Risk Model Categories By Custom RiskRuleCategoryId
 			foreach (RiskRuleCategory category in Enum.GetValues(typeof(RiskRuleCategory)))
 			{
 				riskmodel[category].Sort(
@@ -206,6 +217,169 @@ namespace PingCastle.Report
 						line += "<td class=\"model_cell " + tdclass + "\"><div class=\"div_model\" placement=\"auto right\" data-toggle=\"popover\" title=\"" +
 							tooltip + "\" data-html=\"true\" data-content=\"" +
 							(String.IsNullOrEmpty(tooltipdetail) ? "No rule matched" : "<p>" + tooltipdetail + "</p>") + "\"><span class=\"small\">" + modelstring + "</span></div></td>";
+					}
+					else
+						line += "<td class=\"model_empty_cell\"></td>";
+				}
+				line += "</tr>";
+				if (HasValue)
+					Add(line);
+				else
+					break;
+			}
+			Add(@"
+					</tbody>
+				</table>
+			</div>
+			<div class=""col-md-12"" id=""maturityModel"">
+		Legend: <br>
+			<i class=""risk_model_none"">&nbsp;</i> score is 0 - no risk identified but some improvements detected<br>
+			<i class=""risk_model_low"">&nbsp;</i> score between 1 and 10  - a few actions have been identified<br>
+			<i class=""risk_model_medium"">&nbsp;</i> score between 10 and 30 - rules should be looked with attention<br>
+			<i class=""risk_model_high"">&nbsp;</i> score higher than 30 - major risks identified
+			</div>
+		</div>");
+		}
+
+		protected void GenerateAdvancedRiskModelPanel(List<HealthcheckRiskRule> rules, int numberOfDomain = 1)
+		{
+			Add(@"
+		<div class=""row d-print-none""><div class=""col-lg-12"">
+			<a data-toggle=""collapse"" data-target=""#riskModel"">
+				<h2>Risk model</h2>
+			</a>
+		</div></div>
+		<div class=""row collapse show d-print-none"" id=""riskModel"">
+			<div class=""col-md-12 table-responsive"">
+				<table class=""model_table"">
+					<thead><tr><th></th><th>Stale Objects</th><th>Privileged accounts</th><th>Trusts</th><th>Anomalies</th>");
+			foreach(var category in CustomData.Categories)
+            {
+				Add(@"<th>" + category.Name + @"</th>");
+            }
+			Add(@"</tr></thead>
+					<tbody>
+");
+
+
+            var riskmodel = new Dictionary<string, List<CustomRiskModelCategory>>();
+			foreach(var category in Enum.GetValues(typeof(RiskRuleCategory)))
+            {
+				riskmodel[category.ToString()] = new List<CustomRiskModelCategory>();
+			}
+			foreach(var category in CustomData.Categories)
+            {
+				riskmodel[category.Id] = new List<CustomRiskModelCategory>();
+            }
+
+			for (int j = 1; j <= 4; j++)
+			{
+				for (int i = 0; ; i++)
+				{
+					int id = (1000 * j + i);
+					if (Enum.IsDefined(typeof(RiskModelCategory), id))
+					{
+						riskmodel[((RiskRuleCategory)j).ToString()].Add(new CustomRiskModelCategory()
+						{
+							Id = ((RiskModelCategory)id).ToString(),
+							Description = ReportHelper.GetEnumDescription((RiskModelCategory)id),
+						});
+					}
+					else
+						break;
+				}
+			}
+
+			foreach(var model in CustomData.Models)
+            {
+				riskmodel[model.RiskRuleCategoryId].Add(model);
+            }
+			foreach(var category in riskmodel.Keys)
+            {
+				riskmodel[category].Sort((CustomRiskModelCategory a, CustomRiskModelCategory b) =>
+				{
+					return string.Compare(a.Description, b.Description);
+				});
+            }
+			for (int i = 0; ; i++)
+			{
+				string line = "<tr>";
+				bool HasValue = false;
+				foreach (var category in riskmodel.Keys)
+				{
+					if (i < riskmodel[category].Count)
+					{
+						HasValue = true;
+						CustomRiskModelCategory model = riskmodel[category][i];
+						int score = 0;
+						int numrules = 0;
+						List<CustomHealthCheckRiskRule> rulematched = new List<CustomHealthCheckRiskRule>();
+						foreach (HealthcheckRiskRule rule in rules)
+						{
+							if (rule.Model.ToString() == model.Id)
+							{
+								numrules++;
+								score += rule.Points;
+								rulematched.Add(new CustomHealthCheckRiskRule() 
+								{
+									Category = category,
+									Model = model.Id,
+									Points = rule.Points,
+									Rationale = rule.Rationale,
+									RiskId = rule.RiskId
+								});
+							}
+						}
+						foreach(var rule in CustomData.HealthRules)
+                        {
+							if(rule.Model == model.Id)
+                            {
+								numrules++;
+								score += rule.Points;
+								rulematched.Add(rule);
+							}
+						}
+						string tdclass = "";
+						if (numrules == 0)
+						{
+							tdclass = "model_good";
+						}
+						else if (score == 0)
+						{
+							tdclass = "model_info";
+						}
+						else if (score <= 10 * numberOfDomain)
+						{
+							tdclass = "model_toimprove";
+						}
+						else if (score <= 30 * numberOfDomain)
+						{
+							tdclass = "model_warning";
+						}
+						else
+						{
+							tdclass = "model_danger";
+						}
+						string tooltip = "Rules: " + numrules + " Score: " + (numberOfDomain == 0 ? 100 : score / numberOfDomain);
+						string tooltipdetail = null;
+						rulematched.Sort((CustomHealthCheckRiskRule a, CustomHealthCheckRiskRule b)
+							=> { return a.Points.CompareTo(b.Points); });
+
+						foreach (var rule in rulematched)
+						{
+							tooltipdetail += ReportHelper.Encode(rule.Rationale) + "<br>";
+							var hcrule = CustomRiskRule.GetFromRiskRule<T>(RuleSet<T>.GetRuleFromID(rule.RiskId));
+							if (hcrule == null)
+								hcrule = CustomData.GetRiskRule(rule.RiskId);
+							
+							if (hcrule != null && !string.IsNullOrEmpty(hcrule.ReportLocation))
+							{
+								tooltipdetail += "<small  class='text-muted'>" + ReportHelper.Encode(hcrule.ReportLocation) + "</small><br>";
+							}
+						}
+						line += "<td class=\"model_cell " + tdclass + "\"><div class=\"div_model\" placement=\"auto right\" data-toggle=\"popover\" title=\"" +
+							tooltip + "\" data-html=\"true\" data-content=\"" +
+							(String.IsNullOrEmpty(tooltipdetail) ? "No rule matched" : "<p>" + tooltipdetail + "</p>") + "\"><span class=\"small\">" + model.Description + "</span></div></td>";
 					}
 					else
 						line += "<td class=\"model_empty_cell\"></td>";
@@ -324,61 +498,65 @@ namespace PingCastle.Report
 ");
         }
 
-        protected void GenerateIndicatorPanelDetail(string category, HealthcheckRiskRule rule, string optionalId = null)
-        {
-            string safeRuleId = rule.RiskId.Replace("$", "dollar");
-            var hcrule = RuleSet<T>.GetRuleFromID(rule.RiskId);
-            GenerateAccordionDetail("rules" + optionalId + safeRuleId, "rules" + category, rule.Rationale, rule.Points, true,
-                () =>
-                {
-                    if (hcrule == null)
-                    {
-                    }
-                    else
-                    {
-                        Add("<h3>");
-                        Add(hcrule.Title);
-                        Add("</h3>\r\n<strong>Rule ID:</strong><p class=\"text-justify\">");
-                        Add(hcrule.RiskId);
-                        Add("</p>\r\n<strong>Description:</strong><p class=\"text-justify\">");
-                        Add(NewLineToBR(hcrule.Description));
-                        Add("</p>\r\n<strong>Technical explanation:</strong><p class=\"text-justify\">");
-                        Add(NewLineToBR(hcrule.TechnicalExplanation));
-                        Add("</p>\r\n<strong>Advised solution:</strong><p class=\"text-justify\">");
-                        Add(NewLineToBR(hcrule.Solution));
-                        Add("</p>\r\n<strong>Points:</strong><p>");
-                        Add(NewLineToBR(hcrule.GetComputationModelString()));
-                        Add("</p>\r\n");
-                        if (!String.IsNullOrEmpty(hcrule.Documentation))
-                        {
-                            Add("<strong>Documentation:</strong><p>");
-                            Add(hcrule.Documentation);
-                            Add("</p>");
-                        }
-                    }
-                    if ((rule.Details != null && rule.Details.Count > 0) || (hcrule != null && !String.IsNullOrEmpty(hcrule.ReportLocation)))
-                    {
-                        Add("<strong>Details:</strong>");
-                        if (!String.IsNullOrEmpty(hcrule.ReportLocation))
-                        {
-                            Add("<p>");
-                            Add(hcrule.ReportLocation);
-                            Add("</p>");
-                        }
-                        if (rule.Details != null && rule.Details.Count > 0 && !string.IsNullOrEmpty(rule.Details[0]))
-                        {
-                            var test = rule.Details[0].Replace("Domain controller:", "Domain_controller:").Split(' ');
-                            if (test.Length > 1 && test[0].EndsWith(":"))
-                            {
-                                var tokens = new List<string>();
-                                for (int i = 0; i < test.Length; i++)
-                                {
-                                    if (!string.IsNullOrEmpty(test[i]) && test[i].EndsWith(":"))
-                                    {
-                                        tokens.Add(test[i]);
-                                    }
-                                }
-                                Add(@"<div class=""row"">
+		protected void GenerateIndicatorPanelDetail(string category, HealthcheckRiskRule rule, string optionalId = null)
+		{
+			string safeRuleId = rule.RiskId.Replace("$", "dollar");
+			var hcrule = CustomRiskRule.GetFromRiskRule<T>(RuleSet<T>.GetRuleFromID(rule.RiskId));
+			if (CustomData != null && hcrule == null)
+			{
+				hcrule = CustomData.GetRiskRule(rule.RiskId);
+			}
+			GenerateAccordionDetail("rules" + optionalId + safeRuleId, "rules" + category, rule.Rationale, rule.Points, true,
+				() =>
+				{
+					if (hcrule == null)
+					{
+					}
+					else
+					{
+						Add("<h3>");
+						Add(hcrule.Title);
+						Add("</h3>\r\n<strong>Rule ID:</strong><p class=\"text-justify\">");
+						Add(hcrule.RiskId);
+						Add("</p>\r\n<strong>Description:</strong><p class=\"text-justify\">");
+						Add(NewLineToBR(hcrule.Description));
+						Add("</p>\r\n<strong>Technical explanation:</strong><p class=\"text-justify\">");
+						Add(NewLineToBR(hcrule.TechnicalExplanation));
+						Add("</p>\r\n<strong>Advised solution:</strong><p class=\"text-justify\">");
+						Add(NewLineToBR(hcrule.Solution));
+						Add("</p>\r\n<strong>Points:</strong><p>");
+						Add(NewLineToBR(hcrule.GetComputationModelString()));
+						Add("</p>\r\n");
+						if (!String.IsNullOrEmpty(hcrule.Documentation))
+						{
+							Add("<strong>Documentation:</strong><p>");
+							Add(hcrule.Documentation);
+							Add("</p>");
+						}
+					}
+					if ((rule.Details != null && rule.Details.Count > 0) || (hcrule != null && !String.IsNullOrEmpty(hcrule.ReportLocation)))
+					{
+						Add("<strong>Details:</strong>");
+						if (!String.IsNullOrEmpty(hcrule.ReportLocation))
+						{
+							Add("<p>");
+							Add(hcrule.ReportLocation);
+							Add("</p>");
+						}
+						if (rule.Details != null && rule.Details.Count > 0 && !string.IsNullOrEmpty(rule.Details[0]))
+						{
+							var test = rule.Details[0].Replace("Domain controller:","Domain_controller:").Split(' ');
+							if (test.Length > 1 && test[0].EndsWith(":"))
+							{
+								var tokens = new List<string>();
+								for (int i = 0; i < test.Length; i++)
+								{
+									if (!string.IsNullOrEmpty(test[i]) && test[i].EndsWith(":"))
+									{
+										tokens.Add(test[i]);
+									}
+								}
+								Add(@"<div class=""row"">
 			<div class=""col-md-12 table-responsive"">
 				<table class=""table table-striped table-bordered"">
 					<thead><tr>");

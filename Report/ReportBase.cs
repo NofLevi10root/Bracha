@@ -24,6 +24,7 @@ namespace PingCastle.Report
         public delegate bool HasDomainAmbigousNameDelegate(DomainKey domainKey);
         protected string ReportID;
         protected string PingCastleEnterpriseBaseUrl = "https://www.pingcastle.com/reports/";
+		protected CustomHealthCheckData CustomData;
 
         protected GetUrlDelegate GetUrlCallback;
 
