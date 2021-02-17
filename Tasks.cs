@@ -28,6 +28,7 @@ using System.Threading;
 using PingCastle.Data;
 using System.DirectoryServices;
 using PingCastle.Report;
+using PingCastle.Addition;
 
 namespace PingCastle
 {
@@ -39,6 +40,7 @@ namespace PingCastle
 		public NetworkCredential Credential = null;
 		public List<string> NodesToInvestigate = new List<string>();
 		public string FileOrDirectory = null;
+		public string CustomConfigFileOrDirectory = null;
 		public PingCastleReportDataExportLevel ExportLevel = PingCastleReportDataExportLevel.Normal;
 		public string sendXmlTo;
 		public string sendHtmlTo;
@@ -494,6 +496,26 @@ namespace PingCastle
 						}
 						var fi = new FileInfo(FileOrDirectory);
 						var healthcheckData = DataHelper<HealthcheckData>.LoadXml(FileOrDirectory);
+						var endUserReportGenerator = PingCastleFactory.GetEndUserReportGenerator<HealthcheckData>();
+						endUserReportGenerator.GenerateReportFile(healthcheckData, License, healthcheckData.GetHumanReadableFileName());
+					}
+				);
+		}
+
+		public bool AdvancedRegenerateHtmlTask()
+		{
+			return StartTask("Advanced regenerate html report",
+					() =>
+					{
+						if (!File.Exists(FileOrDirectory))
+						{
+							WriteInRed("The file " + FileOrDirectory + " doesn't exist");
+							return;
+						}
+						var fi = new FileInfo(FileOrDirectory);
+						var healthcheckData = DataHelper<HealthcheckData>.LoadXml(FileOrDirectory);
+						var customHealthCheckData = CustomHealthCheckData.LoadXML(CustomConfigFileOrDirectory);
+						//Insert Here Custom Data
 						var endUserReportGenerator = PingCastleFactory.GetEndUserReportGenerator<HealthcheckData>();
 						endUserReportGenerator.GenerateReportFile(healthcheckData, License, healthcheckData.GetHumanReadableFileName());
 					}

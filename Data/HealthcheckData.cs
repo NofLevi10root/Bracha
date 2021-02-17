@@ -870,6 +870,7 @@ namespace PingCastle.Healthcheck
 					applicableRules.Add(rule);
 				}
 			}
+            //Add Custom Rules [RuleBase]
             if (MaturityLevel == 0)
             {
                 MaturityLevel = 5;

@@ -46,6 +46,7 @@ namespace PingCastle.Rules
 					}
 				}
 			}
+			//Add Custom Rules
 			output.Sort((RuleBase<T> a, RuleBase<T> b)
 				=>
 			{

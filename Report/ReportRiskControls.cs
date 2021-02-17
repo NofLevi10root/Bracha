@@ -47,6 +47,7 @@ namespace PingCastle.Report
 			GenerateSubIndicator("Trusts", data.GlobalScore, data.TrustScore, rules, RiskRuleCategory.Trusts, "It is about links between two Active Directories");
 			GenerateSubIndicator("Privileged Accounts", data.GlobalScore, data.PrivilegiedGroupScore, rules, RiskRuleCategory.PrivilegedAccounts, "It is about administrators of the Active Directory");
 			GenerateSubIndicator("Anomalies", data.GlobalScore, data.AnomalyScore, rules, RiskRuleCategory.Anomalies, "It is about specific security control points");
+			//Here Add Custom Risk Rule Categories Sub Indicators
 			Add(@"
 		</div>
 ");
@@ -120,6 +121,7 @@ namespace PingCastle.Report
 			{
 				riskmodel[category] = new List<RiskModelCategory>();
 			}
+			//Add here All Custom Risk Rule Categories
 			for (int j = 0; j < 4; j++)
 			{
 				for (int i = 0; ; i++)
@@ -133,6 +135,7 @@ namespace PingCastle.Report
 						break;
 				}
 			}
+			// Add here All Custom RIsk Model Categories By Custom RiskRuleCategoryId
 			foreach (RiskRuleCategory category in Enum.GetValues(typeof(RiskRuleCategory)))
 			{
 				riskmodel[category].Sort(
@@ -141,6 +144,7 @@ namespace PingCastle.Report
 											return string.Compare(ReportHelper.GetEnumDescription(a), ReportHelper.GetEnumDescription(b));
 										});
 			}
+			//Sort All by Description and not just the original Categories
 			for (int i = 0; ; i++)
 			{
 				string line = "<tr>";
@@ -187,6 +191,7 @@ namespace PingCastle.Report
 						string tooltip = "Rules: " + numrules + " Score: " + (numberOfDomain == 0? 100 : score / numberOfDomain);
 						string tooltipdetail = null;
 						string modelstring = ReportHelper.GetEnumDescription(model);
+						//Need to Implement A different Way Of Getting Descriptions For Custom Models
 						rulematched.Sort((HealthcheckRiskRule a, HealthcheckRiskRule b)
 							=>
 						{

@@ -182,7 +182,6 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 			});
 
             GenerateSection("Maturity Level", GenerateMaturityInformation);
-
 			GenerateSection("Stale Objects", () =>
 			{
 				GenerateSubIndicator("Stale Objects", Report.GlobalScore, Report.StaleObjectsScore, "It is about operations related to user or computer objects");
@@ -203,6 +202,13 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 				GenerateSubIndicator("Anomalies", Report.GlobalScore, Report.AnomalyScore, "It is about specific security control points");
 				GenerateIndicatorPanel("DetailAnomalies", "Anomalies rule details", RiskRuleCategory.Anomalies, Report.RiskRules, Report.applicableRules);
 			});
+			//Add Custom Risk Rule Categories As Sections
+			/*GenerateSection([Name], () =>
+			 * {
+			 *		GenerateSubIndicator([Name], Report.GlobalScore, [Score], [Explanation]);
+					GenerateIndicatorPanel([DetaildId], [Name + " rule details"], [CategoryReference], Report.RiskRules, Report.applicableRules);
+			 * });
+			 */
 			GenerateSection("Domain Information", GenerateDomainInformation);
 			GenerateSection("User Information", GenerateUserInformation);
 			GenerateSection("Computer Information", GenerateComputerInformation);

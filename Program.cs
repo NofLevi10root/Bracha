@@ -39,6 +39,7 @@ namespace PingCastle
 		bool PerformUploadAllReport;
 		bool PerformHCRules = false;
 		private bool PerformRegenerateReport;
+		private bool PerformAdvancedRegenerateReport;
 		private bool PerformHealthCheckReloadReport;
 		bool PerformHealthCheckGenerateDemoReports;
 		bool PerformScanner = false;
@@ -187,6 +188,10 @@ namespace PingCastle
 			if (PerformRegenerateReport)
 			{
 				if (!tasks.RegenerateHtmlTask()) return;
+			}
+			if (PerformAdvancedRegenerateReport)
+			{
+				if (!tasks.AdvancedRegenerateHtmlTask()) return;
 			}
 			if (PerformHealthCheckReloadReport)
 			{
@@ -391,6 +396,16 @@ namespace PingCastle
 								return false;
 							}
 							tasks.FileOrDirectory = args[++i];
+							break;
+						case "--advanced-regen-report":
+							PerformAdvancedRegenerateReport = true;
+							if (i + 2 >= args.Length)
+							{
+								WriteInRed("arguments for --advanced-regen-report is mandatory");
+								return false;
+							}
+							tasks.FileOrDirectory = args[++i];
+							tasks.CustomConfigFileOrDirectory = args[++i]; // need to check maybe without +1
 							break;
 						case "--generate-fake-reports":
 							PerformGenerateFakeReport = true;
@@ -719,7 +734,7 @@ namespace PingCastle
 				Trace.WriteLine("After parsing arguments");
 			}
 			if (!PerformHealthCheckReport && !PerformHealthCheckConsolidation
-				&& !PerformRegenerateReport && !PerformHealthCheckReloadReport && !delayedInteractiveMode
+				&& !PerformRegenerateReport && !PerformAdvancedRegenerateReport && !PerformHealthCheckReloadReport && !delayedInteractiveMode
 				&& !PerformScanner
 				&& !PerformGenerateKey && !PerformHealthCheckGenerateDemoReports && !PerformCarto
 				&& !PerformUploadAllReport
@@ -951,6 +966,7 @@ namespace PingCastle
 			PerformGenerateKey = false;
 			PerformHealthCheckReloadReport = false;
 			PerformRegenerateReport = false;
+			PerformAdvancedRegenerateReport = false;
 			PerformHCRules = false;
 
 			List<ConsoleMenuItem> choices = new List<ConsoleMenuItem>() {
@@ -960,6 +976,7 @@ namespace PingCastle
 				new ConsoleMenuItem("noenumlimit","Remove the 100 items limitation in healthcheck reports"),
 				new ConsoleMenuItem("decrypt","Decrypt a xml report"),
 				new ConsoleMenuItem("regenerate","Regenerate the html report based on the xml report"),
+				new ConsoleMenuItem("advanced regenerate","Advanced regenerate of the html report based on report and config xml files"),
 				new ConsoleMenuItem("log","Enable logging (log is " + (Trace.Listeners.Count > 1 ? "enabled":"disabled") + ")"),
 			};
 
@@ -985,6 +1002,9 @@ namespace PingCastle
 					return DisplayState.AskForFile;
 				case "regenerate":
 					PerformRegenerateReport = true;
+					return DisplayState.AskForFile;
+				case "advanced regenerate":
+					PerformAdvancedRegenerateReport = true;
 					return DisplayState.AskForFile;
 				case "log":
 					if (Trace.Listeners.Count <= 1)
@@ -1031,9 +1051,22 @@ namespace PingCastle
 				ConsoleMenu.Title = "Select an existing report";
 				ConsoleMenu.Information = "Please specify the report to open.";
 				file = ConsoleMenu.AskForString();
-				ConsoleMenu.Notice = "The file " + file + " was not found";
+				if(String.IsNullOrEmpty(file))
+					ConsoleMenu.Notice = "The file " + file + " was not found";
 			}
 			tasks.FileOrDirectory = file;
+			if (PerformAdvancedRegenerateReport)
+            {
+				file = null;
+				while (String.IsNullOrEmpty(file) || !File.Exists(file))
+				{
+					ConsoleMenu.Title = "Select a config xml file";
+					ConsoleMenu.Information = "Please specify the config to use.";
+					file = ConsoleMenu.AskForString();
+					ConsoleMenu.Notice = "The file " + file + " was not found";
+				}
+				tasks.CustomConfigFileOrDirectory = file;
+			}
 			tasks.EncryptReport = false;
 			return DisplayState.Run;
 		}
