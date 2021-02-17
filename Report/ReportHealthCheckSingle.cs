@@ -18,6 +18,7 @@ using PingCastle.Rules;
 using PingCastle.Healthcheck;
 using PingCastle.Data;
 using PingCastle.Graph.Database;
+using PingCastle.Addition;
 
 namespace PingCastle.Report
 {
@@ -31,6 +32,7 @@ namespace PingCastle.Report
 		public string GenerateReportFile(HealthcheckData report, ADHealthCheckingLicense license, string filename)
 		{
 			Report = report;
+			CustomData = null;
 			_license = license;
 			report.InitializeReportingData();
             ReportID = GenerateUniqueID(report);
@@ -38,7 +40,18 @@ namespace PingCastle.Report
 			return GenerateReportFile(filename);
 		}
 
-        private string GenerateUniqueID(IPingCastleReport report)
+		public string GenerateReportFile(HealthcheckData report, ADHealthCheckingLicense license, string filename, CustomHealthCheckData customData)
+		{
+			Report = report;
+			CustomData = customData;
+			_license = license;
+			report.InitializeReportingData();
+			ReportID = GenerateUniqueID(report);
+			Brand(license);
+			return GenerateReportFile(filename);
+		}
+
+		private string GenerateUniqueID(IPingCastleReport report)
         {
             var s= report.Domain.DomainSID.Split('-');
             return GenerateUniqueID(report.Domain.DomainName, long.Parse(s[s.Length-1]));
@@ -47,6 +60,7 @@ namespace PingCastle.Report
 		public string GenerateRawContent(HealthcheckData report, ADHealthCheckingLicense aDHealthCheckingLicense)
 		{
 			Report = report;
+			CustomData = null;
 			_license = aDHealthCheckingLicense;
 			report.InitializeReportingData();
 			sb.Length = 0;
@@ -178,9 +192,12 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 			{
 				AddParagraph("This section focuses on the core security indicators.<br>Locate the sub-process determining the score and fix some rules in that area to get a score improvement.");
 				GenerateIndicators(Report, Report.AllRiskRules);
-				GenerateRiskModelPanel(Report.RiskRules);
+				if (CustomData != null)
+					GenerateAdvancedRiskModelPanel(Report.RiskRules);
+				else
+					GenerateRiskModelPanel(Report.RiskRules);
 			});
-
+			//finshed to here
             GenerateSection("Maturity Level", GenerateMaturityInformation);
 			GenerateSection("Stale Objects", () =>
 			{
@@ -322,17 +339,22 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 Add("</span> you need to fix the following rules:</p>");
                 GenerateAccordion("rulesmaturity", () =>
                 {
-                    Report.RiskRules.Sort((HealthcheckRiskRule a, HealthcheckRiskRule b)
-                        =>
+					List<HealthcheckRiskRule> levelRules = new List<HealthcheckRiskRule>();
+					foreach(var rule in Report.RiskRules)
                     {
-                        return -a.Points.CompareTo(b.Points);
+						if (l.Contains(rule.RiskId))
+							levelRules.Add(rule);
                     }
-                    );
-                    foreach (HealthcheckRiskRule rule in Report.RiskRules)
+					if(CustomData != null)
                     {
-                        if (l.Contains(rule.RiskId))
-                            GenerateIndicatorPanelDetail("maturity", rule);
+						foreach(var rule in CustomData.HealthRules)
+                        {
+							if (l.Contains(rule.RiskId))
+								levelRules.Add(CustomHealthCheckRiskRule.ParseToHealthcheckRiskRule(rule));
+                        }
                     }
+					foreach(var rule in levelRules)
+						GenerateIndicatorPanelDetail("maturity", rule);
                 });
             }
             
@@ -352,6 +374,19 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 if (!output.ContainsKey(level))
                     output[level] = new List<string>();
                 output[level].Add(hcrule.RiskId);
+            }
+			if(CustomData != null)
+            {
+				foreach(var rule in CustomData.HealthRules)
+                {
+					var hcrule = CustomData.GetRiskRule(rule.RiskId);
+					if (hcrule == null)
+						continue;
+					int level = hcrule.Maturity;
+					if(!output.ContainsKey(level))
+						output[level] = new List<string>();
+					output[level].Add(hcrule.Id);
+				}
             }
             return output;
         }

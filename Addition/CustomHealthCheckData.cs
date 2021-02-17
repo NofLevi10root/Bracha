@@ -1,4 +1,5 @@
 ﻿using PingCastle.Data;
+using PingCastle.Healthcheck;
 using PingCastle.Rules;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,10 @@ namespace PingCastle.Addition
         public List<CustomHealthCheckRiskRule> HealthRules { get; set; }
         #endregion
 
+        #region Fields
+        private Dictionary<string, int> dictCategories;
+        #endregion
+
         #region Constructors
         private CustomHealthCheckData()
         {
@@ -38,6 +43,7 @@ namespace PingCastle.Addition
             Models = new List<CustomRiskModelCategory>();
             RiskRules = new List<CustomRiskRule>();
             HealthRules = new List<CustomHealthCheckRiskRule>();
+            dictCategories = new Dictionary<string, int>();
         }
         #endregion
 
@@ -78,6 +84,47 @@ namespace PingCastle.Addition
                 }
             }
             return xmlDoc;
+        }
+        public void MergeData(HealthcheckData healthData)
+        {
+            healthData.MaturityLevel = GetMaturityLevel(healthData.MaturityLevel);
+        }
+
+        public int CountCategoryHealthRules(string category)
+        {
+            int output = 0;
+            foreach (var rule in HealthRules)
+            {
+                if (rule.Category == category)
+                    output++;
+            }
+            return output;
+        }
+
+        public CustomRiskRule GetRiskRule(string ruleId)
+        {
+            foreach (var rule in RiskRules)
+            {
+                if (rule.Id == ruleId)
+                {
+                    return rule;
+                }
+            }
+            return null;
+        }
+
+        private int GetMaturityLevel(int oldMaturity)
+        {
+            int min = oldMaturity;
+            foreach(var rule in HealthRules)
+            {
+                var hcrule = GetRiskRule(rule.RiskId);
+                if(hcrule != null)
+                {
+                    min = Math.Min(min, hcrule.Maturity);
+                }
+            }
+            return min;
         }
         #endregion
     }

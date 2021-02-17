@@ -18,6 +18,7 @@ using PingCastle.Data;
 using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using System.Configuration;
+using PingCastle.Addition;
 
 namespace PingCastle.Report
 {
@@ -28,6 +29,7 @@ namespace PingCastle.Report
         public delegate bool HasDomainAmbigousNameDelegate(DomainKey domainKey);
         protected string ReportID;
         protected string PingCastleEnterpriseBaseUrl = "https://www.pingcastle.com/reports/";
+		protected CustomHealthCheckData CustomData;
 
 		protected GetUrlDelegate GetUrlCallback;
 

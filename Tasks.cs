@@ -512,12 +512,18 @@ namespace PingCastle
 							WriteInRed("The file " + FileOrDirectory + " doesn't exist");
 							return;
 						}
+
+						if (!File.Exists(CustomConfigFileOrDirectory))
+						{
+							WriteInRed("The file " + CustomConfigFileOrDirectory + " doesn't exist");
+							return;
+						}
 						var fi = new FileInfo(FileOrDirectory);
 						var healthcheckData = DataHelper<HealthcheckData>.LoadXml(FileOrDirectory);
 						var customHealthCheckData = CustomHealthCheckData.LoadXML(CustomConfigFileOrDirectory);
-						//Insert Here Custom Data
+						customHealthCheckData.MergeData(healthcheckData);
 						var endUserReportGenerator = PingCastleFactory.GetEndUserReportGenerator<HealthcheckData>();
-						endUserReportGenerator.GenerateReportFile(healthcheckData, License, healthcheckData.GetHumanReadableFileName());
+						endUserReportGenerator.GenerateReportFile(healthcheckData, License, healthcheckData.GetHumanReadableFileName(), customHealthCheckData);
 					}
 				);
 		}
