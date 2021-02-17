@@ -40,11 +40,12 @@ namespace PingCastle.Report
 		</div>
 		<div class=""row indicators-border"">
 ");
-            GenerateSubIndicator("Stale Object", data.GlobalScore, data.StaleObjectsScore, rules, RiskRuleCategory.StaleObjects, "It is about operations related to user or computer objects");
-            GenerateSubIndicator("Trusts", data.GlobalScore, data.TrustScore, rules, RiskRuleCategory.Trusts, "It is about links between two Active Directories");
-            GenerateSubIndicator("Privileged Accounts", data.GlobalScore, data.PrivilegiedGroupScore, rules, RiskRuleCategory.PrivilegedAccounts, "It is about administrators of the Active Directory");
-            GenerateSubIndicator("Anomalies", data.GlobalScore, data.AnomalyScore, rules, RiskRuleCategory.Anomalies, "It is about specific security control points");
-            Add(@"
+			GenerateSubIndicator("Stale Object", data.GlobalScore, data.StaleObjectsScore, rules, RiskRuleCategory.StaleObjects, "It is about operations related to user or computer objects");
+			GenerateSubIndicator("Trusts", data.GlobalScore, data.TrustScore, rules, RiskRuleCategory.Trusts, "It is about links between two Active Directories");
+			GenerateSubIndicator("Privileged Accounts", data.GlobalScore, data.PrivilegiedGroupScore, rules, RiskRuleCategory.PrivilegedAccounts, "It is about administrators of the Active Directory");
+			GenerateSubIndicator("Anomalies", data.GlobalScore, data.AnomalyScore, rules, RiskRuleCategory.Anomalies, "It is about specific security control points");
+			//Here Add Custom Risk Rule Categories Sub Indicators
+			Add(@"
 		</div>
 ");
         }
@@ -112,106 +113,110 @@ namespace PingCastle.Report
 					<thead><tr><th>Stale Objects</th><th>Privileged accounts</th><th>Trusts</th><th>Anomalies</th></tr></thead>
 					<tbody>
 ");
-            var riskmodel = new Dictionary<RiskRuleCategory, List<RiskModelCategory>>();
-            foreach (RiskRuleCategory category in Enum.GetValues(typeof(RiskRuleCategory)))
-            {
-                riskmodel[category] = new List<RiskModelCategory>();
-            }
-            for (int j = 0; j < 4; j++)
-            {
-                for (int i = 0; ; i++)
-                {
-                    int id = (1000 * j + 1000 + i);
-                    if (Enum.IsDefined(typeof(RiskModelCategory), id))
-                    {
-                        riskmodel[(RiskRuleCategory)j].Add((RiskModelCategory)id);
-                    }
-                    else
-                        break;
-                }
-            }
-            foreach (RiskRuleCategory category in Enum.GetValues(typeof(RiskRuleCategory)))
-            {
-                riskmodel[category].Sort(
-                                        (RiskModelCategory a, RiskModelCategory b) =>
-                                        {
-                                            return string.Compare(ReportHelper.GetEnumDescription(a), ReportHelper.GetEnumDescription(b));
-                                        });
-            }
-            for (int i = 0; ; i++)
-            {
-                string line = "<tr>";
-                bool HasValue = false;
-                foreach (RiskRuleCategory category in Enum.GetValues(typeof(RiskRuleCategory)))
-                {
-                    if (i < riskmodel[category].Count)
-                    {
-                        HasValue = true;
-                        RiskModelCategory model = riskmodel[category][i];
-                        int score = 0;
-                        int numrules = 0;
-                        List<HealthcheckRiskRule> rulematched = new List<HealthcheckRiskRule>();
-                        foreach (HealthcheckRiskRule rule in rules)
-                        {
-                            if (rule.Model == model)
-                            {
-                                numrules++;
-                                score += rule.Points;
-                                rulematched.Add(rule);
-                            }
-                        }
-                        string tdclass = "";
-                        if (numrules == 0)
-                        {
-                            tdclass = "model_good";
-                        }
-                        else if (score == 0)
-                        {
-                            tdclass = "model_info";
-                        }
-                        else if (score <= 10 * numberOfDomain)
-                        {
-                            tdclass = "model_toimprove";
-                        }
-                        else if (score <= 30 * numberOfDomain)
-                        {
-                            tdclass = "model_warning";
-                        }
-                        else
-                        {
-                            tdclass = "model_danger";
-                        }
-                        string tooltip = "Rules: " + numrules + " Score: " + (numberOfDomain == 0 ? 100 : score / numberOfDomain);
-                        string tooltipdetail = null;
-                        string modelstring = ReportHelper.GetEnumDescription(model);
-                        rulematched.Sort((HealthcheckRiskRule a, HealthcheckRiskRule b)
-                            =>
-                        {
-                            return a.Points.CompareTo(b.Points);
-                        });
-                        foreach (var rule in rulematched)
-                        {
-                            tooltipdetail += ReportHelper.Encode(rule.Rationale) + "<br>";
-                            var hcrule = RuleSet<T>.GetRuleFromID(rule.RiskId);
-                            if (hcrule != null && !string.IsNullOrEmpty(hcrule.ReportLocation))
-                            {
-                                tooltipdetail += "<small  class='text-muted'>" + ReportHelper.Encode(hcrule.ReportLocation) + "</small><br>";
-                            }
-                        }
-                        line += "<td class=\"model_cell " + tdclass + "\"><div class=\"div_model\" placement=\"auto right\" data-toggle=\"popover\" title=\"" +
-                            tooltip + "\" data-html=\"true\" data-content=\"" +
-                            (String.IsNullOrEmpty(tooltipdetail) ? "No rule matched" : "<p>" + tooltipdetail + "</p>") + "\"><span class=\"small\">" + modelstring + "</span></div></td>";
-                    }
-                    else
-                        line += "<td class=\"model_empty_cell\"></td>";
-                }
-                line += "</tr>";
-                if (HasValue)
-                    Add(line);
-                else
-                    break;
-            }
-            Add(@"
+			var riskmodel = new Dictionary<RiskRuleCategory, List<RiskModelCategory>>();
+			foreach (RiskRuleCategory category in Enum.GetValues(typeof(RiskRuleCategory)))
+			{
+				riskmodel[category] = new List<RiskModelCategory>();
+			}
+			//Add here All Custom Risk Rule Categories
+			for (int j = 0; j < 4; j++)
+			{
+				for (int i = 0; ; i++)
+				{
+					int id = (1000 * j + 1000 + i);
+					if (Enum.IsDefined(typeof(RiskModelCategory), id))
+					{
+						riskmodel[(RiskRuleCategory)j].Add((RiskModelCategory)id);
+					}
+					else
+						break;
+				}
+			}
+			// Add here All Custom RIsk Model Categories By Custom RiskRuleCategoryId
+			foreach (RiskRuleCategory category in Enum.GetValues(typeof(RiskRuleCategory)))
+			{
+				riskmodel[category].Sort(
+										(RiskModelCategory a, RiskModelCategory b) =>
+										{
+											return string.Compare(ReportHelper.GetEnumDescription(a), ReportHelper.GetEnumDescription(b));
+										});
+			}
+			//Sort All by Description and not just the original Categories
+			for (int i = 0; ; i++)
+			{
+				string line = "<tr>";
+				bool HasValue = false;
+				foreach (RiskRuleCategory category in Enum.GetValues(typeof(RiskRuleCategory)))
+				{
+					if (i < riskmodel[category].Count)
+					{
+						HasValue = true;
+						RiskModelCategory model = riskmodel[category][i];
+						int score = 0;
+						int numrules = 0;
+						List<HealthcheckRiskRule> rulematched = new List<HealthcheckRiskRule>();
+						foreach (HealthcheckRiskRule rule in rules)
+						{
+							if (rule.Model == model)
+							{
+								numrules++;
+								score += rule.Points;
+								rulematched.Add(rule);
+							}
+						}
+						string tdclass = "";
+						if (numrules == 0)
+						{
+							tdclass = "model_good";
+						}
+						else if (score == 0)
+						{
+							tdclass = "model_info";
+						}
+						else if (score <= 10 * numberOfDomain)
+						{
+							tdclass = "model_toimprove";
+						}
+						else if (score <= 30 * numberOfDomain)
+						{
+							tdclass = "model_warning";
+						}
+						else
+						{
+							tdclass = "model_danger";
+						}
+						string tooltip = "Rules: " + numrules + " Score: " + (numberOfDomain == 0? 100 : score / numberOfDomain);
+						string tooltipdetail = null;
+						string modelstring = ReportHelper.GetEnumDescription(model);
+						//Need to Implement A different Way Of Getting Descriptions For Custom Models
+						rulematched.Sort((HealthcheckRiskRule a, HealthcheckRiskRule b)
+							=>
+						{
+							return a.Points.CompareTo(b.Points);
+						});
+						foreach (var rule in rulematched)
+						{
+							tooltipdetail += ReportHelper.Encode(rule.Rationale) + "<br>";
+							var hcrule = RuleSet<T>.GetRuleFromID(rule.RiskId);
+							if (hcrule != null && !string.IsNullOrEmpty(hcrule.ReportLocation))
+							{
+								tooltipdetail += "<small  class='text-muted'>" + ReportHelper.Encode(hcrule.ReportLocation) + "</small><br>";
+							}
+						}
+						line += "<td class=\"model_cell " + tdclass + "\"><div class=\"div_model\" placement=\"auto right\" data-toggle=\"popover\" title=\"" +
+							tooltip + "\" data-html=\"true\" data-content=\"" +
+							(String.IsNullOrEmpty(tooltipdetail) ? "No rule matched" : "<p>" + tooltipdetail + "</p>") + "\"><span class=\"small\">" + modelstring + "</span></div></td>";
+					}
+					else
+						line += "<td class=\"model_empty_cell\"></td>";
+				}
+				line += "</tr>";
+				if (HasValue)
+					Add(line);
+				else
+					break;
+			}
+			Add(@"
 					</tbody>
 				</table>
 			</div>

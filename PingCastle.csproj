@@ -13,7 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>publier\</PublishUrl>
+    <PublishUrl>C:\Users\m4t4n\Desktop\AD\PingCastleOriginPublish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -23,9 +23,10 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationRevision>1</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -77,6 +78,18 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>2449D39BB52E93B583BA29C904421948E942D43B</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>PingCastle_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -89,6 +102,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Addition\CustomHealthCheckData.cs" />
+    <Compile Include="Addition\CustomHealthCheckRiskRule.cs" />
+    <Compile Include="Addition\CustomRiskModelCategory.cs" />
+    <Compile Include="Addition\CustomRiskRule.cs" />
+    <Compile Include="Addition\CustomRiskRuleCategory.cs" />
+    <Compile Include="Addition\CustomRuleComputation.cs" />
     <Compile Include="ADWS\IADConnection.cs" />
     <Compile Include="ADWS\LinuxConnection.cs" />
     <Compile Include="ADWS\LinuxFileConnection.cs" />
@@ -404,6 +423,7 @@
     <EmbeddedResource Include="template\ReportCompromiseGraph.js.gz" />
     <EmbeddedResource Include="template\ReportMapBuilder.js.gz" />
     <EmbeddedResource Include="template\ReportNetworkMap.js.gz" />
+    <None Include="PingCastle_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="changelog.txt" />

@@ -23,22 +23,23 @@ using System.Text.RegularExpressions;
 
 namespace PingCastle
 {
-    [LicenseProvider(typeof(PingCastle.ADHealthCheckingLicenseProvider))]
-    public class Program : IPingCastleLicenseInfo
-    {
-        bool PerformHealthCheckReport = false;
-        bool PerformHealthCheckConsolidation = false;
-        bool PerformGenerateKey = false;
-        bool PerformCarto = false;
-        bool PerformUploadAllReport;
-        bool PerformHCRules = false;
-        private bool PerformRegenerateReport;
-        private bool PerformHealthCheckReloadReport;
-        bool PerformHealthCheckGenerateDemoReports;
-        bool PerformScanner = false;
-        bool PerformGenerateFakeReport = false;
-        bool PerformBot = false;
-        Tasks tasks = new Tasks();
+	[LicenseProvider(typeof(PingCastle.ADHealthCheckingLicenseProvider))]
+	public class Program : IPingCastleLicenseInfo
+	{
+		bool PerformHealthCheckReport = false;
+		bool PerformHealthCheckConsolidation = false;
+		bool PerformGenerateKey = false;
+		bool PerformCarto = false;
+		bool PerformUploadAllReport;
+		bool PerformHCRules = false;
+		private bool PerformRegenerateReport;
+		private bool PerformAdvancedRegenerateReport;
+		private bool PerformHealthCheckReloadReport;
+		bool PerformHealthCheckGenerateDemoReports;
+		bool PerformScanner = false;
+		bool PerformGenerateFakeReport = false;
+		bool PerformBot = false;
+		Tasks tasks = new Tasks();
 
 
         public static void Main(string[] args)
@@ -134,72 +135,76 @@ namespace PingCastle
 # @@  >  " + (license.EndTime < DateTime.MaxValue ? "End of support: " + license.EndTime.ToShortDateString() : "") + @"
 | @@@:   
 : .#                                 Vincent LE TOUX (contact@pingcastle.com)
-  .:       twitter: @mysmartlogon                    https://www.pingcastle.com";
-            if (!ParseCommandLine(args))
-                return;
-            // Trace to file or console may be enabled here
-            Trace.WriteLine("[New run]" + DateTime.Now.ToString("u"));
-            Trace.WriteLine("PingCastle version " + version.ToString(4));
-            Trace.WriteLine("Running on dotnet:" + Environment.Version);
-            if (!String.IsNullOrEmpty(license.DomainLimitation) && !Tasks.compareStringWithWildcard(license.DomainLimitation, tasks.Server))
-            {
-                WriteInRed("Limitations applies to the --server argument (" + license.DomainLimitation + ")");
-                return;
-            }
-            if (!String.IsNullOrEmpty(license.CustomerNotice))
-            {
-                Console.WriteLine(license.CustomerNotice);
-            }
-            if (PerformGenerateKey)
-            {
-                if (!tasks.GenerateKeyTask()) return;
-            }
-            if (PerformScanner)
-            {
-                if (!tasks.ScannerTask()) return;
-            }
-            if (PerformCarto)
-            {
-                if (!tasks.CartoTask(PerformHealthCheckGenerateDemoReports)) return;
-            }
-            if (PerformBot)
-            {
-                if (!tasks.BotTask()) return;
-            }
-            if (PerformHealthCheckReport)
-            {
-                if (!tasks.AnalysisTask<HealthcheckData>()) return;
-            }
-            if (PerformHealthCheckConsolidation || (PerformHealthCheckReport && tasks.Server == "*" && tasks.InteractiveMode))
-            {
-                if (!tasks.ConsolidationTask<HealthcheckData>()) return;
-            }
-            if (PerformHCRules)
-            {
-                if (!tasks.HealthCheckRulesTask()) return;
-            }
-            if (PerformRegenerateReport)
-            {
-                if (!tasks.RegenerateHtmlTask()) return;
-            }
-            if (PerformHealthCheckReloadReport)
-            {
-                if (!tasks.ReloadXmlReport()) return;
-            }
-            if (PerformHealthCheckGenerateDemoReports && !PerformCarto)
-            {
-                if (!tasks.GenerateDemoReportTask()) return;
-            }
-            if (PerformUploadAllReport)
-            {
-                if (!tasks.UploadAllReportInCurrentDirectory()) return;
-            }
-            if (PerformGenerateFakeReport)
-            {
-                if (!tasks.GenerateFakeReport()) return;
-            }
-            tasks.CompleteTasks();
-        }
+  .:       twitter: @mysmartlogon                    https://www.pingcastle.com"; 
+			if (!ParseCommandLine(args))
+				return;
+			// Trace to file or console may be enabled here
+			Trace.WriteLine("[New run]" + DateTime.Now.ToString("u"));
+			Trace.WriteLine("PingCastle version " + version.ToString(4));
+			Trace.WriteLine("Running on dotnet:" + Environment.Version);
+			if (!String.IsNullOrEmpty(license.DomainLimitation) && !Tasks.compareStringWithWildcard(license.DomainLimitation, tasks.Server))
+			{
+				WriteInRed("Limitations applies to the --server argument (" + license.DomainLimitation + ")");
+				return;
+			}
+			if (!String.IsNullOrEmpty(license.CustomerNotice))
+			{
+				Console.WriteLine(license.CustomerNotice);
+			}
+			if (PerformGenerateKey)
+			{
+				if (!tasks.GenerateKeyTask()) return;
+			}
+			if (PerformScanner)
+			{
+				if (!tasks.ScannerTask()) return;
+			}
+			if (PerformCarto)
+			{
+				if (!tasks.CartoTask(PerformHealthCheckGenerateDemoReports)) return;
+			}
+			if (PerformBot)
+			{
+				if (!tasks.BotTask()) return;
+			}
+			if (PerformHealthCheckReport)
+			{
+				if (!tasks.AnalysisTask<HealthcheckData>()) return;
+			}
+			if (PerformHealthCheckConsolidation || (PerformHealthCheckReport && tasks.Server == "*" && tasks.InteractiveMode))
+			{
+				if (!tasks.ConsolidationTask<HealthcheckData>()) return;
+			}
+			if (PerformHCRules)
+			{
+				if (!tasks.HealthCheckRulesTask()) return;
+			}
+			if (PerformRegenerateReport)
+			{
+				if (!tasks.RegenerateHtmlTask()) return;
+			}
+			if (PerformAdvancedRegenerateReport)
+			{
+				if (!tasks.AdvancedRegenerateHtmlTask()) return;
+			}
+			if (PerformHealthCheckReloadReport)
+			{
+				if (!tasks.ReloadXmlReport()) return;
+			}
+			if (PerformHealthCheckGenerateDemoReports && !PerformCarto)
+			{
+				if (!tasks.GenerateDemoReportTask()) return;
+			}
+			if (PerformUploadAllReport)
+			{
+				if (!tasks.UploadAllReportInCurrentDirectory()) return;
+			}
+			if (PerformGenerateFakeReport)
+			{
+				if (!tasks.GenerateFakeReport()) return;
+			}
+			tasks.CompleteTasks();
+		}
 
         const string basicEditionLicense = "PC2H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcplVmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7NX+PX+DV+A/r/r/F7/j7/6l/zO/3bv+avTb/W9P9n9G9O/6W/xumvMfs1il+jpf9Xv8aS/q5+jXP69yX9vfw1Ln6Nk18j+zUa+rbktnu/xvjXeEj/36Pft+n/L6h1Sz/P6WdNP6f0c0H/5fTXlCBk9F76a6wJQv5rAIk/6Nf4NX6NP/gv+0cfpv/Jn/+//Od/6V/4h//TyWd/4y8+/2XlX/qP/5GPz//Xs9/oN/off4c3/+Wf8Lf+js/u/YPL/d/61/x3/9Qfe/d//H5/0b/6B/4n/87//L/973/gv/Hb/ZKTX/Ef/zWfP/zr/pqf/O4//eWv9fm/+snf+eB7v80v+R3+kP9m8sf+H//KX/nuN/2N/7Xf7lt/2F/6f/8Of9d/++f+xD968fLHfqO/9J/8g//4P378a/9Wv99f9r/9Jr/8d5v9T9Vn//T/A/h89xASAQAA";
         string _serialNumber;
@@ -272,517 +277,527 @@ namespace PingCastle
             return IPGlobalProperties.GetIPGlobalProperties().DomainName;
         }
 
-        // parse command line arguments
-        private bool ParseCommandLine(string[] args)
-        {
-            string user = null;
-            string userdomain = null;
-            string password = null;
-            bool delayedInteractiveMode = false;
-            if (args.Length == 0)
-            {
-                if (!RunInteractiveMode())
-                    return false;
-            }
-            else
-            {
-                Trace.WriteLine("Before parsing arguments");
-                for (int i = 0; i < args.Length; i++)
-                {
-                    switch (args[i])
-                    {
-                        case "--api-endpoint":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --api-endpoint is mandatory");
-                                return false;
-                            }
-                            tasks.apiEndpoint = args[++i];
-                            {
-                                Uri res;
-                                if (!Uri.TryCreate(tasks.apiEndpoint, UriKind.Absolute, out res))
-                                {
-                                    WriteInRed("unable to convert api-endpoint into an URI");
-                                    return false;
-                                }
-                            }
-                            break;
-                        case "--api-key":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --api-key is mandatory");
-                                return false;
-                            }
-                            tasks.apiKey = args[++i];
-                            break;
-                        case "--bot":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --bot is mandatory");
-                                return false;
-                            }
-                            tasks.botPipe = args[++i];
-                            PerformBot = true;
-                            break;
-                        case "--carto":
-                            PerformCarto = true;
-                            break;
-                        case "--center-on":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --center-on is mandatory");
-                                return false;
-                            }
-                            tasks.CenterDomainForSimpliedGraph = args[++i];
-                            break;
-                        case "--debug-license":
-                            break;
-                        case "--demo-reports":
-                            PerformHealthCheckGenerateDemoReports = true;
-                            break;
-                        case "--encrypt":
-                            tasks.EncryptReport = true;
-                            break;
-                        case "--foreigndomain":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --foreigndomain is mandatory");
-                                return false;
-                            }
-                            ForeignUsersScanner.EnumInboundSid = args[++i];
-                            break;
-                        case "--explore-trust":
-                            tasks.ExploreTerminalDomains = true;
-                            break;
-                        case "--explore-forest-trust":
-                            tasks.ExploreForestTrust = true;
-                            break;
-                        case "--explore-exception":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --explore-exception is mandatory");
-                                return false;
-                            }
-                            tasks.DomainToNotExplore = new List<string>(args[++i].Split(','));
-                            break;
-                        case "--filter-date":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --filter-date is mandatory");
-                                return false;
-                            }
-                            if (!DateTime.TryParse(args[++i], out tasks.FilterReportDate))
-                            {
-                                WriteInRed("Unable to parse the date \"" + args[i] + "\" - try entering 2016-01-01");
-                                return false;
-                            }
-                            break;
-                        case "--regen-report":
-                            PerformRegenerateReport = true;
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --regen-report is mandatory");
-                                return false;
-                            }
-                            tasks.FileOrDirectory = args[++i];
-                            break;
-                        case "--generate-fake-reports":
-                            PerformGenerateFakeReport = true;
-                            break;
-                        case "--generate-key":
-                            PerformGenerateKey = true;
-                            break;
-                        case "--healthcheck":
-                            PerformHealthCheckReport = true;
-                            break;
-                        case "--hc-conso":
-                            PerformHealthCheckConsolidation = true;
-                            break;
-                        case "--help":
-                            DisplayHelp();
-                            return false;
-                        case "--I-swear-I-paid-win7-support":
-                            Healthcheck.Rules.HeatlcheckRuleStaledObsoleteWin7.IPaidSupport = true;
-                            break;
-                        case "--interactive":
-                            delayedInteractiveMode = true;
-                            break;
-                        case "--level":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --level is mandatory");
-                                return false;
-                            }
-                            try
-                            {
-                                tasks.ExportLevel = (PingCastleReportDataExportLevel)Enum.Parse(typeof(PingCastleReportDataExportLevel), args[++i]);
-                            }
-                            catch (Exception)
-                            {
-                                WriteInRed("Unable to parse the level [" + args[i] + "] to one of the predefined value (" + String.Join(",", Enum.GetNames(typeof(PingCastleReportDataExportLevel))) + ")");
-                                return false;
-                            }
-                            break;
-                        case "--license":
-                            i++;
-                            break;
-                        case "--log":
-                            EnableLogFile();
-                            break;
-                        case "--log-console":
-                            EnableLogConsole();
-                            break;
-                        case "--log-samba":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for -log-samba is mandatory");
-                                return false;
-                            }
-                            LinuxSidResolver.LogLevel = args[++i];
-                            break;
-                        case "--max-nodes":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --max-nodes is mandatory");
-                                return false;
-                            }
-                            {
-                                int maxNodes;
-                                if (!int.TryParse(args[++i], out maxNodes))
-                                {
-                                    WriteInRed("argument for --max-nodes is not a valid value (typically: 1000)");
-                                    return false;
-                                }
-                                ReportGenerator.MaxNodes = maxNodes;
-                            }
-                            break;
-                        case "--max-depth":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --max-depth is mandatory");
-                                return false;
-                            }
-                            {
-                                int maxDepth;
-                                if (!int.TryParse(args[++i], out maxDepth))
-                                {
-                                    WriteInRed("argument for --max-depth is not a valid value (typically: 30)");
-                                    return false;
-                                }
-                                ReportGenerator.MaxDepth = maxDepth;
-                            }
-                            break;
-                        case "--no-enum-limit":
-                            ReportHealthCheckSingle.MaxNumberUsersInHtmlReport = int.MaxValue;
-                            break;
-                        case "--node":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --node is mandatory");
-                                return false;
-                            }
-                            tasks.NodesToInvestigate = new List<string>(Regex.Split(args[++i], @"(?<!(?<!\\)*\\)\,"));
-                            break;
-                        case "--nodes":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --nodes is mandatory");
-                                return false;
-                            }
-                            tasks.NodesToInvestigate = new List<string>(File.ReadAllLines(args[++i]));
-                            break;
-                        case "--notifyMail":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --notifyMail is mandatory");
-                                return false;
-                            }
-                            tasks.mailNotification = args[++i];
-                            break;
-                        case "--nslimit":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --nslimit is mandatory");
-                                return false;
-                            }
-                            if (!int.TryParse(args[++i], out NullSessionScanner.NullSessionEnumerationLimit))
-                            {
-                                WriteInRed("argument for --nslimit is not a valid value (typically: 5)");
-                                return false;
-                            }
-                            break;
-                        case "--password":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --password is mandatory");
-                                return false;
-                            }
-                            password = args[++i];
-                            break;
-                        case "--port":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --port is mandatory");
-                                return false;
-                            }
-                            if (!int.TryParse(args[++i], out tasks.Port))
-                            {
-                                WriteInRed("argument for --port is not a valid value (typically: 9389)");
-                                return false;
-                            }
-                            break;
-                        case "--protocol":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --protocol is mandatory");
-                                return false;
-                            }
-                            try
-                            {
-                                ADWebService.ConnectionType = (ADConnectionType)Enum.Parse(typeof(ADConnectionType), args[++i]);
-                            }
-                            catch (Exception ex)
-                            {
-                                Trace.WriteLine(ex.Message);
-                                WriteInRed("Unable to parse the protocol [" + args[i] + "] to one of the predefined value (" + String.Join(",", Enum.GetNames(typeof(ADConnectionType))) + ")");
-                                return false;
-                            }
-                            break;
-                        case "--reachable":
-                            tasks.AnalyzeReachableDomains = true;
-                            break;
-                        case "--rules":
-                            PerformHCRules = true;
-                            break;
-                        case "--scanner":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --scanner is mandatory");
-                                return false;
-                            }
-                            {
-                                var scanners = PingCastleFactory.GetAllScanners();
-                                string scannername = args[++i];
-                                if (!scanners.ContainsKey(scannername))
-                                {
-                                    string list = null;
-                                    var allscanners = new List<string>(scanners.Keys);
-                                    allscanners.Sort();
-                                    foreach (string name in allscanners)
-                                    {
-                                        if (list != null)
-                                            list += ",";
-                                        list += name;
-                                    }
-                                    WriteInRed("Unsupported scannername - available scanners are:" + list);
-                                }
-                                tasks.Scanner = scanners[scannername];
-                                PerformScanner = true;
-                            }
-                            break;
-                        case "--scmode-single":
-                            ScannerBase.ScanningMode = 2;
-                            break;
-                        case "--scmode-workstation":
-                            ScannerBase.ScanningMode = 3;
-                            break;
-                        case "--scmode-server":
-                            ScannerBase.ScanningMode = 4;
-                            break;
-                        case "--scmode-dc":
-                            ScannerBase.ScanningMode = 5;
-                            break;
-                        case "--sendxmlTo":
-                        case "--sendXmlTo":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --sendXmlTo is mandatory");
-                                return false;
-                            }
-                            tasks.sendXmlTo = args[++i];
-                            break;
-                        case "--sendhtmlto":
-                        case "--sendHtmlTo":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --sendHtmlTo is mandatory");
-                                return false;
-                            }
-                            tasks.sendHtmlTo = args[++i];
-                            break;
-                        case "--sendallto":
-                        case "--sendAllTo":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --sendAllTo is mandatory");
-                                return false;
-                            }
-                            tasks.sendAllTo = args[++i];
-                            break;
-                        case "--server":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --server is mandatory");
-                                return false;
-                            }
-                            tasks.Server = args[++i];
-                            break;
-                        case "--skip-null-session":
-                            HealthcheckAnalyzer.SkipNullSession = true;
-                            break;
-                        case "--reload-report":
-                        case "--slim-report":
-                            PerformHealthCheckReloadReport = true;
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --slim-report is mandatory");
-                                return false;
-                            }
-                            tasks.FileOrDirectory = args[++i];
-                            break;
-                        case "--smtplogin":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --smtplogin is mandatory");
-                                return false;
-                            }
-                            tasks.smtpLogin = args[++i];
-                            break;
-                        case "--smtppass":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --smtppass is mandatory");
-                                return false;
-                            }
-                            tasks.smtpPassword = args[++i];
-                            break;
-                        case "--smtptls":
-                            tasks.smtpTls = true;
-                            break;
-                        case "--upload-all-reports":
-                            PerformUploadAllReport = true;
-                            break;
-                        case "--user":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --user is mandatory");
-                                return false;
-                            }
-                            i++;
-                            if (args[i].Contains("\\"))
-                            {
-                                int pos = args[i].IndexOf('\\');
-                                userdomain = args[i].Substring(0, pos);
-                                user = args[i].Substring(pos + 1);
-                            }
-                            else
-                            {
-                                user = args[i];
-                            }
-                            break;
-                        case "--webdirectory":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --webdirectory is mandatory");
-                                return false;
-                            }
-                            tasks.sharepointdirectory = args[++i];
-                            break;
-                        case "--webuser":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --webuser is mandatory");
-                                return false;
-                            }
-                            tasks.sharepointuser = args[++i];
-                            break;
-                        case "--webpassword":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --webpassword is mandatory");
-                                return false;
-                            }
-                            tasks.sharepointpassword = args[++i];
-                            break;
-                        case "--xmls":
-                            if (i + 1 >= args.Length)
-                            {
-                                WriteInRed("argument for --xmls is mandatory");
-                                return false;
-                            }
-                            tasks.FileOrDirectory = args[++i];
-                            break;
-                        default:
-                            WriteInRed("unknow argument: " + args[i]);
-                            DisplayHelp();
-                            return false;
-                    }
-                }
-                Trace.WriteLine("After parsing arguments");
-            }
-            if (!PerformHealthCheckReport && !PerformHealthCheckConsolidation
-                && !PerformRegenerateReport && !PerformHealthCheckReloadReport && !delayedInteractiveMode
-                && !PerformScanner
-                && !PerformGenerateKey && !PerformHealthCheckGenerateDemoReports && !PerformCarto
-                && !PerformUploadAllReport
-                && !PerformHCRules
-                && !PerformGenerateFakeReport
-                && !PerformBot)
-            {
-                WriteInRed("You must choose at least one value among --healthcheck --hc-conso --advanced-export --advanced-report --nullsession --carto");
-                DisplayHelp();
-                return false;
-            }
-            Trace.WriteLine("Things to do OK");
-            if (delayedInteractiveMode)
-            {
-                RunInteractiveMode();
-            }
-            if (PerformHealthCheckReport || PerformScanner)
-            {
-                if (String.IsNullOrEmpty(tasks.Server))
-                {
-                    tasks.Server = GetCurrentDomain();
-                    if (String.IsNullOrEmpty(tasks.Server))
-                    {
-                        WriteInRed("This computer is not connected to a domain. The program couldn't guess the domain or server to connect.");
-                        WriteInRed("Please run again this program with the flag --server <my.domain.com> or --server <mydomaincontroller.my.domain.com>");
-                        DisplayHelp();
-                        return false;
-                    }
-                }
-                if (user != null)
-                {
-                    if (password == null)
-                        password = AskCredential();
-                    if (String.IsNullOrEmpty(userdomain))
-                    {
-                        tasks.Credential = new NetworkCredential(user, password);
-                    }
-                    else
-                    {
-                        tasks.Credential = new NetworkCredential(user, password, userdomain);
-                    }
-                }
-            }
-            if (PerformHealthCheckConsolidation)
-            {
-                if (String.IsNullOrEmpty(tasks.FileOrDirectory))
-                {
-                    tasks.FileOrDirectory = Directory.GetCurrentDirectory();
-                }
-                else
-                {
-                    if (!Directory.Exists(tasks.FileOrDirectory))
-                    {
-                        WriteInRed("The path specified by --xmls isn't a directory");
-                        DisplayHelp();
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
+		// parse command line arguments
+		private bool ParseCommandLine(string[] args)
+		{
+			string user = null;
+			string userdomain = null;
+			string password = null;
+			bool delayedInteractiveMode = false;
+			if (args.Length == 0)
+			{
+				if (!RunInteractiveMode())
+					return false;
+			}
+			else
+			{
+				Trace.WriteLine("Before parsing arguments");
+				for (int i = 0; i < args.Length; i++)
+				{
+					switch (args[i])
+					{
+						case "--api-endpoint":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --api-endpoint is mandatory");
+								return false;
+							}
+							tasks.apiEndpoint = args[++i];
+							{
+								Uri res;
+								if (!Uri.TryCreate(tasks.apiEndpoint, UriKind.Absolute, out res))
+								{
+									WriteInRed("unable to convert api-endpoint into an URI");
+									return false;
+								}
+							}
+							break;
+						case "--api-key":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --api-key is mandatory");
+								return false;
+							}
+							tasks.apiKey = args[++i];
+							break;
+						case "--bot":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --bot is mandatory");
+								return false;
+							}
+							tasks.botPipe = args[++i];
+							PerformBot = true;
+							break;
+						case "--carto":
+							PerformCarto = true;
+							break;
+						case "--center-on":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --center-on is mandatory");
+								return false;
+							}
+							tasks.CenterDomainForSimpliedGraph = args[++i];
+							break;
+						case "--debug-license":
+							break;
+						case "--demo-reports":
+							PerformHealthCheckGenerateDemoReports = true;
+							break;
+						case "--encrypt":
+							tasks.EncryptReport = true;
+							break;
+						case "--foreigndomain":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --foreigndomain is mandatory");
+								return false;
+							}
+							ForeignUsersScanner.EnumInboundSid = args[++i];
+							break;
+						case "--explore-trust":
+							tasks.ExploreTerminalDomains = true;
+							break;
+						case "--explore-forest-trust":
+							tasks.ExploreForestTrust = true;
+							break;
+						case "--explore-exception":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --explore-exception is mandatory");
+								return false;
+							}
+							tasks.DomainToNotExplore = new List<string>(args[++i].Split(','));
+							break;
+						case "--filter-date":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --filter-date is mandatory");
+								return false;
+							}
+							if (!DateTime.TryParse(args[++i], out tasks.FilterReportDate))
+							{
+								WriteInRed("Unable to parse the date \"" + args[i] + "\" - try entering 2016-01-01");
+								return false;
+							}
+							break;
+						case "--regen-report":
+							PerformRegenerateReport = true;
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --regen-report is mandatory");
+								return false;
+							}
+							tasks.FileOrDirectory = args[++i];
+							break;
+						case "--advanced-regen-report":
+							PerformAdvancedRegenerateReport = true;
+							if (i + 2 >= args.Length)
+							{
+								WriteInRed("arguments for --advanced-regen-report is mandatory");
+								return false;
+							}
+							tasks.FileOrDirectory = args[++i];
+							tasks.CustomConfigFileOrDirectory = args[++i]; // need to check maybe without +1
+							break;
+						case "--generate-fake-reports":
+							PerformGenerateFakeReport = true;
+							break;
+						case "--generate-key":
+							PerformGenerateKey = true;
+							break;
+						case "--healthcheck":
+							PerformHealthCheckReport = true;
+							break;
+						case "--hc-conso":
+							PerformHealthCheckConsolidation = true;
+							break;
+						case "--help":
+							DisplayHelp();
+							return false;
+						case "--I-swear-I-paid-win7-support":
+							Healthcheck.Rules.HeatlcheckRuleStaledObsoleteWin7.IPaidSupport = true;
+							break;
+						case "--interactive":
+							delayedInteractiveMode = true;
+							break;
+						case "--level":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --level is mandatory");
+								return false;
+							}
+							try
+							{
+								tasks.ExportLevel = (PingCastleReportDataExportLevel)Enum.Parse(typeof(PingCastleReportDataExportLevel), args[++i]);
+							}
+							catch (Exception)
+							{
+								WriteInRed("Unable to parse the level [" + args[i] + "] to one of the predefined value (" + String.Join(",", Enum.GetNames(typeof(PingCastleReportDataExportLevel))) + ")");
+								return false;
+							}
+							break;
+						case "--license":
+							i++;
+							break;
+						case "--log":
+							EnableLogFile();
+							break;
+						case "--log-console":
+							EnableLogConsole();
+							break;
+						case "--log-samba":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for -log-samba is mandatory");
+								return false;
+							}
+							LinuxSidResolver.LogLevel = args[++i];
+							break;
+						case "--max-nodes":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --max-nodes is mandatory");
+								return false;
+							}
+							{
+								int maxNodes;
+								if (!int.TryParse(args[++i], out maxNodes))
+								{
+									WriteInRed("argument for --max-nodes is not a valid value (typically: 1000)");
+									return false;
+								}
+								ReportGenerator.MaxNodes = maxNodes;
+							}
+							break;
+						case "--max-depth":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --max-depth is mandatory");
+								return false;
+							}
+							{
+								int maxDepth;
+								if (!int.TryParse(args[++i], out maxDepth))
+								{
+									WriteInRed("argument for --max-depth is not a valid value (typically: 30)");
+									return false;
+								}
+								ReportGenerator.MaxDepth = maxDepth;
+							}
+							break;
+						case "--no-enum-limit":
+							ReportHealthCheckSingle.MaxNumberUsersInHtmlReport = int.MaxValue;
+							break;
+						case "--node":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --node is mandatory");
+								return false;
+							}
+							tasks.NodesToInvestigate = new List<string>(Regex.Split(args[++i], @"(?<!(?<!\\)*\\)\,"));
+							break;
+						case "--nodes":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --nodes is mandatory");
+								return false;
+							}
+							tasks.NodesToInvestigate = new List<string>(File.ReadAllLines(args[++i]));
+							break;
+						case "--notifyMail":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --notifyMail is mandatory");
+								return false;
+							}
+							tasks.mailNotification = args[++i];
+							break;
+						case "--nslimit":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --nslimit is mandatory");
+								return false;
+							}
+							if (!int.TryParse(args[++i], out NullSessionScanner.NullSessionEnumerationLimit))
+							{
+								WriteInRed("argument for --nslimit is not a valid value (typically: 5)");
+								return false;
+							}
+							break;
+						case "--password":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --password is mandatory");
+								return false;
+							}
+							password = args[++i];
+							break;
+						case "--port":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --port is mandatory");
+								return false;
+							}
+							if (!int.TryParse(args[++i], out tasks.Port))
+							{
+								WriteInRed("argument for --port is not a valid value (typically: 9389)");
+								return false;
+							}
+							break;
+						case "--protocol":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --protocol is mandatory");
+								return false;
+							}
+							try
+							{
+								ADWebService.ConnectionType = (ADConnectionType)Enum.Parse(typeof(ADConnectionType), args[++i]);
+							}
+							catch (Exception ex)
+							{
+								Trace.WriteLine(ex.Message);
+								WriteInRed("Unable to parse the protocol [" + args[i] + "] to one of the predefined value (" + String.Join(",", Enum.GetNames(typeof(ADConnectionType))) + ")");
+								return false;
+							}
+							break;
+						case "--reachable":
+							tasks.AnalyzeReachableDomains = true;
+							break;
+						case "--rules":
+							PerformHCRules = true;
+							break;
+						case "--scanner":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --scanner is mandatory");
+								return false;
+							}
+							{
+								var scanners = PingCastleFactory.GetAllScanners();
+								string scannername = args[++i];
+								if (!scanners.ContainsKey(scannername))
+								{
+									string list = null;
+									var allscanners = new List<string>(scanners.Keys);
+									allscanners.Sort();
+									foreach (string name in allscanners)
+									{
+										if (list != null)
+											list += ",";
+										list += name;
+									}
+									WriteInRed("Unsupported scannername - available scanners are:" + list);
+								}
+								tasks.Scanner = scanners[scannername];
+								PerformScanner = true;
+							}
+							break;
+						case "--scmode-single":
+							ScannerBase.ScanningMode = 2;
+							break;
+						case "--sendxmlTo":
+						case "--sendXmlTo":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --sendXmlTo is mandatory");
+								return false;
+							}
+							tasks.sendXmlTo = args[++i];
+							break;
+						case "--sendhtmlto":
+						case "--sendHtmlTo":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --sendHtmlTo is mandatory");
+								return false;
+							}
+							tasks.sendHtmlTo = args[++i];
+							break;
+						case "--sendallto":
+						case "--sendAllTo":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --sendAllTo is mandatory");
+								return false;
+							}
+							tasks.sendAllTo = args[++i];
+							break;
+						case "--server":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --server is mandatory");
+								return false;
+							}
+							tasks.Server = args[++i];
+							break;
+						case "--skip-null-session":
+							HealthcheckAnalyzer.SkipNullSession = true;
+							break;
+						case "--reload-report":
+						case "--slim-report":
+							PerformHealthCheckReloadReport = true;
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --slim-report is mandatory");
+								return false;
+							}
+							tasks.FileOrDirectory = args[++i];
+							break;
+						case "--smtplogin":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --smtplogin is mandatory");
+								return false;
+							}
+							tasks.smtpLogin = args[++i];
+							break;
+						case "--smtppass":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --smtppass is mandatory");
+								return false;
+							}
+							tasks.smtpPassword = args[++i];
+							break;
+						case "--smtptls":
+							tasks.smtpTls = true;
+							break;
+						case "--upload-all-reports":
+							PerformUploadAllReport = true;
+							break;
+						case "--user":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --user is mandatory");
+								return false;
+							}
+							i++;
+							if (args[i].Contains("\\"))
+							{
+								int pos = args[i].IndexOf('\\');
+								userdomain = args[i].Substring(0, pos);
+								user = args[i].Substring(pos + 1);
+							}
+							else
+							{
+								user = args[i];
+							}
+							break;
+						case "--webdirectory":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --webdirectory is mandatory");
+								return false;
+							}
+							tasks.sharepointdirectory = args[++i];
+							break;
+						case "--webuser":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --webuser is mandatory");
+								return false;
+							}
+							tasks.sharepointuser = args[++i];
+							break;
+						case "--webpassword":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --webpassword is mandatory");
+								return false;
+							}
+							tasks.sharepointpassword = args[++i];
+							break;
+						case "--xmls":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --xmls is mandatory");
+								return false;
+							}
+							tasks.FileOrDirectory = args[++i];
+							break;
+						default:
+							WriteInRed("unknow argument: " + args[i]);
+							DisplayHelp();
+							return false;
+					}
+				}
+				Trace.WriteLine("After parsing arguments");
+			}
+			if (!PerformHealthCheckReport && !PerformHealthCheckConsolidation
+				&& !PerformRegenerateReport && !PerformAdvancedRegenerateReport && !PerformHealthCheckReloadReport && !delayedInteractiveMode
+				&& !PerformScanner
+				&& !PerformGenerateKey && !PerformHealthCheckGenerateDemoReports && !PerformCarto
+				&& !PerformUploadAllReport
+				&& !PerformHCRules
+				&& !PerformGenerateFakeReport
+				&& !PerformBot)
+			{
+				WriteInRed("You must choose at least one value among --healthcheck --hc-conso --advanced-export --advanced-report --nullsession --carto");
+				DisplayHelp();
+				return false;
+			}
+			Trace.WriteLine("Things to do OK");
+			if (delayedInteractiveMode)
+			{
+				RunInteractiveMode();
+			}
+			if (PerformHealthCheckReport || PerformScanner)
+			{
+				if (String.IsNullOrEmpty(tasks.Server))
+				{
+					tasks.Server = GetCurrentDomain();
+					if (String.IsNullOrEmpty(tasks.Server))
+					{
+						WriteInRed("This computer is not connected to a domain. The program couldn't guess the domain or server to connect.");
+						WriteInRed("Please run again this program with the flag --server <my.domain.com> or --server <mydomaincontroller.my.domain.com>");
+						DisplayHelp();
+						return false;
+					}
+				}
+				if (user != null)
+				{
+					if (password == null)
+						password = AskCredential();
+					if (String.IsNullOrEmpty(userdomain))
+					{
+						tasks.Credential = new NetworkCredential(user, password);
+					}
+					else
+					{
+						tasks.Credential = new NetworkCredential(user, password, userdomain);
+					}
+				}
+			}
+			if (PerformHealthCheckConsolidation)
+			{
+				if (String.IsNullOrEmpty(tasks.FileOrDirectory))
+				{
+					tasks.FileOrDirectory = Directory.GetCurrentDirectory();
+				}
+				else
+				{
+					if (!Directory.Exists(tasks.FileOrDirectory))
+					{
+						WriteInRed("The path specified by --xmls isn't a directory");
+						DisplayHelp();
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+					{
+						WriteInRed("The path specified by --xmls isn't a directory");
+						DisplayHelp();
+						return false;
+					}
+				}
+			}
+			return true;
+		}
 
         private void EnableLogFile()
         {
@@ -939,65 +954,70 @@ namespace PingCastle
                 if (String.IsNullOrEmpty(tasks.Server))
                 {
                     tasks.Server = defaultDomain;
-                }
-                if (!String.IsNullOrEmpty(tasks.Server))
-                {
-                    break;
-                }
-            }
+		DisplayState DisplayAdvancedMenu()
+		{
+			PerformGenerateKey = false;
+			PerformHealthCheckReloadReport = false;
+			PerformRegenerateReport = false;
+			PerformAdvancedRegenerateReport = false;
+			PerformHCRules = false;
             return DisplayState.Run;
-        }
-
-        DisplayState DisplayAdvancedMenu()
-        {
-            PerformGenerateKey = false;
-            PerformHealthCheckReloadReport = false;
-            PerformRegenerateReport = false;
-            PerformHCRules = false;
-
-            List<ConsoleMenuItem> choices = new List<ConsoleMenuItem>() {
-                new ConsoleMenuItem("protocol","Change the protocol used to query the AD (LDAP, ADWS, ...)"),
-                new ConsoleMenuItem("hcrules","Generate a report containing all rules applied by PingCastle"),
-                new ConsoleMenuItem("generatekey","Generate RSA keys used to encrypt and decrypt reports"),
-                new ConsoleMenuItem("noenumlimit","Remove the 100 items limitation in healthcheck reports"),
-                new ConsoleMenuItem("decrypt","Decrypt a xml report"),
-                new ConsoleMenuItem("regenerate","Regenerate the html report based on the xml report"),
-                new ConsoleMenuItem("log","Enable logging (log is " + (Trace.Listeners.Count > 1 ? "enabled":"disabled") + ")"),
-            };
-
-            ConsoleMenu.Title = "What do you want to do?";
-            int choice = ConsoleMenu.SelectMenu(choices);
-            if (choice == 0)
-                return DisplayState.Exit;
-
-            string whattodo = choices[choice - 1].Choice;
-            switch (whattodo)
-            {
-                default:
-                case "protocol":
-                    return DisplayState.ProtocolMenu;
-                case "hcrules":
-                    PerformHCRules = true;
-                    return DisplayState.Run;
-                case "generatekey":
-                    PerformGenerateKey = true;
-                    return DisplayState.Run;
-                case "decrypt":
-                    PerformHealthCheckReloadReport = true;
-                    return DisplayState.AskForFile;
-                case "regenerate":
-                    PerformRegenerateReport = true;
-                    return DisplayState.AskForFile;
-                case "log":
-                    if (Trace.Listeners.Count <= 1)
-                        EnableLogFile();
-                    return DisplayState.Exit;
-                case "noenumlimit":
-                    ReportHealthCheckSingle.MaxNumberUsersInHtmlReport = int.MaxValue;
-                    ConsoleMenu.Notice = "Limitation removed";
-                    return DisplayState.Exit;
-            }
-        }
+			List<ConsoleMenuItem> choices = new List<ConsoleMenuItem>() {
+				new ConsoleMenuItem("protocol","Change the protocol used to query the AD (LDAP, ADWS, ...)"),
+				new ConsoleMenuItem("hcrules","Generate a report containing all rules applied by PingCastle"),
+				new ConsoleMenuItem("generatekey","Generate RSA keys used to encrypt and decrypt reports"),
+				new ConsoleMenuItem("noenumlimit","Remove the 100 items limitation in healthcheck reports"),
+				new ConsoleMenuItem("decrypt","Decrypt a xml report"),
+				new ConsoleMenuItem("regenerate","Regenerate the html report based on the xml report"),
+				new ConsoleMenuItem("advanced regenerate","Advanced regenerate of the html report based on report and config xml files"),
+				new ConsoleMenuItem("log","Enable logging (log is " + (Trace.Listeners.Count > 1 ? "enabled":"disabled") + ")"),
+			};
+			List<ConsoleMenuItem> choices = new List<ConsoleMenuItem>() {
+				new ConsoleMenuItem("protocol","Change the protocol used to query the AD (LDAP, ADWS, ...)"),
+				new ConsoleMenuItem("hcrules","Generate a report containing all rules applied by PingCastle"),
+				new ConsoleMenuItem("generatekey","Generate RSA keys used to encrypt and decrypt reports"),
+				new ConsoleMenuItem("noenumlimit","Remove the 100 items limitation in healthcheck reports"),
+				new ConsoleMenuItem("decrypt","Decrypt a xml report"),
+			string whattodo = choices[choice - 1].Choice;
+			switch (whattodo)
+			{
+				default:
+				case "protocol":
+					return DisplayState.ProtocolMenu;
+				case "hcrules":
+					PerformHCRules = true;
+					return DisplayState.Run;
+				case "generatekey":
+					PerformGenerateKey = true;
+					return DisplayState.Run;
+				case "decrypt":
+					PerformHealthCheckReloadReport = true;
+					return DisplayState.AskForFile;
+				case "regenerate":
+					PerformRegenerateReport = true;
+					return DisplayState.AskForFile;
+				case "advanced regenerate":
+					PerformAdvancedRegenerateReport = true;
+					return DisplayState.AskForFile;
+				case "log":
+					if (Trace.Listeners.Count <= 1)
+						EnableLogFile();
+					return DisplayState.Exit;
+				case "noenumlimit":
+					ReportHealthCheckSingle.MaxNumberUsersInHtmlReport = int.MaxValue;
+					ConsoleMenu.Notice = "Limitation removed";
+					return DisplayState.Exit;
+			}
+		}
+					if (Trace.Listeners.Count <= 1)
+						EnableLogFile();
+					return DisplayState.Exit;
+				case "noenumlimit":
+					ReportHealthCheckSingle.MaxNumberUsersInHtmlReport = int.MaxValue;
+					ConsoleMenu.Notice = "Limitation removed";
+					return DisplayState.Exit;
+			}
+		}
 
         DisplayState DisplayProtocolMenu()
         {
@@ -1016,29 +1036,42 @@ namespace PingCastle
                 if (choices[i].Choice == ADWebService.ConnectionType.ToString())
                     defaultChoice = 1 + i;
             }
-            int choice = ConsoleMenu.SelectMenu(choices, defaultChoice);
-            if (choice == 0)
-                return DisplayState.Exit;
-
-            string whattodo = choices[choice - 1].Choice;
-            ADWebService.ConnectionType = (ADConnectionType)Enum.Parse(typeof(ADConnectionType), whattodo);
-            return DisplayState.Exit;
-        }
-
-        DisplayState DisplayAskForFile()
-        {
-            string file = null;
-            while (String.IsNullOrEmpty(file) || !File.Exists(file))
+		DisplayState DisplayAskForFile()
+		{
+			string file = null;
+			while (String.IsNullOrEmpty(file) || !File.Exists(file))
+			{
+				ConsoleMenu.Title = "Select an existing report";
+				ConsoleMenu.Information = "Please specify the report to open.";
+				file = ConsoleMenu.AskForString();
+				if(String.IsNullOrEmpty(file))
+					ConsoleMenu.Notice = "The file " + file + " was not found";
+			}
+			tasks.FileOrDirectory = file;
+			if (PerformAdvancedRegenerateReport)
             {
-                ConsoleMenu.Title = "Select an existing report";
-                ConsoleMenu.Information = "Please specify the report to open.";
-                file = ConsoleMenu.AskForString();
-                ConsoleMenu.Notice = "The file " + file + " was not found";
-            }
-            tasks.FileOrDirectory = file;
-            tasks.EncryptReport = false;
-            return DisplayState.Run;
-        }
+				file = null;
+				while (String.IsNullOrEmpty(file) || !File.Exists(file))
+				{
+					ConsoleMenu.Title = "Select a config xml file";
+					ConsoleMenu.Information = "Please specify the config to use.";
+					file = ConsoleMenu.AskForString();
+					ConsoleMenu.Notice = "The file " + file + " was not found";
+				}
+				tasks.CustomConfigFileOrDirectory = file;
+			}
+			tasks.EncryptReport = false;
+			return DisplayState.Run;
+		}
+				ConsoleMenu.Title = "Select an existing report";
+				ConsoleMenu.Information = "Please specify the report to open.";
+				file = ConsoleMenu.AskForString();
+				ConsoleMenu.Notice = "The file " + file + " was not found";
+			}
+			tasks.FileOrDirectory = file;
+			tasks.EncryptReport = false;
+			return DisplayState.Run;
+		}
 
         // interactive interface
         private bool RunInteractiveMode()
