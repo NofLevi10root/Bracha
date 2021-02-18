@@ -73,7 +73,7 @@ namespace PingCastle.Report
 			}
 			if(CustomData != null)
             {
-				numrules += CustomData.CountCategoryHealthRules(Enum.GetName(typeof(RiskRuleCategory), RiskRuleCategory));
+				numrules += CustomData.CountCategoryHealthRules(RiskRuleCategory.ToString());
             }
 			GenerateSubIndicator(category, globalScore, score, numrules, explanation);
 		}
@@ -201,7 +201,6 @@ namespace PingCastle.Report
 						string tooltip = "Rules: " + numrules + " Score: " + (numberOfDomain == 0? 100 : score / numberOfDomain);
 						string tooltipdetail = null;
 						string modelstring = ReportHelper.GetEnumDescription(model);
-						//Need to Implement A different Way Of Getting Descriptions For Custom Models
 						rulematched.Sort((HealthcheckRiskRule a, HealthcheckRiskRule b)
 							=>
 						{
@@ -281,11 +280,7 @@ namespace PingCastle.Report
 					int id = (1000 * j + i);
 					if (Enum.IsDefined(typeof(RiskModelCategory), id))
 					{
-						riskmodel[((RiskRuleCategory)j).ToString()].Add(new CustomRiskModelCategory()
-						{
-							Id = ((RiskModelCategory)id).ToString(),
-							Description = ReportHelper.GetEnumDescription((RiskModelCategory)id),
-						});
+						riskmodel[((RiskRuleCategory)j).ToString()].Add(new CustomRiskModelCategory((RiskModelCategory)id));
 					}
 					else
 						break;
@@ -315,21 +310,14 @@ namespace PingCastle.Report
 						CustomRiskModelCategory model = riskmodel[category][i];
 						int score = 0;
 						int numrules = 0;
-						List<CustomHealthCheckRiskRule> rulematched = new List<CustomHealthCheckRiskRule>();
+						List<HealthcheckRiskRule> rulematched = new List<HealthcheckRiskRule>();
 						foreach (HealthcheckRiskRule rule in rules)
 						{
 							if (rule.Model.ToString() == model.Id)
 							{
 								numrules++;
 								score += rule.Points;
-								rulematched.Add(new CustomHealthCheckRiskRule() 
-								{
-									Category = category,
-									Model = model.Id,
-									Points = rule.Points,
-									Rationale = rule.Rationale,
-									RiskId = rule.RiskId
-								});
+								rulematched.Add(rule);
 							}
 						}
 						foreach(var rule in CustomData.HealthRules)
@@ -338,7 +326,7 @@ namespace PingCastle.Report
                             {
 								numrules++;
 								score += rule.Points;
-								rulematched.Add(rule);
+								rulematched.Add(CustomHealthCheckRiskRule.ParseToHealthcheckRiskRule(rule));
 							}
 						}
 						string tdclass = "";
@@ -364,13 +352,13 @@ namespace PingCastle.Report
 						}
 						string tooltip = "Rules: " + numrules + " Score: " + (numberOfDomain == 0 ? 100 : score / numberOfDomain);
 						string tooltipdetail = null;
-						rulematched.Sort((CustomHealthCheckRiskRule a, CustomHealthCheckRiskRule b)
+						rulematched.Sort((HealthcheckRiskRule a, HealthcheckRiskRule b)
 							=> { return a.Points.CompareTo(b.Points); });
 
 						foreach (var rule in rulematched)
 						{
 							tooltipdetail += ReportHelper.Encode(rule.Rationale) + "<br>";
-							var hcrule = CustomRiskRule.GetFromRiskRule<T>(RuleSet<T>.GetRuleFromID(rule.RiskId));
+							var hcrule = CustomRiskRule.GetFromRiskRule(RuleSet<T>.GetRuleFromID(rule.RiskId));
 							if (hcrule == null)
 								hcrule = CustomData.GetRiskRule(rule.RiskId);
 							
@@ -414,9 +402,9 @@ namespace PingCastle.Report
 				<h2>");
 			Add(title);
 			Add(@" [");
-			Add(GetRulesNumberForCategory(rules, category).ToString());
+			Add((GetRulesNumberForCategory(rules, category) + (CustomData != null ? CustomData.CountCategoryHealthRules(category.ToString()) : 0)).ToString());
 			Add(@" rules matched on a total of ");
-			Add(GetApplicableRulesNumberForCategory(applicableRules, category).ToString());
+			Add((GetApplicableRulesNumberForCategory(applicableRules, category) + (CustomData != null ? CustomData.CountCategoryRiskRules(category.ToString()) : 0)).ToString());
 			Add(@"]</h2>
 			</a>
 		</div></div>
@@ -431,6 +419,17 @@ namespace PingCastle.Report
 				{
 					hasRule = true;
 					break;
+				}
+			}
+			if(hasRule == false && CustomData != null)
+            {
+				foreach (CustomHealthCheckRiskRule rule in CustomData.HealthRules)
+				{
+					if (rule.Category == category.ToString())
+					{
+						hasRule = true;
+						break;
+					}
 				}
 			}
 			if (hasRule)
@@ -448,7 +447,68 @@ namespace PingCastle.Report
 							if (rule.Category == category)
                                 GenerateIndicatorPanelDetail(category.ToString(), rule);
 						}
+						if(CustomData != null)
+                        {
+							foreach(var rule in CustomData.HealthRules)
+                            {
+								if (rule.Category == category.ToString())
+									GenerateIndicatorPanelDetail(rule.Category, CustomHealthCheckRiskRule.ParseToHealthcheckRiskRule(rule));
+                            }
+                        }
 					});
+			}
+			else
+			{
+				Add("<p>No rule matched</p>");
+			}
+			Add(@"
+			</div>
+		</div>");
+		}
+
+		protected void GenerateAdvancedIndicatorPanel(string id, string title, string category)
+		{
+			Add(@"
+		<div class=""row""><div class=""col-lg-12 mt-2"">
+			<a data-toggle=""collapse"" data-target=""#" + id + @""">
+				<h2>");
+			Add(title);
+			Add(@" [");
+			Add(CustomData.CountCategoryHealthRules(category));
+			Add(@" rules matched on a total of ");
+			Add(CustomData.CountCategoryRiskRules(category));
+			Add(@"]</h2>
+			</a>
+		</div></div>
+		<div class=""row collapse show"" id=""");
+			Add(id);
+			Add(@"""><div class=""col-lg-12"">
+");
+			bool hasRule = false;
+			foreach (CustomHealthCheckRiskRule rule in CustomData.HealthRules)
+			{
+				if (rule.Category == category)
+				{
+					hasRule = true;
+					break;
+				}
+			}
+			if (hasRule)
+			{
+				GenerateAccordion("rules" + category.ToString(), () =>
+				{
+					CustomData.HealthRules.Sort((CustomHealthCheckRiskRule a, CustomHealthCheckRiskRule b)
+						=>
+					{
+						return -a.Points.CompareTo(b.Points);
+					}
+					);
+					foreach (CustomHealthCheckRiskRule rule in CustomData.HealthRules)
+					{
+						if (rule.Category == category)
+							GenerateIndicatorPanelDetail(category, CustomHealthCheckRiskRule.ParseToHealthcheckRiskRule(rule));
+					}
+				});
 			}
 			else
 			{
@@ -503,7 +563,7 @@ namespace PingCastle.Report
 		protected void GenerateIndicatorPanelDetail(string category, HealthcheckRiskRule rule)
 		{
 			string safeRuleId = rule.RiskId.Replace("$", "dollar");
-			var hcrule = CustomRiskRule.GetFromRiskRule<T>(RuleSet<T>.GetRuleFromID(rule.RiskId));
+			var hcrule = CustomRiskRule.GetFromRiskRule(RuleSet<T>.GetRuleFromID(rule.RiskId));
 			if(CustomData != null && hcrule == null)
             {
 				hcrule = CustomData.GetRiskRule(rule.RiskId);
@@ -562,7 +622,13 @@ namespace PingCastle.Report
 								foreach(var token in tokens)
 								{
 									Add("<th>");
-									AddEncoded(token.Replace("Domain_controller:", "Domain controller:").Substring(0, token.Length - 1));
+									if(token == "Domain_controller:")
+										AddEncoded(token.Replace("Domain_controller:", "Domain controller:").Substring(0, token.Length - 1));
+									else
+                                    {
+										string parsedToken = token.Replace("#$%%$#", " ");
+										AddEncoded(parsedToken.Substring(0, parsedToken.Length - 1));
+									}
 									Add("</th>");
 								}
 								Add("</tr></thead><tbody>");

@@ -197,7 +197,6 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 				else
 					GenerateRiskModelPanel(Report.RiskRules);
 			});
-			//finshed to here
             GenerateSection("Maturity Level", GenerateMaturityInformation);
 			GenerateSection("Stale Objects", () =>
 			{
@@ -219,13 +218,17 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 				GenerateSubIndicator("Anomalies", Report.GlobalScore, Report.AnomalyScore, "It is about specific security control points");
 				GenerateIndicatorPanel("DetailAnomalies", "Anomalies rule details", RiskRuleCategory.Anomalies, Report.RiskRules, Report.applicableRules);
 			});
-			//Add Custom Risk Rule Categories As Sections
-			/*GenerateSection([Name], () =>
-			 * {
-			 *		GenerateSubIndicator([Name], Report.GlobalScore, [Score], [Explanation]);
-					GenerateIndicatorPanel([DetaildId], [Name + " rule details"], [CategoryReference], Report.RiskRules, Report.applicableRules);
-			 * });
-			 */
+			if(CustomData != null)
+            {
+				foreach (var category in CustomData.Categories)
+				{
+					GenerateSection(category.Name, () =>
+					{
+						GenerateSubIndicator(category.Name, Report.GlobalScore, category.Score, category.Explanation);
+						GenerateAdvancedIndicatorPanel("Detail" + category.Id, category.Name + "rule details", category.Id);
+					});
+				}
+			}
 			GenerateSection("Domain Information", GenerateDomainInformation);
 			GenerateSection("User Information", GenerateUserInformation);
 			GenerateSection("Computer Information", GenerateComputerInformation);
@@ -512,7 +515,8 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 		}
 
         private void AddPasswordDistributionChart(List<HealthcheckPwdDistributionData> input, string id, Dictionary<int, string> tooltips = null)
-        {
+        
+		{
             NumberFormatInfo nfi = new NumberFormatInfo();
             nfi.NumberDecimalSeparator = ".";
             var data = new SortedDictionary<int, int>();
