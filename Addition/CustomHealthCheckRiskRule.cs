@@ -34,7 +34,10 @@ namespace PingCastle.Addition
         public string Model { get; set; }
         public string RiskId { get; set; }
         public string Rationale { get; set; }
+        [XmlIgnore]
         public List<string> Details { get; set; }
+        [XmlElement("Details")]
+        public CustomRuleDetails RuleDetails { get; set; }
         #endregion
 
         #region Methods

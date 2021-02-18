@@ -108,6 +108,7 @@
     <Compile Include="Addition\CustomRiskRule.cs" />
     <Compile Include="Addition\CustomRiskRuleCategory.cs" />
     <Compile Include="Addition\CustomRuleComputation.cs" />
+    <Compile Include="Addition\CustomRuleDetails.cs" />
     <Compile Include="ADWS\IADConnection.cs" />
     <Compile Include="ADWS\LinuxConnection.cs" />
     <Compile Include="ADWS\LinuxFileConnection.cs" />

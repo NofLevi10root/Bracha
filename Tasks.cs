@@ -512,6 +512,7 @@ namespace PingCastle
 						var healthcheckData = DataHelper<HealthcheckData>.LoadXml(FileOrDirectory);
 						var customHealthCheckData = CustomHealthCheckData.LoadXML(CustomConfigFileOrDirectory);
 						customHealthCheckData.MergeData(healthcheckData);
+						customHealthCheckData.FillData(healthcheckData);
 						var endUserReportGenerator = PingCastleFactory.GetEndUserReportGenerator<HealthcheckData>();
 						endUserReportGenerator.GenerateReportFile(healthcheckData, License, healthcheckData.GetHumanReadableFileName(), customHealthCheckData);
 					}

@@ -9,7 +9,9 @@ namespace PingCastle.Addition
     public class CustomRiskRule
     {
         #region Properties
-        public string Id { get; set; } = "";
+        public string Id { get; set; }
+        public string Category { get; set; }
+        public string Model { get; set; }
         [XmlIgnore]
         public int Maturity { get; set; }
         [XmlElement(ElementName = "Maturity")]
@@ -37,7 +39,6 @@ namespace PingCastle.Addition
         public string Solution { get; set; }
         public string ReportLocation { get; set; }
         public string Documentation { get; set; }
-        public string DetailsPath { get; set; }
         public List<string> Details { get; set; }
 
         [XmlArray("RuleComputations")]
@@ -53,6 +54,8 @@ namespace PingCastle.Addition
             CustomRiskRule output = new CustomRiskRule()
             {
                 Id = rule.RiskId,
+                Category = rule.Category.ToString(),
+                Model = rule.Model.ToString(),
                 Description = rule.Description,
                 Details = rule.Details,
                 Documentation = rule.Documentation,

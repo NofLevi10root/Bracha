@@ -193,39 +193,48 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 				else
 					GenerateRiskModelPanel(Report.RiskRules);
 			});
-			//finshed to here
             GenerateSection("Maturity Level", GenerateMaturityInformation);
-
-            GenerateSection("Stale Objects", () =>
+			GenerateSection("Stale Objects", () =>
+			{
+				GenerateSubIndicator("Stale Objects", Report.GlobalScore, Report.StaleObjectsScore, "It is about operations related to user or computer objects");
+				GenerateIndicatorPanel("DetailStale", "Stale Objects rule details", RiskRuleCategory.StaleObjects, Report.RiskRules, Report.applicableRules);
+			});
+			GenerateSection("Privileged Accounts", () =>
+			{
+				GenerateSubIndicator("Privileged Accounts", Report.GlobalScore, Report.PrivilegiedGroupScore, "It is about administrators of the Active Directory");
+				GenerateIndicatorPanel("DetailPrivileged", "Privileged Accounts rule details", RiskRuleCategory.PrivilegedAccounts, Report.RiskRules, Report.applicableRules);
+			});
+			GenerateSection("Trusts", () =>
+			{
+				GenerateSubIndicator("Trusts", Report.GlobalScore, Report.TrustScore, "It is about operations related to user or computer objects");
+				GenerateIndicatorPanel("DetailTrusts", "Trusts rule details", RiskRuleCategory.Trusts, Report.RiskRules, Report.applicableRules);
+			});
+			GenerateSection("Anomalies analysis", () =>
+			{
+				GenerateSubIndicator("Anomalies", Report.GlobalScore, Report.AnomalyScore, "It is about specific security control points");
+				GenerateIndicatorPanel("DetailAnomalies", "Anomalies rule details", RiskRuleCategory.Anomalies, Report.RiskRules, Report.applicableRules);
+			});
+			if(CustomData != null)
             {
-                GenerateSubIndicator("Stale Objects", Report.GlobalScore, Report.StaleObjectsScore, "It is about operations related to user or computer objects");
-                GenerateIndicatorPanel("DetailStale", "Stale Objects rule details", RiskRuleCategory.StaleObjects, Report.RiskRules, Report.applicableRules);
-            });
-            GenerateSection("Privileged Accounts", () =>
-            {
-                GenerateSubIndicator("Privileged Accounts", Report.GlobalScore, Report.PrivilegiedGroupScore, "It is about administrators of the Active Directory");
-                GenerateIndicatorPanel("DetailPrivileged", "Privileged Accounts rule details", RiskRuleCategory.PrivilegedAccounts, Report.RiskRules, Report.applicableRules);
-            });
-            GenerateSection("Trusts", () =>
-            {
-                GenerateSubIndicator("Trusts", Report.GlobalScore, Report.TrustScore, "It is about links between two Active Directories");
-                GenerateIndicatorPanel("DetailTrusts", "Trusts rule details", RiskRuleCategory.Trusts, Report.RiskRules, Report.applicableRules);
-            });
-            GenerateSection("Anomalies analysis", () =>
-            {
-                GenerateSubIndicator("Anomalies", Report.GlobalScore, Report.AnomalyScore, "It is about specific security control points");
-                GenerateIndicatorPanel("DetailAnomalies", "Anomalies rule details", RiskRuleCategory.Anomalies, Report.RiskRules, Report.applicableRules);
-            });
-            GenerateSection("Domain Information", GenerateDomainInformation);
-            GenerateSection("User Information", GenerateUserInformation);
-            GenerateSection("Computer Information", GenerateComputerInformation);
-            GenerateSection("Admin Groups", GenerateAdminGroupsInformation);
-            GenerateSection("Control Paths Analysis", GenerateCompromissionGraphInformation);
-            GenerateSection("Trusts details", GenerateTrustInformation);
-            GenerateSection("Anomalies", GenerateAnomalyDetail);
-            GenerateSection("Password Policies", GeneratePasswordPoliciesDetail);
-            GenerateSection("GPO", GenerateGPODetail);
-        }
+				foreach (var category in CustomData.Categories)
+				{
+					GenerateSection(category.Name, () =>
+					{
+						GenerateSubIndicator(category.Name, Report.GlobalScore, category.Score, category.Explanation);
+						GenerateAdvancedIndicatorPanel("Detail" + category.Id, category.Name + "rule details", category.Id);
+					});
+				}
+			}
+			GenerateSection("Domain Information", GenerateDomainInformation);
+			GenerateSection("User Information", GenerateUserInformation);
+			GenerateSection("Computer Information", GenerateComputerInformation);
+			GenerateSection("Admin Groups", GenerateAdminGroupsInformation);
+			GenerateSection("Control Paths Analysis", GenerateCompromissionGraphInformation);
+			GenerateSection("Trusts details", GenerateTrustInformation);
+			GenerateSection("Anomalies", GenerateAnomalyDetail);
+			GenerateSection("Password Policies", GeneratePasswordPoliciesDetail);
+			GenerateSection("GPO", GenerateGPODetail);
+		}
 
         protected override void GenerateFooterInformation()
         {
@@ -508,7 +517,8 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
         }
 
         private void AddPasswordDistributionChart(List<HealthcheckPwdDistributionData> input, string id, Dictionary<int, string> tooltips = null)
-        {
+        
+		{
             NumberFormatInfo nfi = new NumberFormatInfo();
             nfi.NumberDecimalSeparator = ".";
             var data = new SortedDictionary<int, int>();

@@ -33,7 +33,8 @@ namespace PingCastle.Addition
         #endregion
 
         #region Fields
-        private Dictionary<string, int> dictCategories;
+        private readonly Dictionary<string, CustomRiskRuleCategory> dictCategories;
+        private readonly Dictionary<string, CustomRiskRule> dictRiskRules;
         #endregion
 
         #region Constructors
@@ -43,7 +44,10 @@ namespace PingCastle.Addition
             Models = new List<CustomRiskModelCategory>();
             RiskRules = new List<CustomRiskRule>();
             HealthRules = new List<CustomHealthCheckRiskRule>();
-            dictCategories = new Dictionary<string, int>();
+
+            dictCategories = new Dictionary<string, CustomRiskRuleCategory>();
+            dictRiskRules = new Dictionary<string, CustomRiskRule>();
+            
         }
         #endregion
 
@@ -85,6 +89,76 @@ namespace PingCastle.Addition
             }
             return xmlDoc;
         }
+
+        public void FillData(HealthcheckData healthData)
+        {
+            #region Add Categories To Dictionary
+            foreach (var category in Categories)
+            {
+                if (!dictCategories.ContainsKey(category.Id))
+                    dictCategories.Add(category.Id, category);
+            }
+            #endregion
+            #region Add Risk Rules To Dictinary
+            foreach (var riskRule in RiskRules)
+            {
+                if (!dictRiskRules.ContainsKey(riskRule.Id))
+                    dictRiskRules.Add(riskRule.Id, riskRule);
+            }
+            #endregion
+            #region Fill Health Risk Rules Data
+            foreach (var healthRule in HealthRules)
+            {
+                var rule = GetRiskRule(healthRule.RiskId);
+                if (rule != null)
+                {
+                    healthRule.Category = rule.Category;
+                    healthRule.Model = rule.Model;
+                    #region Get Details
+                    if (healthRule.RuleDetails != null)
+                    {
+                        healthRule.Details = healthRule.RuleDetails.ParseToDetails();
+                    }
+                    #endregion
+                    #region Add Point To Category
+                    if (Enum.IsDefined(typeof(RiskRuleCategory), healthRule.Category)) // add points
+                    {
+                        switch (healthRule.Category)
+                        {
+                            case "Anomalies":
+                                healthData.AnomalyScore = Math.Min(100, healthData.AnomalyScore + healthRule.Points);
+                                break;
+                            case "PrivilegedAccounts":
+                                healthData.PrivilegiedGroupScore = Math.Min(100, healthData.PrivilegiedGroupScore + healthRule.Points);
+                                break;
+                            case "StaleObjects":
+                                healthData.StaleObjectsScore = Math.Min(100, healthData.StaleObjectsScore + healthRule.Points);
+                                break;
+                            case "Trusts":
+                                healthData.TrustScore = Math.Min(100, healthData.TrustScore + healthRule.Points);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        var category = dictCategories[healthRule.Category];
+                        category.Score = Math.Min(100, category.Score + healthRule.Points);
+                    }
+                    #endregion
+                }
+            }
+            #endregion
+            #region Set Global Score
+            healthData.GlobalScore = Math.Max(healthData.AnomalyScore, healthData.PrivilegiedGroupScore);
+            healthData.GlobalScore = Math.Max(healthData.GlobalScore, healthData.StaleObjectsScore);
+            healthData.GlobalScore = Math.Max(healthData.GlobalScore, healthData.TrustScore);
+            foreach (var category in Categories)
+            {
+                healthData.GlobalScore = Math.Max(healthData.GlobalScore, category.Score);
+            }
+            #endregion
+
+        }
         public void MergeData(HealthcheckData healthData)
         {
             healthData.MaturityLevel = GetMaturityLevel(healthData.MaturityLevel);
@@ -101,16 +175,20 @@ namespace PingCastle.Addition
             return output;
         }
 
-        public CustomRiskRule GetRiskRule(string ruleId)
+        public int CountCategoryRiskRules(string category)
         {
+            int output = 0;
             foreach (var rule in RiskRules)
             {
-                if (rule.Id == ruleId)
-                {
-                    return rule;
-                }
+                if (rule.Category == category)
+                    output++;
             }
-            return null;
+            return output;
+        }
+
+        public CustomRiskRule GetRiskRule(string ruleId)
+        {
+            return dictRiskRules.ContainsKey(ruleId) ? dictRiskRules[ruleId] : null;
         }
 
         private int GetMaturityLevel(int oldMaturity)
