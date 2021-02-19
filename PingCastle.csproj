@@ -104,6 +104,7 @@
   <ItemGroup>
     <Compile Include="Addition\CustomHealthCheckData.cs" />
     <Compile Include="Addition\CustomHealthCheckRiskRule.cs" />
+    <Compile Include="Addition\CustomInformationSection.cs" />
     <Compile Include="Addition\CustomRiskModelCategory.cs" />
     <Compile Include="Addition\CustomRiskRule.cs" />
     <Compile Include="Addition\CustomRiskRuleCategory.cs" />

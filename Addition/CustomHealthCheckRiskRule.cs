@@ -36,18 +36,21 @@ namespace PingCastle.Addition
         public string Rationale { get; set; }
         [XmlIgnore]
         public List<string> Details { get; set; }
-        [XmlElement("Details")]
-        public CustomRuleDetails RuleDetails { get; set; }
+        [XmlArray("Details")]
+        [XmlArrayItem("Detail")]
+        public List<CustomRuleDetails> RuleDetails { get; set; } = new List<CustomRuleDetails>();
         #endregion
 
         #region Methods
         public static Healthcheck.HealthcheckRiskRule ParseToHealthcheckRiskRule(CustomHealthCheckRiskRule rule)
         {
-            Healthcheck.HealthcheckRiskRule output = new Healthcheck.HealthcheckRiskRule();
-            output.RiskId = rule.RiskId;
-            output.Points = rule.Points;
-            output.Rationale = rule.Rationale;
-            output.Details = rule.Details;
+            Healthcheck.HealthcheckRiskRule output = new Healthcheck.HealthcheckRiskRule
+            {
+                RiskId = rule.RiskId,
+                Points = rule.Points,
+                Rationale = rule.Rationale,
+                Details = rule.Details
+            };
             if (Enum.IsDefined(typeof(RiskRuleCategory), rule.Category))
                 output.Category = (RiskRuleCategory)Enum.Parse(typeof(RiskRuleCategory), rule.Category);
             if (Enum.IsDefined(typeof(RiskModelCategory), rule.Model))
