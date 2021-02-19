@@ -30,11 +30,20 @@ namespace PingCastle.Addition
         [XmlArray("HealthcheckRiskRules")]
         [XmlArrayItem(ElementName = "HealthcheckRiskRule")]
         public List<CustomHealthCheckRiskRule> HealthRules { get; set; }
+
+        [XmlArray("InformationSections")]
+        [XmlArrayItem(ElementName = "InformationSection")]
+        public List<CustomInformationSection> InformationSections { get; set; }
+
+        [XmlIgnore]
+        public Dictionary<string, List<List<string>>> DictCustomTables { get; set; } // [tableName/SectionName][rows][cols]
         #endregion
 
         #region Fields
+        private string dataDirectory;
         private readonly Dictionary<string, CustomRiskRuleCategory> dictCategories;
-        private readonly Dictionary<string, CustomRiskRule> dictRiskRules;
+        private readonly Dictionary<string, CustomRiskModelCategory> dictModels;
+        private readonly Dictionary<string, CustomRiskRule> dictRiskRules;       
         #endregion
 
         #region Constructors
@@ -46,8 +55,9 @@ namespace PingCastle.Addition
             HealthRules = new List<CustomHealthCheckRiskRule>();
 
             dictCategories = new Dictionary<string, CustomRiskRuleCategory>();
+            dictModels = new Dictionary<string, CustomRiskModelCategory>();
             dictRiskRules = new Dictionary<string, CustomRiskRule>();
-            
+            DictCustomTables = new Dictionary<string, List<List<string>>>();
         }
         #endregion
 
@@ -61,6 +71,7 @@ namespace PingCastle.Addition
                 XmlSerializer xs = new XmlSerializer(typeof(CustomHealthCheckData));
                 output = (CustomHealthCheckData)xs.Deserialize(new XmlNodeReader(xmlDoc));
             }
+            output.dataDirectory = Path.GetDirectoryName(filename);
             return output;
         }
 
@@ -99,11 +110,20 @@ namespace PingCastle.Addition
                     dictCategories.Add(category.Id, category);
             }
             #endregion
+            #region Add Models To Dictionary
+            foreach (var model in Models)
+            {
+                if (!dictModels.ContainsKey(model.Id))
+                    dictModels.Add(model.Id, model);
+            }
+            #endregion
             #region Add Risk Rules To Dictinary
             foreach (var riskRule in RiskRules)
             {
                 if (!dictRiskRules.ContainsKey(riskRule.Id))
                     dictRiskRules.Add(riskRule.Id, riskRule);
+                if (dictModels.ContainsKey(riskRule.Model))
+                    riskRule.Category = dictModels[riskRule.Model].RiskRuleCategoryId;
             }
             #endregion
             #region Fill Health Risk Rules Data
@@ -117,7 +137,28 @@ namespace PingCastle.Addition
                     #region Get Details
                     if (healthRule.RuleDetails != null)
                     {
-                        healthRule.Details = healthRule.RuleDetails.ParseToDetails();
+                        foreach(var detail in healthRule.RuleDetails)
+                        {
+                            if (detail.FilePath.StartsWith(@".\"))
+                                detail.FilePath = dataDirectory + "\\" + detail.FilePath.Substring(2);
+                            if(detail.Type == CustomDetailsType.List && (healthRule.Details == null || healthRule.Details.Count == 0))
+                            {
+                                healthRule.Details = detail.ParseToDetails();
+                            }
+                            else if(detail.Type == CustomDetailsType.Table)
+                            {
+                                healthRule.Details = detail.ParseToDetails();
+                            }
+                            else if(detail.Type == CustomDetailsType.SharedTable)
+                            {
+                                if (string.IsNullOrEmpty(detail.SectionId))
+                                    continue;
+                                if (!DictCustomTables.ContainsKey(detail.SectionId))
+                                    DictCustomTables.Add(detail.SectionId, new List<List<string>>());
+                                detail.AddSharedTableData(DictCustomTables[detail.SectionId]);
+                            }
+                        }
+                        
                     }
                     #endregion
                     #region Add Point To Category

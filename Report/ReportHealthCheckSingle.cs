@@ -234,6 +234,13 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 			GenerateSection("Anomalies", GenerateAnomalyDetail);
 			GenerateSection("Password Policies", GeneratePasswordPoliciesDetail);
 			GenerateSection("GPO", GenerateGPODetail);
+			if(CustomData != null)
+            {
+				foreach(var section in CustomData.InformationSections)
+                {
+					GenerateSection(section.Name, () =>  GenerateAdvancedCustomSection(section));
+                }
+            }
 		}
 
         protected override void GenerateFooterInformation()
@@ -846,67 +853,114 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             GenerateDCInformation();
         }
 
-        private void GenerateOperatingSystemList()
-        {
-            GenerateSubSection("Operating Systems", "operatingsystems");
-            bool oldOS = Report.version <= new Version(2, 5, 0, 0);
-            if (oldOS)
-            {
-                AddBeginTable("Operating System list");
-                AddHeaderText("Operating System");
-                AddHeaderText("Count");
-                AddBeginTableData();
-                Report.OperatingSystem.Sort(
-                    (HealthcheckOSData x, HealthcheckOSData y) =>
-                    {
-                        return OrderOS(x.OperatingSystem, y.OperatingSystem);
-                    }
-                    );
-                {
-                    foreach (HealthcheckOSData os in Report.OperatingSystem)
-                    {
-                        AddBeginRow();
-                        AddCellText(os.OperatingSystem);
-                        AddCellNum(os.NumberOfOccurence);
-                        AddEndRow();
-                    }
-                }
-                AddEndTable();
-            }
-            else
-            {
-                AddBeginTable("Operating System list");
-                AddHeaderText("Operating System");
-                AddHeaderText("Nb OS");
-                AddAccountCheckHeader(true);
-                AddBeginTableData();
+		private void GenerateOperatingSystemList()
+		{
+			GenerateSubSection("Operating Systems", "operatingsystems");
+			bool oldOS = Report.version <= new Version(2, 5, 0, 0);
+			if (oldOS)
+			{
+				AddBeginTable("Operating System list");
+				AddHeaderText("Operating System");
+				AddHeaderText("Count");
+				AddBeginTableData();
+				Report.OperatingSystem.Sort(
+					(HealthcheckOSData x, HealthcheckOSData y) =>
+					{
+						return OrderOS(x.OperatingSystem, y.OperatingSystem);
+					}
+					);
+				{
+					foreach (HealthcheckOSData os in Report.OperatingSystem)
+					{
+						AddBeginRow();
+						AddCellText(os.OperatingSystem);
+						AddCellNum(os.NumberOfOccurence);
+						AddEndRow();
+					}
+				}
+				AddEndTable();
+			}
+			else
+			{
+				AddBeginTable("Operating System list");
+				AddHeaderText("Operating System");
+				AddHeaderText("Nb OS");
+				AddAccountCheckHeader(true);
+				if (CustomData != null && CustomData.DictCustomTables.ContainsKey("operatingsystems")) // add custom cols
+				{
+					for (int i = 1; i < CustomData.DictCustomTables["operatingsystems"][0].Count; i++)
+					{
+						AddHeaderText(CustomData.DictCustomTables["operatingsystems"][0][i]);
+					}
+				}
+				AddBeginTableData();
 
-                Report.OperatingSystem.Sort(
-                    (HealthcheckOSData x, HealthcheckOSData y) =>
-                    {
-                        return OrderOS(x.OperatingSystem, y.OperatingSystem);
-                    }
-                    );
+				Report.OperatingSystem.Sort(
+					(HealthcheckOSData x, HealthcheckOSData y) =>
+					{
+						return OrderOS(x.OperatingSystem, y.OperatingSystem);
+					}
+					);
+				{
+					foreach (HealthcheckOSData os in Report.OperatingSystem)
+					{
+						AddBeginRow();
+						AddCellText(os.OperatingSystem);
+						AddCellNum(os.data.Number);
+						AddCellNum(os.data.NumberEnabled);
+						AddCellNum(os.data.NumberDisabled);
+						AddCellNum(os.data.NumberActive);
+						AddCellNum(os.data.NumberInactive);
+						AddCellNum(os.data.NumberSidHistory);
+						AddCellNum(os.data.NumberBadPrimaryGroup);
+						AddCellNum(os.data.NumberTrustedToAuthenticateForDelegation);
+						AddCellNum(os.data.NumberReversibleEncryption);
+						if (CustomData != null && CustomData.DictCustomTables.ContainsKey("operatingsystems")) 
+						{
+							for (int row = 1; row < CustomData.DictCustomTables["operatingsystems"].Count; row++) // find key (Correct row)
+							{
+								if(os.OperatingSystem == CustomData.DictCustomTables["operatingsystems"][row][0])
+                                {
+									for (int col = 1; col < CustomData.DictCustomTables["operatingsystems"][0].Count; col++)
+									{
+										AddCellText(CustomData.DictCustomTables["operatingsystems"][row][col]);
+									}
+								}
+							}
+						}
+						AddEndRow();
+					}
+				}
+				AddEndTable();
+			}
+		}
+		private void GenerateAdvancedCustomSection(CustomInformationSection section)
+        {
+			AddParagraph(section.Explanation);
+			
+			if(CustomData.DictCustomTables.ContainsKey(section.Id) && CustomData.DictCustomTables[section.Id].Count > 0)//Add Table
+			{
+				var tableData = CustomData.DictCustomTables[section.Id];
+				AddBeginTable();
+
+				foreach(var header in tableData[0])
                 {
-                    foreach (HealthcheckOSData os in Report.OperatingSystem)
+					AddHeaderText(header);
+				}
+				AddBeginTableData();
+
+				for (int row = 1; row < tableData.Count; row++)
+                {
+					AddBeginRow();
+					for (int col = 0; col < tableData[row].Count; col++)
                     {
-                        AddBeginRow();
-                        AddCellText(os.OperatingSystem);
-                        AddCellNum(os.data.Number);
-                        AddCellNum(os.data.NumberEnabled);
-                        AddCellNum(os.data.NumberDisabled);
-                        AddCellNum(os.data.NumberActive);
-                        AddCellNum(os.data.NumberInactive);
-                        AddCellNum(os.data.NumberSidHistory);
-                        AddCellNum(os.data.NumberBadPrimaryGroup);
-                        AddCellNum(os.data.NumberTrustedToAuthenticateForDelegation);
-                        AddCellNum(os.data.NumberReversibleEncryption);
-                        AddEndRow();
-                    }
-                }
-                AddEndTable();
-            }
-        }
+						AddCellText(tableData[row][col]);
+					}
+					AddEndRow();
+				}
+				AddEndTable();
+			}	
+		}
 
         private void GenerateDCInformation()
         {
