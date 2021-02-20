@@ -37,7 +37,10 @@ namespace PingCastle.Addition
         public string Description { get; set; }
         public string TechnicalExplanation { get; set; }
         public string Solution { get; set; }
+        [XmlIgnore]
         public string ReportLocation { get; set; }
+        [XmlElement("ReportLocation")]
+        public CustomReportLocation ReportLocationHelper { get; set; }
         public string Documentation { get; set; }
         public List<string> Details { get; set; }
 
@@ -122,6 +125,11 @@ namespace PingCastle.Addition
                 }
             }
             return sb.ToString();
+        }
+        public void SetReportLocation()
+        {
+            if (ReportLocationHelper != null && ReportLocationHelper.Target != null)
+            ReportLocation =  "The detail can be found in <a href=\"#" + ReportLocationHelper.Target + "\">" + ReportLocationHelper.TargetTitle + "</a>";
         }
         #endregion
     }

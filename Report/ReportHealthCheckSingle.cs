@@ -242,7 +242,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             {
 				foreach(var section in CustomData.InformationSections)
                 {
-					GenerateSection(section.Name, () =>  GenerateAdvancedCustomSection(section));
+					GenerateSection(section.Id, section.Name, () =>  GenerateAdvancedCustomSection(section));
                 }
             }
 		}
@@ -885,11 +885,11 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 				AddHeaderText("Operating System");
 				AddHeaderText("Nb OS");
 				AddAccountCheckHeader(true);
-				if (CustomData != null && CustomData.DictCustomTables.ContainsKey("operatingsystems")) // add custom cols
+				if (CustomData != null) // add custom cols
 				{
-					for (int i = 1; i < CustomData.DictCustomTables["operatingsystems"][0].Count; i++)
-					{
-						AddHeaderText(CustomData.DictCustomTables["operatingsystems"][0][i]);
+					foreach(var header in CustomData.GetCustomTableHeaders("operatingsystems"))
+                    {
+						AddHeaderText(header);
 					}
 				}
 				AddBeginTableData();
@@ -914,17 +914,11 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 						AddCellNum(os.data.NumberBadPrimaryGroup);
 						AddCellNum(os.data.NumberTrustedToAuthenticateForDelegation);
 						AddCellNum(os.data.NumberReversibleEncryption);
-						if (CustomData != null && CustomData.DictCustomTables.ContainsKey("operatingsystems")) 
+						if (CustomData != null) 
 						{
-							for (int row = 1; row < CustomData.DictCustomTables["operatingsystems"].Count; row++) // find key (Correct row)
-							{
-								if(os.OperatingSystem == CustomData.DictCustomTables["operatingsystems"][row][0])
-                                {
-									for (int col = 1; col < CustomData.DictCustomTables["operatingsystems"][0].Count; col++)
-									{
-										AddCellText(CustomData.DictCustomTables["operatingsystems"][row][col]);
-									}
-								}
+							foreach(var cell in CustomData.GetCustomTableRow("operatingsystems", os.OperatingSystem))
+                            {
+								AddCellText(cell);
 							}
 						}
 						AddEndRow();

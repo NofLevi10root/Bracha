@@ -678,7 +678,35 @@ namespace PingCastle.Report
 ");
         }
 
-        protected void GenerateSubSection(string title, string section = null)
+		protected virtual void GenerateSection(string sectionId, string title, GenerateContentDelegate generateContent) // custom method
+		{
+			string id = "section" + sectionId;
+			Add(@"
+<!-- Section " + title + @" -->
+<div id=""" + id + @""">
+	<div class=""row"">
+		<div class=""col-lg-12"">
+			<div class=""starter-template"">
+				<div class=""card mb-4"">
+					<div class=""card-header"">
+						<h1 class=""card-title""><a data-toggle=""collapse"" aria-expanded=""true"" href=""#panel" + id + @""">" + title + @"</a></h1>
+					</div>
+					<div class=""card-body collapse show"" id=""panel" + id + @""">
+");
+			generateContent();
+			Add(@"
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class=""pagebreak""> </div>
+<!-- Section " + title + @" end -->
+");
+		}
+
+		protected void GenerateSubSection(string title, string section = null)
         {
 			Add(@"
 		<!-- SubSection ");
