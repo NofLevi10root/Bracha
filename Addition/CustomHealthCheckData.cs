@@ -133,6 +133,7 @@ namespace PingCastle.Addition
                 if (rule != null)
                 {
                     rule.SetReportLocation();
+                    rule.SetDocumentation();
                     healthRule.Category = rule.Category;
                     healthRule.Model = rule.Model;
                     #region Get Details

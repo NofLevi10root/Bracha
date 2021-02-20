@@ -41,7 +41,14 @@ namespace PingCastle.Addition
         public string ReportLocation { get; set; }
         [XmlElement("ReportLocation")]
         public CustomReportLocation ReportLocationHelper { get; set; }
+
+        [XmlIgnore]
         public string Documentation { get; set; }
+
+        [XmlArray("Documentation")]
+        [XmlArrayItem("Line")]
+        public List<CustomDocumentationLine> DocumentationHelper { get; set; }
+
         public List<string> Details { get; set; }
 
         [XmlArray("RuleComputations")]
@@ -130,6 +137,18 @@ namespace PingCastle.Addition
         {
             if (ReportLocationHelper != null && ReportLocationHelper.Target != null)
             ReportLocation =  "The detail can be found in <a href=\"#" + ReportLocationHelper.Target + "\">" + ReportLocationHelper.TargetTitle + "</a>";
+        }
+        public void SetDocumentation()
+        {
+            if(DocumentationHelper != null)
+            {
+                string[] lines = new string[DocumentationHelper.Count];
+                for(int i = 0; i < lines.Length; i++)
+                {
+                    lines[i] = CustomDocumentationLine.ParseToDocumentaionLine(DocumentationHelper[i]);
+                }
+                Documentation =  string.Join("<br>", lines);
+            }
         }
         #endregion
     }
