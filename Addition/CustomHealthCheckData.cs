@@ -132,6 +132,7 @@ namespace PingCastle.Addition
                 var rule = GetRiskRule(healthRule.RiskId);
                 if (rule != null)
                 {
+                    rule.SetReportLocation();
                     healthRule.Category = rule.Category;
                     healthRule.Model = rule.Model;
                     #region Get Details
@@ -244,6 +245,36 @@ namespace PingCastle.Addition
                 }
             }
             return min;
+        }
+        public List<string> GetCustomTableHeaders(string table)
+        {
+            List<string> output = new List<string>();
+            if (DictCustomTables.ContainsKey(table))
+            {
+                for (int i = 1; i < DictCustomTables[table][0].Count; i++)
+                {
+                    output.Add(DictCustomTables[table][0][i]);
+                }
+            }
+            return output;
+        }
+        public List<string> GetCustomTableRow(string table, string key)
+        {
+            List<string> output = new List<string>();
+            if (DictCustomTables.ContainsKey("operatingsystems"))
+            {
+                for (int row = 1; row < DictCustomTables["operatingsystems"].Count; row++) // find key (Correct row)
+                {
+                    if (key == DictCustomTables["operatingsystems"][row][0])
+                    {
+                        for (int col = 1; col < DictCustomTables["operatingsystems"][0].Count; col++)
+                        {
+                            output.Add(DictCustomTables["operatingsystems"][row][col]);
+                        }
+                    }
+                }
+            }
+            return output;
         }
         #endregion
     }
