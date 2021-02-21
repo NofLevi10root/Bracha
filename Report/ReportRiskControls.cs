@@ -252,7 +252,7 @@ namespace PingCastle.Report
 			<div class=""col-md-12 table-responsive"">
 				<table class=""model_table"">
 					<thead><tr><th></th><th>Stale Objects</th><th>Privileged accounts</th><th>Trusts</th><th>Anomalies</th>");
-			foreach(var category in CustomData.Categories)
+			foreach(var category in CustomData.Categories) // transfer to static method in customdata
             {
 				Add(@"<th>" + category.Name + @"</th>");
             }

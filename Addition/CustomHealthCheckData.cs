@@ -100,7 +100,6 @@ namespace PingCastle.Addition
             }
             return xmlDoc;
         }
-
         public void FillData(HealthcheckData healthData)
         {
             #region Add Categories To Dictionary
@@ -143,11 +142,7 @@ namespace PingCastle.Addition
                         {
                             if (detail.FilePath.StartsWith(@".\"))
                                 detail.FilePath = dataDirectory + "\\" + detail.FilePath.Substring(2);
-                            if(detail.Type == CustomDetailsType.List && (healthRule.Details == null || healthRule.Details.Count == 0))
-                            {
-                                healthRule.Details = detail.ParseToDetails();
-                            }
-                            else if(detail.Type == CustomDetailsType.Table)
+                            if(detail.Type == CustomDetailsType.Table)
                             {
                                 healthRule.Details = detail.ParseToDetails();
                             }
@@ -206,7 +201,6 @@ namespace PingCastle.Addition
         {
             healthData.MaturityLevel = GetMaturityLevel(healthData.MaturityLevel);
         }
-
         public int CountCategoryHealthRules(string category)
         {
             int output = 0;
@@ -217,7 +211,6 @@ namespace PingCastle.Addition
             }
             return output;
         }
-
         public int CountCategoryRiskRules(string category)
         {
             int output = 0;
@@ -228,12 +221,10 @@ namespace PingCastle.Addition
             }
             return output;
         }
-
         public CustomRiskRule GetRiskRule(string ruleId)
         {
             return dictRiskRules.ContainsKey(ruleId) ? dictRiskRules[ruleId] : null;
         }
-
         private int GetMaturityLevel(int oldMaturity)
         {
             int min = oldMaturity;

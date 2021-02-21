@@ -22,26 +22,9 @@ namespace PingCastle.Addition
                 return null;
             switch (Type)
             {
-                case CustomDetailsType.List:
-                    output = GetList(File.ReadAllLines(FilePath));
-                    break;
                 case CustomDetailsType.Table:
                     output = GetTable(File.ReadAllLines(FilePath));
                     break;
-            }
-            return output;
-        }
-        private static List<string> GetList(string[] lines)
-        {
-            List<string> output = new List<string>();
-            if (lines.Length == 0 || string.IsNullOrEmpty(lines[0].Trim()))
-                return null;
-
-
-            string header = lines[0].Trim().Replace(" ", "#$%%$#") + ": "; // Header
-            for (int i = 1; i < lines.Length; i++) // Lines
-            {
-                output.Add(header + lines[i]);
             }
             return output;
         }
@@ -293,7 +276,6 @@ namespace PingCastle.Addition
     }
     public enum CustomDetailsType
     {
-        List,
         Table,
         Chart,
         SharedTable
