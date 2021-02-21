@@ -1184,6 +1184,7 @@ namespace PingCastle
 			Console.WriteLine("    --filter-date <date>: filter report generated after the date.");
 			Console.WriteLine("");
 			Console.WriteLine("  --regen-report <xml> : regenerate a html report based on a xml report");
+			Console.WriteLine("  --advanced-regen-report <base:xml> <additions:xml> : regenerate a html report based on a xml report and a custom data xml file");
 			Console.WriteLine("  --reload-report <xml> : regenerate a xml report based on a xml report");
 			Console.WriteLine("                          any healthcheck switches (send email, ..) can be reused");
 			Console.WriteLine("    --level <level>   : specify the amount of data found in the xml file");
