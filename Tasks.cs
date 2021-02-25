@@ -415,63 +415,63 @@ namespace PingCastle
             return pingCastleReport;
         }
 
-        public bool ConsolidationTask<T>() where T : IPingCastleReport
-        {
-            return StartTask("PingCastle report consolidation (" + typeof(T).Name + ")",
-                    () =>
-                    {
-                        if (String.IsNullOrEmpty(FileOrDirectory))
-                        {
-                            FileOrDirectory = Directory.GetCurrentDirectory();
-                        }
-                        if (!Directory.Exists(FileOrDirectory))
-                        {
-                            WriteInRed("The directory " + FileOrDirectory + " doesn't exist");
-                            return;
-                        }
-                        var consolidation = PingCastleReportHelper<T>.LoadXmls(FileOrDirectory, FilterReportDate);
-                        if (consolidation.Count == 0)
-                        {
-                            WriteInRed("No report has been found. Please generate one with PingCastle and try again. The task will stop.");
-                            return;
-                        }
-                        if (typeof(T) == typeof(HealthcheckData))
-                        {
-                            var hcconso = consolidation as PingCastleReportCollection<HealthcheckData>;
-                            var report = new ReportHealthCheckConsolidation();
-                            report.GenerateReportFile(hcconso, License, "ad_hc_summary.html");
-                            ReportHealthCheckMapBuilder nodeAnalyzer = new ReportHealthCheckMapBuilder(hcconso, License);
-                            nodeAnalyzer.Log = Console.WriteLine;
-                            nodeAnalyzer.GenerateReportFile("ad_hc_summary_full_node_map.html");
-                            nodeAnalyzer.FullNodeMap = false;
-                            nodeAnalyzer.CenterDomainForSimpliedGraph = CenterDomainForSimpliedGraph;
-                            nodeAnalyzer.GenerateReportFile("ad_hc_summary_simple_node_map.html");
-                            var mapReport = new ReportNetworkMap();
-                            mapReport.GenerateReportFile(hcconso, License, "ad_hc_hilbert_map.html");
-                        }
-                    }
-                );
-        }
+		public bool ConsolidationTask<T>() where T : IPingCastleReport
+		{
+			return StartTask("RisX report consolidation (" + typeof(T).Name + ")",
+					() =>
+					{
+						if (String.IsNullOrEmpty(FileOrDirectory))
+						{
+							FileOrDirectory = Directory.GetCurrentDirectory();
+						}
+						if (!Directory.Exists(FileOrDirectory))
+						{
+							WriteInRed("The directory " + FileOrDirectory + " doesn't exist");
+							return;
+						}
+						var consolidation = PingCastleReportHelper<T>.LoadXmls(FileOrDirectory, FilterReportDate);
+						if (consolidation.Count == 0)
+						{
+							WriteInRed("No report has been found. Please generate one with RisX and try again. The task will stop.");
+							return;
+						}
+						if (typeof(T) == typeof(HealthcheckData))
+						{
+							var hcconso = consolidation as PingCastleReportCollection<HealthcheckData>;
+							var report = new ReportHealthCheckConsolidation();
+							report.GenerateReportFile(hcconso, License, "ad_hc_summary.html");
+							ReportHealthCheckMapBuilder nodeAnalyzer = new ReportHealthCheckMapBuilder(hcconso, License);
+							nodeAnalyzer.Log = Console.WriteLine;
+							nodeAnalyzer.GenerateReportFile("ad_hc_summary_full_node_map.html");
+							nodeAnalyzer.FullNodeMap = false;
+							nodeAnalyzer.CenterDomainForSimpliedGraph = CenterDomainForSimpliedGraph;
+							nodeAnalyzer.GenerateReportFile("ad_hc_summary_simple_node_map.html");
+							var mapReport = new ReportNetworkMap();
+							mapReport.GenerateReportFile(hcconso, License, "ad_hc_hilbert_map.html");
+						}
+					}
+				);
+		}
 
-        public bool HealthCheckRulesTask()
-        {
-            return StartTask("PingCastle Health Check rules",
-                    () =>
-                    {
-                        if (String.IsNullOrEmpty(FileOrDirectory))
-                        {
-                            FileOrDirectory = Directory.GetCurrentDirectory();
-                        }
-                        if (!Directory.Exists(FileOrDirectory))
-                        {
-                            WriteInRed("The directory " + FileOrDirectory + " doesn't exist");
-                            return;
-                        }
-                        var rulesBuilder = new ReportHealthCheckRules();
-                        rulesBuilder.GenerateReportFile("ad_hc_rules_list.html");
-                    }
-                );
-        }
+		public bool HealthCheckRulesTask()
+		{
+			return StartTask("RisX Health Check rules",
+					() =>
+					{
+						if (String.IsNullOrEmpty(FileOrDirectory))
+						{
+							FileOrDirectory = Directory.GetCurrentDirectory();
+						}
+						if (!Directory.Exists(FileOrDirectory))
+						{
+							WriteInRed("The directory " + FileOrDirectory + " doesn't exist");
+							return;
+						}
+						var rulesBuilder = new ReportHealthCheckRules();
+						rulesBuilder.GenerateReportFile("ad_hc_rules_list.html");
+					}
+				);
+		}
 
 
 		public bool RegenerateHtmlTask()
@@ -594,40 +594,40 @@ namespace PingCastle
             );
         }
 
-        public bool GenerateDemoReportTask()
-        {
-            return StartTask("Generating demo reports",
-                    () =>
-                    {
-                        if (String.IsNullOrEmpty(FileOrDirectory))
-                        {
-                            FileOrDirectory = Directory.GetCurrentDirectory();
-                        }
-                        if (!Directory.Exists(FileOrDirectory))
-                        {
-                            WriteInRed("The directory " + FileOrDirectory + " doesn't exist");
-                            return;
-                        }
-                        string path = Path.Combine(FileOrDirectory, "demo");
-                        if (!Directory.Exists(path))
-                        {
-                            Directory.CreateDirectory(path);
-                        }
-                        var consolidation = PingCastleReportHelper<HealthcheckData>.LoadXmls(FileOrDirectory, FilterReportDate);
-                        if (consolidation.Count == 0)
-                        {
-                            WriteInRed("No report has been found. Please generate one with PingCastle and the Healtch Check mode. The program will stop.");
-                            return;
-                        }
-                        consolidation = PingCastleReportHelper<HealthcheckData>.TransformReportsToDemo(consolidation);
-                        foreach (HealthcheckData data in consolidation)
-                        {
-                            string domain = data.DomainFQDN;
-                            var endUserReportGenerator = PingCastleFactory.GetEndUserReportGenerator<HealthcheckData>();
-                            string html = endUserReportGenerator.GenerateReportFile(data, License, Path.Combine(path, data.GetHumanReadableFileName()));
-                            data.SetExportLevel(ExportLevel);
-                            string xml = DataHelper<HealthcheckData>.SaveAsXml(data, Path.Combine(path, data.GetMachineReadableFileName()), EncryptReport);
-                        }
+		public bool GenerateDemoReportTask()
+		{
+			return StartTask("Generating demo reports",
+					() =>
+					{
+						if (String.IsNullOrEmpty(FileOrDirectory))
+						{
+							FileOrDirectory = Directory.GetCurrentDirectory();
+						}
+						if (!Directory.Exists(FileOrDirectory))
+						{
+							WriteInRed("The directory " + FileOrDirectory + " doesn't exist");
+							return;
+						}
+						string path = Path.Combine(FileOrDirectory, "demo");
+						if (!Directory.Exists(path))
+						{
+							Directory.CreateDirectory(path);
+						}
+						var consolidation = PingCastleReportHelper<HealthcheckData>.LoadXmls(FileOrDirectory, FilterReportDate);
+						if (consolidation.Count == 0)
+						{
+							WriteInRed("No report has been found. Please generate one with RisX and the Healtch Check mode. The program will stop.");
+							return;
+						}
+						consolidation = PingCastleReportHelper<HealthcheckData>.TransformReportsToDemo(consolidation);
+						foreach (HealthcheckData data in consolidation)
+						{
+							string domain = data.DomainFQDN;
+							var endUserReportGenerator = PingCastleFactory.GetEndUserReportGenerator<HealthcheckData>();
+							string html = endUserReportGenerator.GenerateReportFile(data, License, Path.Combine(path, data.GetHumanReadableFileName()));
+							data.SetExportLevel(ExportLevel);
+							string xml = DataHelper<HealthcheckData>.SaveAsXml(data, Path.Combine(path, data.GetMachineReadableFileName()), EncryptReport);
+						}
 
                     }
                 );

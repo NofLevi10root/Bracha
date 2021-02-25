@@ -102,20 +102,21 @@ namespace PingCastle.Report
             }
         }
 
-        private void GenerateCspMeta()
-        {
-            Add(@"<meta http-equiv=""Content-Security-Policy"" content=""default-src 'self'; script-src ");
-            foreach (var script in JSToAdd)
-            {
-                ComputeCSPHash(script);
-            }
-            Add(@" 'unsafe-inline'; style-src ");
-            foreach (var css in CSSToAdd)
-            {
-                ComputeCSPHash(css);
-            }
-            Add(@" 'unsafe-inline'; object-src 'none'; base-uri https://www.pingcastle.com ; img-src data: https://www.pingcastle.com;""/>");
-        }
+		private void GenerateCspMeta()
+		{
+			Add(@"<meta http-equiv=""Content-Security-Policy"" content=""default-src 'self'; script-src ");
+			foreach (var script in JSToAdd)
+			{
+				ComputeCSPHash(script);
+			}
+			Add(@" 'unsafe-inline'; style-src ");
+			foreach (var css in CSSToAdd)
+			{
+				ComputeCSPHash(css);
+			}
+            //Add(@" 'unsafe-inline'; object-src 'none'; base-uri https://www.pingcastle.com ; img-src data: https://www.pingcastle.com;""/>");
+            Add(@" 'unsafe-inline'; object-src 'none'; base-uri https://www.10root.com ; img-src data: https://www.10root.com;""/>");
+		}
 
         private void ComputeCSPHash(string css)
         {

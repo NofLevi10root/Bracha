@@ -389,7 +389,7 @@ To change it you can edit the owner of an object using &lt;a href="https://docs.
     <value>The purpose is to ensure that the SID History creation is not enabled</value>
   </data>
   <data name="S_Domain____Solution" xml:space="preserve">
-    <value>If a migration is in progress, declare it in PingCastle so this rule won't be triggered. Else, remove this auditing group. You can locate it by using the LDAP query (sAMAccountName=*$$$)</value>
+    <value>If a migration is in progress, declare it in RisX so this rule won't be triggered. Else, remove this auditing group. You can locate it by using the LDAP query (sAMAccountName=*$$$)</value>
   </data>
   <data name="S_Domain____Rationale" xml:space="preserve">
     <value>The SIDHistory auditing group is present: SID History creation is enabled</value>
@@ -410,7 +410,7 @@ To change it you can edit the owner of an object using &lt;a href="https://docs.
     <value>The purpose is to access without any account, aka NULL Sessions, within the Active Directory. A NULL Session is a session opened anonymously to access the AD, often used by attackers to perform a recon operation on the AD, to identify weaknesses</value>
   </data>
   <data name="A_NullSession_Solution" xml:space="preserve">
-    <value>Locate other PingCastle rules such as A-PreWin2000Anonymous or A-DsHeuristicsAnonymous which triggered and apply the solutions. You can use the PingCastle scanner mode to do a manual check and prove the extraction of the data.</value>
+    <value>Locate other RisX rules such as A-PreWin2000Anonymous or A-DsHeuristicsAnonymous which triggered and apply the solutions. You can use the PingCastle scanner mode to do a manual check and prove the extraction of the data.</value>
   </data>
   <data name="A_NullSession_Rationale" xml:space="preserve">
     <value>Number of DC(s) with NULL SESSION enabled: {count}</value>
@@ -672,7 +672,7 @@ Second, a more manual way is to essentially reset the password manually once, th
   It can be done with tools such as ADSIEdit or ADExplorer.
   Then, for each domain controller, extract the events 4624 at the date matching the LastLogon date. You will identify the computer and the process at the origin of the logon event.
   
-  Please note that PingCastle relies on the attribute LastLogonTimestamp to perform this check. The LastLogonTimestamp attribute is replicated but has a latency of a maximum of 14 days, while LastLogon is updated at each logon and is more accurate but not replicated.
+  Please note that RisX relies on the attribute LastLogonTimestamp to perform this check. The LastLogonTimestamp attribute is replicated but has a latency of a maximum of 14 days, while LastLogon is updated at each logon and is more accurate but not replicated.
     </value>
   </data>
   <data name="P_AdminLogin_Rationale" xml:space="preserve">
@@ -1058,14 +1058,14 @@ Each security descriptor of the domain (including file shares for example) shoul
   </data>
   <data name="A_AnonymousAuthorizedGPO_TechnicalExplanation" xml:space="preserve">
     <value>It is possible that domains are set to authorize connection without any account, which represents a security breach. It allows potential attackers to enumerate all the users and computers belonging to a domain, in order to identify very efficiently future weak targets.
-It is possible to verify the results provided by the PingCastle solution by using a Kali distribution. You should run [rpcclient -U " target_ip_address] and press enter at the password prompt to finally type [enumdomusers].</value>
+It is possible to verify the results provided by the RisX solution by using a Kali distribution. You should run [rpcclient -U " target_ip_address] and press enter at the password prompt to finally type [enumdomusers].</value>
   </data>
   <data name="A_BackupMetadata_TechnicalExplanation" xml:space="preserve">
     <value>A verification is done on the backups, ensuring that the backup is performed according to Microsoft standards. Indeed at each backup the DIT Database Partition Backup Signature is updated.  If for any reasons, backups are needed to perform a rollback (rebuild a domain) or to track past changes, the backups will actually be up to date. This check is equivalent to a &lt;i&gt;REPADMIN /showbackup *&lt;/i&gt;.</value>
   </data>
   <data name="A_DsHeuristicsAnonymous_TechnicalExplanation" xml:space="preserve">
     <value>The way an Active Directory behaves can be controlled via the attribute &lt;i&gt;DsHeuristics&lt;/i&gt; of &lt;i&gt;CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration&lt;/i&gt;. A parameter stored in its attribute and whose value is &lt;i&gt;fLDAPBlockAnonOps&lt;/i&gt; can be set to allow access without any account on the &lt;b&gt;whole forest level&lt;/b&gt;.
-It is possible to verify the results provided by the PingCastle solution by using a Kali distribution. You should run &lt;i&gt;rpcclient -U " target_ip_address&lt;/i&gt; and press enter at the password prompt to finally type &lt;i&gt;enumdomusers&lt;/i&gt;.</value>
+It is possible to verify the results provided by the RisX solution by using a Kali distribution. You should run &lt;i&gt;rpcclient -U " target_ip_address&lt;/i&gt; and press enter at the password prompt to finally type &lt;i&gt;enumdomusers&lt;/i&gt;.</value>
   </data>
   <data name="A_Krbtgt_TechnicalExplanation" xml:space="preserve">
     <value>Kerberos is an authentication protocol. It is using to sign its tickets a secret stored as the password of the krbtgt account. If the hash of the password of the krbtgt account is retrieved, it can be use to generate authentication tickets at will.
@@ -1112,17 +1112,17 @@ Also this attack can be performed using the former password of the krbtgt accoun
   <data name="A_NullSession_TechnicalExplanation" xml:space="preserve">
     <value>Unless other rules which check for known cause of anonymous access, this rule tries to enumerate accounts from the domain without any account. The program use two methods: MS-SAMR with a NULL connection and MS-LSAT which forces SID resolution with well known SID.
 NULL sessions are deactivated by default since Windows 2003 and Windows XP. For compatibility reasons a setting enabling them may be still active years after.
-It is possible to verify the results provided by the PingCastle solution by using a Kali distribution. You should run [rpcclient -U " target_ip_address] and press enter at the password prompt to finally type [enumdomusers].</value>
+It is possible to verify the results provided by the RisX solution by using a Kali distribution. You should run [rpcclient -U " target_ip_address] and press enter at the password prompt to finally type [enumdomusers].</value>
   </data>
   <data name="A_PreWin2000Anonymous_TechnicalExplanation" xml:space="preserve">
     <value>When a Windows 2003 DC is promoted, a pre-Windows 2000 compatibility setting can be enabled through the wizard. If it is enabled, the wizard will add "Everyone" and "Anonymous" to the pre-Windows 2000 compatible access group, and by doing so, it will authorize the domain to be queried without an account (null session)
-It is possible to verify the results provided by the PingCastle solution by using a Kali distribution. You should run [rpcclient -U " target_ip_address] and press enter at the password prompt to finally type [enumdomusers].</value>
+It is possible to verify the results provided by the RisX solution by using a Kali distribution. You should run [rpcclient -U " target_ip_address] and press enter at the password prompt to finally type [enumdomusers].</value>
   </data>
   <data name="A_ProtectedUsers_TechnicalExplanation" xml:space="preserve">
     <value>The Protected Users group is a special group which is a very effective mitigation solution to counter attacks using Credential theft starting with Windows 8.1. Older Operating System must be updated to take this protection in account such as the &lt;b&gt;Windows 7 KB2871997&lt;/b&gt; patch.</value>
   </data>
   <data name="A_PwdGPO_TechnicalExplanation" xml:space="preserve">
-    <value>A check is performed to identify passwords in the GPO. If a password is identified through the PingCastle solution, it means that it can be identified through many other means by attackers, and that the account should be considered compromised. 
+    <value>A check is performed to identify passwords in the GPO. If a password is identified through the RisX solution, it means that it can be identified through many other means by attackers, and that the account should be considered compromised. 
 Do note that the AES key used to encrypt passwords in GPOs has been made public for interoperability reasons, which is why even an encrypted password is compromised. It has been revealed in &lt;a href="https://msdn.microsoft.com/en-us/library/cc422924.aspx"&gt;this page&lt;/a&gt;</value>
   </data>
   <data name="A_ReversiblePwd_TechnicalExplanation" xml:space="preserve">
@@ -1199,10 +1199,10 @@ Do note that the AES key used to encrypt passwords in GPOs has been made public 
     <value>The OS Windows 2003 as a DC is vulnerable to many publicly known exploits such as MS14-068 and it is very complicated to patch it at this date. A domain running this OS version should be considered compromised</value>
   </data>
   <data name="S_DC_NotUpdated_TechnicalExplanation" xml:space="preserve">
-    <value>Domain Controller needs to be updated regularly because threats to the AD evolve all the time, so assets in the AD should evolve accordingly. The date of last update is computed by getting the &lt;i&gt;StatisticsStartTime&lt;/i&gt; from &lt;i&gt;[net statistics workstation]&lt;/i&gt;. If not available, the PingCastle solution will use the &lt;i&gt;lastLogonTimestamp&lt;/i&gt; attribute which is refreshed based on the LastLogon attribute. Do note that there is a maximum delay for refresh: 14 days.</value>
+    <value>Domain Controller needs to be updated regularly because threats to the AD evolve all the time, so assets in the AD should evolve accordingly. The date of last update is computed by getting the &lt;i&gt;StatisticsStartTime&lt;/i&gt; from &lt;i&gt;[net statistics workstation]&lt;/i&gt;. If not available, the RisX solution will use the &lt;i&gt;lastLogonTimestamp&lt;/i&gt; attribute which is refreshed based on the LastLogon attribute. Do note that there is a maximum delay for refresh: 14 days.</value>
   </data>
   <data name="S_DC_SubnetMissing_TechnicalExplanation" xml:space="preserve">
-    <value>When multiple sites are created in a domain, networks should be declared in the domain in order to optimize processes such as DC attribution. In addition, PingCastle can collect the information to be able to build a network map. This rule has been triggered because at least one domain controller has an IP address which was not found in subnet declaration. These IP addresses have been collected by querying the DC FQDN IP address in both IPv6 and IPv4 format.</value>
+    <value>When multiple sites are created in a domain, networks should be declared in the domain in order to optimize processes such as DC attribution. In addition, RisX can collect the information to be able to build a network map. This rule has been triggered because at least one domain controller has an IP address which was not found in subnet declaration. These IP addresses have been collected by querying the DC FQDN IP address in both IPv6 and IPv4 format.</value>
   </data>
   <data name="S_DesEnabled_TechnicalExplanation" xml:space="preserve">
     <value>DES is very weak algorithm and once assigned to an account, it can be used in Kerberos ticket requests, even though it is easily breakable. It represents a security risk for the kerberos ticket, therefore for the whole AD.</value>
@@ -1532,10 +1532,10 @@ https://github.com/misterch0c/shadowbroker/tree/master/windows/exploits </value>
     <value>Check if the account has been migrated from a domain which doesn't exist anymore</value>
   </data>
   <data name="A_SMB2SignatureNotEnabled_TechnicalExplanation" xml:space="preserve">
-    <value>Python responder is a tool used to compromise a domain by listening for SMB connections and injecting rogue data into the communications at the network level. SMB v1 does not provide a mechanism to enforce integrity and thus is compromised easily. SMB v2 (and subsequent version SMB v3) provides a way to guarantee the integrity of the network communication via a signature of each packet. By establishing a SMB v2 dialog with domain controllers, PingCastle checks the signature capability by looking at the SMB options provided by the server.</value>
+    <value>Python responder is a tool used to compromise a domain by listening for SMB connections and injecting rogue data into the communications at the network level. SMB v1 does not provide a mechanism to enforce integrity and thus is compromised easily. SMB v2 (and subsequent version SMB v3) provides a way to guarantee the integrity of the network communication via a signature of each packet. By establishing a SMB v2 dialog with domain controllers, RisX checks the signature capability by looking at the SMB options provided by the server.</value>
   </data>
   <data name="A_SMB2SignatureNotRequired_TechnicalExplanation" xml:space="preserve">
-    <value>Python responder is a tool used to compromise a domain by listening for SMB connections and injecting rogue data into the communications at the network level. SMB v1 does not provide a mechanism to enforce integrity and thus is compromised easily. SMB v2 (and subsequent version SMB v3) provides a way to guarantee the integrity of the network communication via a signature of each packet. By establishing a SMB v2 dialog with domain controllers, PingCastle checks the signature capability by looking at the SMB options provided by the server.</value>
+    <value>Python responder is a tool used to compromise a domain by listening for SMB connections and injecting rogue data into the communications at the network level. SMB v1 does not provide a mechanism to enforce integrity and thus is compromised easily. SMB v2 (and subsequent version SMB v3) provides a way to guarantee the integrity of the network communication via a signature of each packet. By establishing a SMB v2 dialog with domain controllers, RisX checks the signature capability by looking at the SMB options provided by the server.</value>
   </data>
   <data name="A_SMB2SignatureNotEnabled_Documentation" xml:space="preserve">
     <value>https://msdn.microsoft.com/en-us/library/cc246675.aspx</value>
@@ -2523,7 +2523,7 @@ Then Deny log on locally and Deny logon through Remote Desktop Services.</value>
     To reduce the impact of such compromise, the best practice is to isolate components (such as admins, DC) in tiers.
     Typically, a domain admin should not be allowed to connect to any workstation but login only to perform highly privileged operations.
     
-    To check for this policy, PingCastle looks at all GPO and check if there is a GPO denying logon (SeDenyRemoteInteractiveLogonRight, SeDenyInteractiveLogonRight) of admins (Domain Admins or Administrators) to a specific scope.
+    To check for this policy, RisX looks at all GPO and check if there is a GPO denying logon (SeDenyRemoteInteractiveLogonRight, SeDenyInteractiveLogonRight) of admins (Domain Admins or Administrators) to a specific scope.
     
     False positives can occurs for this rule:
     * if the expected GPO is hidden due to ACL checks
@@ -2667,8 +2667,8 @@ https://github.com/ANSSI-FR/AD-control-paths</value>
     The SSL protocols in Windows is provided by the Schannel component.
 The Schannel component needs to be tuned in order to not propose these weak protocols. Many guidelines to handle this problem issued by Microsoft do not talk about Schannel but rather IIS. These guidlines are quoted in the documentation section below.
 
-PingCastle is able to check the SSL version if LDAPS is exposed. LDAPS is automatically exposed once a certificate is available for the DC and the service restarted.
-Please note that PingCastle is using the native .Net SSL stack to perform this test. .Net begins to ignore these weak protocols starting the version 4.7 of the framework and as a consequence, PingCasle may miss some weak protocol detection.
+RisX is able to check the SSL version if LDAPS is exposed. LDAPS is automatically exposed once a certificate is available for the DC and the service restarted.
+Please note that RisX is using the native .Net SSL stack to perform this test. .Net begins to ignore these weak protocols starting the version 4.7 of the framework and as a consequence, PingCasle may miss some weak protocol detection.
 
 To test these protocol, you can use openssl with the following commands:
 openssl s_client -connect dc.domain.local:636 -ssl2
@@ -2985,7 +2985,7 @@ The NSPI protocol is used internally by Exchange to resolve addresses, and thus 
     <value>NTFRS is an old protocol and is not considered as secure.
     The SYSVOL share is mainly hosted on domain controllers to host GPO files and login scripts.
   If the content can be modified, it can be used to grant to an hacker the control of the computers reading these configuration files.
-To know if the setting is enabled, PingCastle read the following LDAP entry: CN=Domain System Volume (SYSVOL share),CN=File Replication Service,CN=System
+To know if the setting is enabled, RisX read the following LDAP entry: CN=Domain System Volume (SYSVOL share),CN=File Replication Service,CN=System
 If there is any entry found, the program consider that NTFRS is in use for SYSVOl replication.</value>
   </data>
   <data name="A_NTFRSOnSysvol_Title" xml:space="preserve">
@@ -3765,7 +3765,7 @@ That means that an extraction of its password (using DCSync for example) can lea
   </data>
   <data name="S_OS_Win7_TechnicalExplanation" xml:space="preserve">
     <value>The Windows 7 OS is not supported any longer, as it is vulnerable to many publicly known exploits: Administrator's credentials can be captured, security protocols are weak, etc.
-PingCastle is trying to guess if support has been purchased from Microsoft. Based on the documentation referenced below, the program checks if the script Activate-ProductOnline.ps1 is present.
+RisX is trying to guess if support has been purchased from Microsoft. Based on the documentation referenced below, the program checks if the script Activate-ProductOnline.ps1 is present.
 If the script is detected, Windows 7 is considered as supported and this rule is not triggered.</value>
   </data>
   <data name="S_OS_Win7_Title" xml:space="preserve">

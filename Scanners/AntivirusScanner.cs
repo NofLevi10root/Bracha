@@ -146,62 +146,62 @@ Or just press enter to use the default.";
             return base.QueryForAdditionalParameterInInteractiveMode();
         }
 
-        protected override string GetCsvData(string computer)
-        {
-            StringBuilder sb = new StringBuilder();
-            NativeMethods.UNICODE_STRING us = new NativeMethods.UNICODE_STRING();
-            NativeMethods.LSA_OBJECT_ATTRIBUTES loa = new NativeMethods.LSA_OBJECT_ATTRIBUTES();
-            us.Initialize(computer);
-            IntPtr PolicyHandle = IntPtr.Zero;
-            uint ret = NativeMethods.LsaOpenPolicy(ref us, ref loa, 0x00000800, out PolicyHandle);
-            us.Dispose();
-            if (ret != 0)
-            {
-                Trace.WriteLine("LsaOpenPolicy 0x" + ret.ToString("x") + " for " + computer);
-                sb.Append(computer);
-                sb.Append("\tUnable to connect\tPingCastle couldn't connect to the computer. The error was 0x" + ret.ToString("x"));
-                return sb.ToString();
-            }
-            var names = new NativeMethods.UNICODE_STRING[AVReference.Count + customService.Count];
-            try
-            {
-                int i = 0;
-                foreach (var entry in AVReference)
-                {
-                    names[i] = new NativeMethods.UNICODE_STRING();
-                    names[i].Initialize("NT Service\\" + entry.Key);
-                    i++;
-                }
-                foreach (var entry in customService)
-                {
-                    names[i] = new NativeMethods.UNICODE_STRING();
-                    names[i].Initialize("NT Service\\" + entry);
-                    i++;
-                }
-                IntPtr ReferencedDomains, Sids;
-                ret = NativeMethods.LsaLookupNames(PolicyHandle, names.Length, names, out ReferencedDomains, out Sids);
-                if (ret == 0xC0000073) //STATUS_NONE_MAPPED
-                {
-                    sb.Append(computer);
-                    sb.Append("\tNo known service found\tIf you think that the information is incorrect, please contact PingCastle support to add the antivirus in the checked list.");
-                    return sb.ToString();
-                }
-                if (ret != 0 && ret != 0x00000107) // ignore STATUS_SOME_NOT_MAPPED
-                {
-                    Trace.WriteLine("LsaLookupNames 0x" + ret.ToString("x"));
-                    sb.Append(computer);
-                    sb.Append("\tUnable to lookup\tPingCastle couldn't translate the SID to the computer. The error was 0x" + ret.ToString("x"));
-                    return sb.ToString();
-                }
-                try
-                {
-                    var domainList = (NativeMethods.LSA_REFERENCED_DOMAIN_LIST)Marshal.PtrToStructure(ReferencedDomains, typeof(NativeMethods.LSA_REFERENCED_DOMAIN_LIST));
-                    if (domainList.Entries > 0)
-                    {
-                        var trustInfo = (NativeMethods.LSA_TRUST_INFORMATION)Marshal.PtrToStructure(domainList.Domains, typeof(NativeMethods.LSA_TRUST_INFORMATION));
-                    }
-                    NativeMethods.LSA_TRANSLATED_SID[] translated;
-                    MarshalUnmananagedArray2Struct<NativeMethods.LSA_TRANSLATED_SID>(Sids, names.Length, out translated);
+		protected override string GetCsvData(string computer)
+		{
+			StringBuilder sb = new StringBuilder(); 
+			NativeMethods.UNICODE_STRING us = new NativeMethods.UNICODE_STRING();
+			NativeMethods.LSA_OBJECT_ATTRIBUTES loa = new NativeMethods.LSA_OBJECT_ATTRIBUTES();
+			us.Initialize(computer);
+			IntPtr PolicyHandle = IntPtr.Zero;
+			uint ret = NativeMethods.LsaOpenPolicy(ref us, ref loa, 0x00000800, out PolicyHandle);
+			us.Dispose();
+			if (ret != 0)
+			{
+				Trace.WriteLine("LsaOpenPolicy 0x" + ret.ToString("x") + " for " + computer);
+				sb.Append(computer);
+				sb.Append("\tUnable to connect\tRisX couldn't connect to the computer. The error was 0x" + ret.ToString("x"));
+				return sb.ToString();
+			}
+			var names = new NativeMethods.UNICODE_STRING[AVReference.Count + customService.Count];
+			try
+			{
+				int i = 0;
+				foreach (var entry in AVReference)
+				{
+					names[i] = new NativeMethods.UNICODE_STRING();
+					names[i].Initialize("NT Service\\" + entry.Key);
+					i++;
+				}
+				foreach (var entry in customService)
+				{
+					names[i] = new NativeMethods.UNICODE_STRING();
+					names[i].Initialize("NT Service\\" + entry);
+					i++;
+				}
+				IntPtr ReferencedDomains, Sids;
+				ret = NativeMethods.LsaLookupNames(PolicyHandle, names.Length, names, out ReferencedDomains, out Sids);
+				if (ret == 0xC0000073) //STATUS_NONE_MAPPED
+				{
+					sb.Append(computer);
+					sb.Append("\tNo known service found\tIf you think that the information is incorrect, please contact RisX support to add the antivirus in the checked list.");
+					return sb.ToString();
+				}
+				if (ret != 0 && ret != 0x00000107) // ignore STATUS_SOME_NOT_MAPPED
+				{
+					Trace.WriteLine("LsaLookupNames 0x" + ret.ToString("x"));
+					sb.Append(computer);
+					sb.Append("\tUnable to lookup\tRisX couldn't translate the SID to the computer. The error was 0x" + ret.ToString("x"));
+					return sb.ToString();
+				}
+				try
+				{
+					var domainList = (NativeMethods.LSA_REFERENCED_DOMAIN_LIST)Marshal.PtrToStructure(ReferencedDomains, typeof(NativeMethods.LSA_REFERENCED_DOMAIN_LIST));
+					if (domainList.Entries > 0)
+					{
+						var trustInfo = (NativeMethods.LSA_TRUST_INFORMATION)Marshal.PtrToStructure(domainList.Domains, typeof(NativeMethods.LSA_TRUST_INFORMATION));
+					}
+					NativeMethods.LSA_TRANSLATED_SID[] translated;
+					MarshalUnmananagedArray2Struct<NativeMethods.LSA_TRANSLATED_SID>(Sids, names.Length, out translated);
 
                     i = 0;
                     foreach (var entry in AVReference)
