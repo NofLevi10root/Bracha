@@ -1,4 +1,5 @@
-# Ping Castle
+[![CI](https://github.com/HMTools/10RPingCastle/actions/workflows/CI.yml/badge.svg)](https://github.com/HMTools/10RPingCastle/actions/workflows/CI.yml)
+# 10RPing Castle
 
 ## Introduction
 
