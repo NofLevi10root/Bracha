@@ -251,12 +251,9 @@ namespace PingCastle.Report
 		<div class=""row collapse show d-print-none"" id=""riskModel"">
 			<div class=""col-md-12 table-responsive"">
 				<table class=""model_table"">
-					<thead><tr><th></th><th>Stale Objects</th><th>Privileged accounts</th><th>Trusts</th><th>Anomalies</th>");
-			foreach(var category in CustomData.Categories) // transfer to static method in customdata
-            {
-				Add(@"<th>" + category.Name + @"</th>");
-            }
-			Add(@"</tr></thead>
+					<thead><tr><th></th><th>Stale Objects</th><th>Privileged accounts</th><th>Trusts</th><th>Anomalies</th>" 
+					+ CustomRiskRuleCategory.ParseCategoriesToTableHeaders(CustomData.Categories)
+					+ @"</tr></thead>
 					<tbody>
 ");
 
@@ -287,7 +284,7 @@ namespace PingCastle.Report
 
 			foreach(var model in CustomData.Models)
             {
-				riskmodel[model.RiskRuleCategoryId].Add(model);
+				riskmodel[model.Category].Add(model);
             }
 			foreach(var category in riskmodel.Keys)
             {
@@ -356,7 +353,7 @@ namespace PingCastle.Report
 						foreach (var rule in rulematched)
 						{
 							tooltipdetail += ReportHelper.Encode(rule.Rationale) + "<br>";
-							var hcrule = CustomRiskRule.GetFromRiskRule(RuleSet<T>.GetRuleFromID(rule.RiskId));
+							var hcrule = CustomRiskRule.GetFromRuleBase(RuleSet<T>.GetRuleFromID(rule.RiskId));
 							if (hcrule == null)
 								hcrule = CustomData.GetRiskRule(rule.RiskId);
 							
@@ -561,9 +558,9 @@ namespace PingCastle.Report
 		protected void GenerateIndicatorPanelDetail(string category, HealthcheckRiskRule rule, string optionalId = null)
 		{
 			string safeRuleId = rule.RiskId.Replace("$", "dollar");
-			var hcrule = CustomRiskRule.GetFromRiskRule<T>(RuleSet<T>.GetRuleFromID(rule.RiskId));
-			if (CustomData != null && hcrule == null)
-			{
+			var hcrule = CustomRiskRule.GetFromRuleBase(RuleSet<T>.GetRuleFromID(rule.RiskId));
+			if(CustomData != null && hcrule == null)
+            {
 				hcrule = CustomData.GetRiskRule(rule.RiskId);
 			}
 			GenerateAccordionDetail("rules" + optionalId + safeRuleId, "rules" + category, rule.Rationale, rule.Points, true,

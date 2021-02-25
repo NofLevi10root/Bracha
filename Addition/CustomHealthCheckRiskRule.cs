@@ -16,17 +16,17 @@ namespace PingCastle.Addition
         {
             get
             {
-                return this.Points.ToString();
+                return Points.ToString();
             }
             set
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    this.Points = 0;
+                    Points = 0;
                 }
                 else
                 {
-                    this.Points = int.Parse(value);
+                    Points = int.Parse(value);
                 }
             }
         }

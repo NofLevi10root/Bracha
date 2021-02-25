@@ -612,6 +612,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 if (tooltips != null && tooltips.ContainsKey(i))
                     tooltip = tooltips[i];
                 Add(@"<rect class=""bar"" fill=""#Fa9C1A"" x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
+                //Add(@"<rect class=""bar"" fill=""#00B0D2"" x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
                 AddEncoded(tooltip);
                 Add(@"""></rect>");
             }
@@ -634,6 +635,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 if (string.IsNullOrEmpty(tooltip))
                     tooltip = value.ToString();
                 Add(@"<rect class=""bar"" fill=""#Fa9C1A"" x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
+                //Add(@"<rect class=""bar"" fill=""#00B0D2"" x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
                 AddEncoded(tooltip);
                 Add(@"""></rect>");
             }
