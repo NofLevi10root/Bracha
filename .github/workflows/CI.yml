@@ -20,11 +20,11 @@ jobs:
     - name: Restore NuGet Packages
       run: nuget restore PingCastle.sln
  
-    - name: Build and Publish Web App
+    - name: Build and Publish
       run: msbuild PingCastle.sln /p:Configuration=Release /p:DeployOnBuild=true
       
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2.2.2
       with:
         name: published
-        path: bin\Release\Publish
+        path: bin\Release
