@@ -19,7 +19,7 @@ namespace PingCastle.Scanners
 	public class ConsistencyScanner : IScanner
 	{
 		public string Name { get { return "corruptADDatabase"; } }
-		public string Description { get { return "Try to detect corrupted AD database. To run only when requested by PingCastle support."; } }
+		public string Description { get { return "Try to detect corrupted AD database. To run only when requested by RisX support."; } }
 
 		public string Server { get; private set; }
 		public int Port { get; private set; }

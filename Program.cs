@@ -88,7 +88,7 @@ namespace PingCastle
 		{
 			ADHealthCheckingLicense license = null;
 			Version version = Assembly.GetExecutingAssembly().GetName().Version;
-			Trace.WriteLine("PingCastle version " + version.ToString(4));
+			Trace.WriteLine("10Root RisX powered by PingCastle version " + version.ToString(4));
 			for (int i = 0; i < args.Length; i++)
 			{
 				if (args[i].Equals("--debug-license", StringComparison.InvariantCultureIgnoreCase))
@@ -136,12 +136,10 @@ namespace PingCastle
 				Console.WriteLine();
 			}
 			tasks.License = license;
-			ConsoleMenu.Header = @"|:.      PingCastle (Version " + version.ToString(4) + @"     " + ConsoleMenu.GetBuildDateTime(Assembly.GetExecutingAssembly()) + @")
-|  #:.   Get Active Directory Security at 80% in 20% of the time
-# @@  >  " + (license.EndTime < DateTime.MaxValue ? "End of support: " + license.EndTime.ToShortDateString() : "") + @"
-| @@@:   
-: .#                                 Vincent LE TOUX (contact@pingcastle.com)
-  .:       twitter: @mysmartlogon                    https://www.pingcastle.com"; 
+			ConsoleMenu.Header = @"|     10Root RisX powered by PingCastle (Version " + version.ToString(4) + @"     " + ConsoleMenu.GetBuildDateTime(Assembly.GetExecutingAssembly()) + @")
+|     Get Active Directory Security at 80% in 20% of the time
+|     " + (license.EndTime < DateTime.MaxValue ? "End of support: " + license.EndTime.ToShortDateString() : "") + @"     |     https://10root.com
+";
 			if (!ParseCommandLine(args))
 				return;
 			// Trace to file or console may be enabled here
@@ -862,11 +860,11 @@ namespace PingCastle
 			PerformScanner = false;
 
 			List<ConsoleMenuItem> choices = new List<ConsoleMenuItem>() {
-				new ConsoleMenuItem("healthcheck","Score the risk of a domain", "This is the main functionnality of PingCastle. In a matter of minutes, it produces a report which will give you an overview of your Active Directory security. This report can be generated on other domains by using the existing trust links."),
+				new ConsoleMenuItem("healthcheck","Score the risk of a domain", "This is the main functionnality of RisX. In a matter of minutes, it produces a report which will give you an overview of your Active Directory security. This report can be generated on other domains by using the existing trust links."),
 				new ConsoleMenuItem("conso","Aggregate multiple reports into a single one", "With many healthcheck reports, you can get a single report for a whole scope. Maps will be generated."),
 				new ConsoleMenuItem("carto","Build a map of all interconnected domains", "It combines the healthcheck reports that would be run on all trusted domains and then the conso option. But lighter and then faster."),
 				new ConsoleMenuItem("scanner","Perform specific security checks on workstations", "You can know your local admins, if Bitlocker is properly configured, discover unprotect shares, ... A menu will be shown to select the right scanner."),
-				new ConsoleMenuItem("advanced","Open the advanced menu", "This is the place you want to configure PingCastle without playing with command line switches."),
+				new ConsoleMenuItem("advanced","Open the advanced menu", "This is the place you want to configure RisX without playing with command line switches."),
 			};
 
 			ConsoleMenu.Title = "What do you want to do?";
@@ -971,7 +969,7 @@ namespace PingCastle
 
 			List<ConsoleMenuItem> choices = new List<ConsoleMenuItem>() {
 				new ConsoleMenuItem("protocol","Change the protocol used to query the AD (LDAP, ADWS, ...)"),
-				new ConsoleMenuItem("hcrules","Generate a report containing all rules applied by PingCastle"),
+				new ConsoleMenuItem("hcrules","Generate a report containing all rules applied by RisX"),
 				new ConsoleMenuItem("generatekey","Generate RSA keys used to encrypt and decrypt reports"),
 				new ConsoleMenuItem("noenumlimit","Remove the 100 items limitation in healthcheck reports"),
 				new ConsoleMenuItem("decrypt","Decrypt a xml report"),
@@ -1173,7 +1171,7 @@ namespace PingCastle
 			Console.WriteLine("");
 			Console.WriteLine("    --I-swear-I-paid-win7-support : meaningless");
 			Console.WriteLine("");
-			Console.WriteLine("--rules               : Generate an html containing all the rules used by PingCastle");
+			Console.WriteLine("--rules               : Generate an html containing all the rules used by RisX");
 			Console.WriteLine("");
 			Console.WriteLine("  --generate-key      : generate and display a new RSA key for encryption");
 			Console.WriteLine("");

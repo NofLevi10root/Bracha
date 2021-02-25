@@ -427,7 +427,7 @@ namespace PingCastle
 
 		public bool ConsolidationTask<T>() where T : IPingCastleReport
 		{
-			return StartTask("PingCastle report consolidation (" + typeof(T).Name + ")",
+			return StartTask("RisX report consolidation (" + typeof(T).Name + ")",
 					() =>
 					{
 						if (String.IsNullOrEmpty(FileOrDirectory))
@@ -442,7 +442,7 @@ namespace PingCastle
 						var consolidation = PingCastleReportHelper<T>.LoadXmls(FileOrDirectory, FilterReportDate);
 						if (consolidation.Count == 0)
 						{
-							WriteInRed("No report has been found. Please generate one with PingCastle and try again. The task will stop.");
+							WriteInRed("No report has been found. Please generate one with RisX and try again. The task will stop.");
 							return;
 						}
 						if (typeof(T) == typeof(HealthcheckData))
@@ -465,7 +465,7 @@ namespace PingCastle
 
 		public bool HealthCheckRulesTask()
 		{
-			return StartTask("PingCastle Health Check rules",
+			return StartTask("RisX Health Check rules",
 					() =>
 					{
 						if (String.IsNullOrEmpty(FileOrDirectory))
@@ -626,7 +626,7 @@ namespace PingCastle
 						var consolidation = PingCastleReportHelper<HealthcheckData>.LoadXmls(FileOrDirectory, FilterReportDate);
 						if (consolidation.Count == 0)
 						{
-							WriteInRed("No report has been found. Please generate one with PingCastle and the Healtch Check mode. The program will stop.");
+							WriteInRed("No report has been found. Please generate one with RisX and the Healtch Check mode. The program will stop.");
 							return;
 						}
 						consolidation = PingCastleReportHelper<HealthcheckData>.TransformReportsToDemo(consolidation);

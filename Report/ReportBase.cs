@@ -119,7 +119,8 @@ namespace PingCastle.Report
 			{
 				ComputeCSPHash(css);
 			}
-            Add(@" 'unsafe-inline'; object-src 'none'; base-uri https://www.pingcastle.com ; img-src data: https://www.pingcastle.com;""/>");
+            //Add(@" 'unsafe-inline'; object-src 'none'; base-uri https://www.pingcastle.com ; img-src data: https://www.pingcastle.com;""/>");
+            Add(@" 'unsafe-inline'; object-src 'none'; base-uri https://www.10root.com ; img-src data: https://www.10root.com;""/>");
 		}
 
 		private void ComputeCSPHash(string css)

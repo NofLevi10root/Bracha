@@ -83,7 +83,7 @@ namespace PingCastle.Rules
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("An exception occured when running the rule : " + ruleName);
-                    Console.WriteLine("Please contact support@pingcastle.com with the following details so the problem can be fixed");
+                    Console.WriteLine("Please contact support@10root.com with the following details so the problem can be fixed");
                     Console.ResetColor();
                     Console.WriteLine("Message: " + ex.Message);
                     Console.WriteLine("StackTrace: " + ex.StackTrace);
