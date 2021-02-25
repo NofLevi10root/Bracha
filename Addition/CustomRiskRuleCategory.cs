@@ -14,5 +14,17 @@ namespace PingCastle.Addition
         public string Explanation { get; set; }
         public int Score { get; set; } = 0;
         #endregion
+
+        #region Methods
+        public static string ParseCategoriesToTableHeaders(List<CustomRiskRuleCategory> categories)
+        {
+            StringBuilder builder = new StringBuilder();
+            foreach (var category in categories) // transfer to static method in customdata
+            {
+                builder.Append(@"<th>" + category.Name + @"</th>");
+            }
+            return builder.ToString();
+        }
+        #endregion
     }
 }

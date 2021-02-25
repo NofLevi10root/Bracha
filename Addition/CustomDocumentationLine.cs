@@ -14,7 +14,7 @@ namespace PingCastle.Addition
         #endregion
 
         #region Methods
-        public static string ParseToDocumentaionLine(CustomDocumentationLine line)
+        public static string ParseToDocumentationLine(CustomDocumentationLine line)
         {
             StringBuilder builder = new StringBuilder();
             if(!string.IsNullOrEmpty(line.Target))

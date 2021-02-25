@@ -149,6 +149,7 @@ namespace PingCastle.Addition
                 if (tooltips != null && tooltips.ContainsKey(i))
                     tooltip = tooltips[i];
                 builder.Append(@"<rect class=""bar"" fill=""#Fa9C1A"" x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
+                //builder.Append(@"<rect class=""bar"" fill=""#00B0D2"" x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
                 builder.Append(Report.ReportHelper.Encode(tooltip));
                 builder.Append(@"""></rect>");
             }
@@ -171,6 +172,7 @@ namespace PingCastle.Addition
                 if (string.IsNullOrEmpty(tooltip))
                     tooltip = value.ToString();
                 builder.Append(@"<rect class=""bar"" fill=""#Fa9C1A"" x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
+                //builder.Append(@"<rect class=""bar"" fill=""#00B0D2"" x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
                 builder.Append(Report.ReportHelper.Encode(tooltip));
                 builder.Append(@"""></rect>");
             }

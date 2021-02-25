@@ -70,9 +70,9 @@ color: #FFFFFF;
 svg {
 	font: 10px sans-serif;
 }
-.indicators-border
-{
-border: 2px solid #Fa9C1A;
-margin:2px;
-padding: 2px;
+.indicators-border {
+	/*border: 2px solid #Fa9C1A;*/
+	border: 2px solid #00B0D2;
+	margin: 2px;
+	padding: 2px;
 }

@@ -10,7 +10,7 @@ namespace PingCastle.Addition
         #region Properties
         public string Id { get; set; }
         public string Description { get; set; }
-        public string RiskRuleCategoryId { get; set; }
+        public string Category { get; set; }
         #endregion
 
         #region Constructors

@@ -43,7 +43,8 @@ namespace PingCastle.Addition
         private string dataDirectory;
         private readonly Dictionary<string, CustomRiskRuleCategory> dictCategories;
         private readonly Dictionary<string, CustomRiskModelCategory> dictModels;
-        private readonly Dictionary<string, CustomRiskRule> dictRiskRules;       
+        private readonly Dictionary<string, CustomRiskRule> dictRiskRules;    
+        
         #endregion
 
         #region Constructors
@@ -74,7 +75,6 @@ namespace PingCastle.Addition
             output.dataDirectory = Path.GetDirectoryName(filename);
             return output;
         }
-
         private static XmlDocument LoadXmlDocument(Stream report, string filenameForDebug)
         {
             XmlDocument xmlDoc = new XmlDocument();
@@ -122,7 +122,10 @@ namespace PingCastle.Addition
                 if (!dictRiskRules.ContainsKey(riskRule.Id))
                     dictRiskRules.Add(riskRule.Id, riskRule);
                 if (dictModels.ContainsKey(riskRule.Model))
-                    riskRule.Category = dictModels[riskRule.Model].RiskRuleCategoryId;
+                {
+                    riskRule.Category = dictModels[riskRule.Model].Category;
+                }
+                    
             }
             #endregion
             #region Fill Health Risk Rules Data

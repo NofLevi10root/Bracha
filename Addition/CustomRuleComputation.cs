@@ -16,17 +16,17 @@ namespace PingCastle.Addition
         {
             get
             {
-                return this.Score.ToString();
+                return Score.ToString();
             }
             set
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    this.Score = 0;
+                    Score = 0;
                 }
                 else
                 {
-                    this.Score = int.Parse(value);
+                    Score = int.Parse(value);
                 }
             }
         }
@@ -37,17 +37,17 @@ namespace PingCastle.Addition
         {
             get
             {
-                return this.Threshold.ToString();
+                return Threshold.ToString();
             }
             set
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    this.Threshold = 0;
+                    Threshold = 0;
                 }
                 else
                 {
-                    this.Threshold = int.Parse(value);
+                    Threshold = int.Parse(value);
                 }
             }
         }
@@ -58,17 +58,17 @@ namespace PingCastle.Addition
         {
             get
             {
-                return this.Order.ToString();
+                return Order.ToString();
             }
             set
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    this.Order = 0;
+                    Order = 0;
                 }
                 else
                 {
-                    this.Order = int.Parse(value);
+                    Order = int.Parse(value);
                 }
             }
         }

@@ -19,17 +19,17 @@ namespace PingCastle.Addition
         {
             get
             {
-                return this.Maturity.ToString();
+                return Maturity.ToString();
             }
             set
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    this.Maturity = 0;
+                    Maturity = 0;
                 }
                 else
                 {
-                    this.Maturity = int.Parse(value);
+                    Maturity = int.Parse(value);
                 }
             }
         }
@@ -57,7 +57,7 @@ namespace PingCastle.Addition
         #endregion
 
         #region Methods
-        public static CustomRiskRule GetFromRiskRule<T>(RuleBase<T> rule)
+        public static CustomRiskRule GetFromRuleBase<T>(RuleBase<T> rule)
         {
             if (rule == null)
                 return null;
@@ -145,7 +145,7 @@ namespace PingCastle.Addition
                 string[] lines = new string[DocumentationHelper.Count];
                 for(int i = 0; i < lines.Length; i++)
                 {
-                    lines[i] = CustomDocumentationLine.ParseToDocumentaionLine(DocumentationHelper[i]);
+                    lines[i] = CustomDocumentationLine.ParseToDocumentationLine(DocumentationHelper[i]);
                 }
                 Documentation =  string.Join("<br>", lines);
             }
