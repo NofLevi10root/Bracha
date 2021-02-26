@@ -473,4 +473,8 @@ powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "Process
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="AfterBuild">
+    <Copy SourceFiles="bin\$(Configuration)\PingCastle.exe.config" 
+          DestinationFolder="bin\$(Configuration)\app.publish" />
+  </Target>
 </Project>
