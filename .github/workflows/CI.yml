@@ -21,7 +21,7 @@ jobs:
       run: nuget restore PingCastle.sln
  
     - name: Build and Publish
-      run: msbuild PingCastle.sln /p:Configuration=Release /p:DeployOnBuild=true /p:TargetFrameworkVersion="v2.0"
+      run: msbuild PingCastle.sln /p:Configuration=Release /p:DeployOnBuild=true /p:TargetFrameworkVersion="v3.0"
       
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2.2.2
