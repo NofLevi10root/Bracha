@@ -27,4 +27,4 @@ jobs:
       uses: actions/upload-artifact@v2.2.2
       with:
         name: published
-        path: bin\Release
+        path: bin\Release\app.publish
