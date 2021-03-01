@@ -11,7 +11,7 @@ namespace PingCastle.Addition
         #region Properties
         public CustomDetailsType Type { get; set; }
         public string FilePath { get; set; }
-        public string SectionId { get; set; }
+        public string TableId { get; set; }
         #endregion
 
         #region Methods
@@ -178,96 +178,6 @@ namespace PingCastle.Addition
             }
             builder.Append(@"</g></svg></div>");
             return builder.ToString();
-        }
-        public void AddSharedTableData(List<List<string>> sharedTable)
-        {
-            if (!File.Exists(FilePath))
-                return;
-            
-            var lines = File.ReadAllLines(FilePath);
-            if (lines.Length == 0)
-                return;
-            if (sharedTable.Count == 0)
-            {
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    List<string> line = new List<string>();
-                    foreach (var part in lines[i].Split(','))
-                    {
-                        line.Add(part.Trim());
-                    }
-                    sharedTable.Add(line);
-                }
-            }
-            else
-            {
-                var headers = lines[0].Split(',');
-                var colsNum = headers.Length;
-                string[][] data = new string[lines.Length][];
-                for (int i = 0; i < lines.Length; i++) // build table 
-                {
-                    data[i] = new string[colsNum];
-                    var lineParts = lines[i].Split(',');
-                    for (int q = 0; q < lineParts.Length; q++)
-                    {
-                        data[i][q] = lineParts[q].Trim();
-                    }
-                }
-
-                List<int> colsToAdd = new List<int>(); // find which cols doesn't already exist
-                for (int i = 0; i < colsNum; i++)
-                {
-                    string header = headers[i].Trim();
-                    if (!sharedTable[0].Contains(header))
-                    {
-                        sharedTable[0].Add(header);
-                        colsToAdd.Add(i);
-                    }
-                }
-                    
-                        
-
-                for(int i = 1; i < lines.Length; i++) //run on each line
-                {
-                    List<string> lineParts = new List<string>();
-                    foreach (var part in lines[i].Split(','))
-                        lineParts.Add(part.Trim());
-
-                    foreach(var row in sharedTable)
-                    {
-                        if(row[0] == lineParts[0]) // same key
-                        {
-                            foreach(var colToAdd in colsToAdd) // add missing cols
-                            {
-                                row.Add(lineParts[colToAdd]);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        public static List<string> ParseSharedTable(List<List<string>> sharedTable)
-        {
-            if (sharedTable.Count == 0)
-                return null;
-            List<string> output = new List<string>();
-
-            List<string> headers = new List<string>();
-
-            foreach (var header in sharedTable[0]) // Headers
-            {
-                headers.Add(header + ": ");
-            }
-            for (int i = 1; i < sharedTable.Count; i++) // Rows
-            {
-                StringBuilder builder = new StringBuilder();
-                for (int q = 0; q < sharedTable[i].Count; q++)
-                {
-                    builder.Append(headers[q] + sharedTable[i][q] + " ");
-                }
-                output.Add(builder.ToString());
-            }
-            return output;
         }
         #endregion
     }

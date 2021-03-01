@@ -41,17 +41,15 @@ namespace PingCastle.Addition
         [XmlArray("Tables")]
         [XmlArrayItem(ElementName = "Table")]
         public List<CustomTable> Tables { get; set; }
-
-        [XmlIgnore]
-        public Dictionary<string, List<List<string>>> DictCustomTables { get; set; } // [tableName/SectionName][rows][cols]
         #endregion
 
         #region Fields
         private string dataDirectory;
         private readonly Dictionary<string, CustomRiskRuleCategory> dictCategories;
         private readonly Dictionary<string, CustomRiskModelCategory> dictModels;
-        private readonly Dictionary<string, CustomRiskRule> dictRiskRules;    
-        
+        private readonly Dictionary<string, CustomRiskRule> dictRiskRules;
+        private readonly Dictionary<string, CustomTable> dictTables;
+        private readonly Dictionary<string, CustomInformationSection> dictSections;
         #endregion
 
         #region Constructors
@@ -61,12 +59,14 @@ namespace PingCastle.Addition
             Models = new List<CustomRiskModelCategory>();
             RiskRules = new List<CustomRiskRule>();
             HealthRules = new List<CustomHealthCheckRiskRule>();
+            InformationSections = new List<CustomInformationSection>();
             Tables = new List<CustomTable>();
 
             dictCategories = new Dictionary<string, CustomRiskRuleCategory>();
             dictModels = new Dictionary<string, CustomRiskModelCategory>();
             dictRiskRules = new Dictionary<string, CustomRiskRule>();
-            DictCustomTables = new Dictionary<string, List<List<string>>>();
+            dictTables = new Dictionary<string, CustomTable>();
+            dictSections = new Dictionary<string, CustomInformationSection>();
         }
         #endregion
 
@@ -110,6 +110,17 @@ namespace PingCastle.Addition
         }
         public void FillData(HealthcheckData healthData)
         {
+            #region Add Sections
+            foreach (var section in InformationSections)
+                dictSections.Add(section.Id, section);
+            #endregion
+            #region Add Tables
+            foreach (var table in Tables)
+            {
+                dictTables.Add(table.Id, table);
+                table.SetInitData();
+            }
+            #endregion
             #region Add Categories To Dictionary
             foreach (var category in Categories)
             {
@@ -159,11 +170,11 @@ namespace PingCastle.Addition
                             }
                             else if(detail.Type == CustomDetailsType.SharedTable)
                             {
-                                if (string.IsNullOrEmpty(detail.SectionId))
+                                if (string.IsNullOrEmpty(detail.TableId))
                                     continue;
-                                if (!DictCustomTables.ContainsKey(detail.SectionId))
-                                    DictCustomTables.Add(detail.SectionId, new List<List<string>>());
-                                detail.AddSharedTableData(DictCustomTables[detail.SectionId]);
+                                if (!dictTables.ContainsKey(detail.TableId))
+                                    dictTables.Add(detail.TableId, new CustomTable());
+                                dictTables[detail.TableId].AddDetail(detail);
                             }
                         }
                         
@@ -249,35 +260,31 @@ namespace PingCastle.Addition
             }
             return min;
         }
-        public List<string> GetCustomTableHeaders(string table)
+        public List<string> GetCustomTableRow(string table, string key)
         {
             List<string> output = new List<string>();
-            if (DictCustomTables.ContainsKey(table))
+            if (dictTables.ContainsKey(table))
             {
-                for (int i = 1; i < DictCustomTables[table][0].Count; i++)
+                for(int col = 1; col < dictTables[table].Columns.Count; col++)
                 {
-                    output.Add(DictCustomTables[table][0][i]);
+                    if (dictTables[table].Columns[col].Values.ContainsKey(key))
+
+                        output.Add(dictTables[table].Columns[col].Values[key]);
                 }
             }
             return output;
         }
-        public List<string> GetCustomTableRow(string table, string key)
+        public CustomInformationSection GetSection(string id)
         {
-            List<string> output = new List<string>();
-            if (DictCustomTables.ContainsKey("operatingsystems"))
-            {
-                for (int row = 1; row < DictCustomTables["operatingsystems"].Count; row++) // find key (Correct row)
-                {
-                    if (key == DictCustomTables["operatingsystems"][row][0])
-                    {
-                        for (int col = 1; col < DictCustomTables["operatingsystems"][0].Count; col++)
-                        {
-                            output.Add(DictCustomTables["operatingsystems"][row][col]);
-                        }
-                    }
-                }
-            }
-            return output;
+            if (dictSections.ContainsKey(id))
+                return dictSections[id];
+            return null;
+        }
+        public CustomTable GetTable(string id)
+        {
+            if (dictTables.ContainsKey(id))
+                return dictTables[id];
+            return null;
         }
         #endregion
     }
