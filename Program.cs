@@ -28,6 +28,7 @@ namespace PingCastle
 	{
 		bool PerformHealthCheckReport = false;
 		bool PerformHealthCheckConsolidation = false;
+		private bool PerformAdvancedConsolidation = false;
 		bool PerformGenerateKey = false;
 		bool PerformCarto = false;
 		bool PerformUploadAllReport;
@@ -168,8 +169,15 @@ namespace PingCastle
 			if (PerformHealthCheckReport)
 			{
 				if (!tasks.AnalysisTask<HealthcheckData>()) return;
-			}
-			if (PerformHealthCheckConsolidation || (PerformHealthCheckReport && tasks.Server == "*" && tasks.InteractiveMode))
+                // Addition
+                if (tasks.xmlreports.Count > 0 && !string.IsNullOrEmpty(tasks.Server) && !string.IsNullOrEmpty(tasks.CustomConfigFileOrDirectory))
+                {
+					//get only one -- need to implement for * [ can get names from tasks.xmlreports]
+					tasks.FileOrDirectory = "ad_hc_" + tasks.Server + ".xml";
+					if (!tasks.AdvancedRegenerateHtmlTask()) return;
+				}
+            }
+			if (PerformHealthCheckConsolidation || PerformAdvancedConsolidation || (PerformHealthCheckReport && tasks.Server == "*" && tasks.InteractiveMode))
 			{
 				if (!tasks.ConsolidationTask<HealthcheckData>()) return;
 			}
@@ -181,7 +189,7 @@ namespace PingCastle
 			{
 				if (!tasks.RegenerateHtmlTask()) return;
 			}
-			if (PerformAdvancedRegenerateReport)
+			if (PerformAdvancedRegenerateReport) // maybe add here Or To Run On Results
 			{
 				if (!tasks.AdvancedRegenerateHtmlTask()) return;
 			}
@@ -294,6 +302,19 @@ namespace PingCastle
 				{
 					switch (args[i])
 					{
+						case "--add-data":
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --add-data is mandatory");
+								return false;
+							}
+							tasks.CustomConfigFileOrDirectory = args[++i];
+							if (!File.Exists(tasks.CustomConfigFileOrDirectory))
+							{
+								WriteInRed("The file " + tasks.CustomConfigFileOrDirectory + " doesn't exist");
+								return false;
+							}
+							break;
 						case "--api-endpoint":
 							if (i + 1 >= args.Length)
 							{
@@ -397,7 +418,7 @@ namespace PingCastle
 								return false;
 							}
 							tasks.FileOrDirectory = args[++i];
-							tasks.CustomConfigFileOrDirectory = args[++i]; // need to check maybe without +1
+							tasks.CustomConfigFileOrDirectory = args[++i];
 							break;
 						case "--generate-fake-reports":
 							PerformGenerateFakeReport = true;
@@ -410,6 +431,15 @@ namespace PingCastle
 							break;
 						case "--hc-conso":
 							PerformHealthCheckConsolidation = true;
+							break;
+						case "--advanced-hc-conso":
+							PerformAdvancedConsolidation = true;
+							if (i + 1 >= args.Length)
+							{
+								WriteInRed("argument for --advanced-hc-conso is mandatory");
+								return false;
+							}
+							tasks.AdvancedConsoDirectory = args[++i];
 							break;
 						case "--help":
 							DisplayHelp();
@@ -724,7 +754,7 @@ namespace PingCastle
 				}
 				Trace.WriteLine("After parsing arguments");
 			}
-			if (!PerformHealthCheckReport && !PerformHealthCheckConsolidation
+			if (!PerformHealthCheckReport && !PerformHealthCheckConsolidation && !PerformAdvancedConsolidation
 				&& !PerformRegenerateReport && !PerformAdvancedRegenerateReport && !PerformHealthCheckReloadReport && !delayedInteractiveMode
 				&& !PerformScanner
 				&& !PerformGenerateKey && !PerformHealthCheckGenerateDemoReports && !PerformCarto
@@ -733,7 +763,7 @@ namespace PingCastle
 				&& !PerformGenerateFakeReport
 				&& !PerformBot)
 			{
-				WriteInRed("You must choose at least one value among --healthcheck --hc-conso --advanced-export --advanced-report --nullsession --carto");
+				WriteInRed("You must choose at least one value among --healthcheck --hc-conso --advanced-hc-conso --advanced-export --advanced-report --nullsession --carto");
 				DisplayHelp();
 				return false;
 			}
@@ -841,18 +871,19 @@ namespace PingCastle
             return builder.ToString();
         }
 
-        private enum DisplayState
-        {
-            Exit,
-            MainMenu,
-            ScannerMenu,
-            AskForServer,
-            Run,
-            AvancedMenu,
-            AskForScannerParameter,
-            ProtocolMenu,
-            AskForFile,
-        }
+		private enum DisplayState
+		{
+			Exit,
+			MainMenu,
+			ScannerMenu,
+			AskForServer,
+			Run,
+			AvancedMenu,
+			AskForScannerParameter,
+			ProtocolMenu,
+			AskForFile,
+			AskForDir, // Addition
+		}
 
         DisplayState DisplayMainMenu()
         {
@@ -958,6 +989,7 @@ namespace PingCastle
 			PerformHealthCheckReloadReport = false;
 			PerformRegenerateReport = false;
 			PerformAdvancedRegenerateReport = false;
+			PerformAdvancedConsolidation = false;
 			PerformHCRules = false;
             return DisplayState.Run;
 			List<ConsoleMenuItem> choices = new List<ConsoleMenuItem>() {
@@ -968,6 +1000,8 @@ namespace PingCastle
 				new ConsoleMenuItem("decrypt","Decrypt a xml report"),
 				new ConsoleMenuItem("regenerate","Regenerate the html report based on the xml report"),
 				new ConsoleMenuItem("advanced regenerate","Advanced regenerate of the html report based on report and config xml files"),
+				new ConsoleMenuItem("advanced conso","Aggregate multiple reports into a single one adding advance data to each one",
+					"With many healthcheck reports, you can get a single report for a whole scope.Maps will be generated."),
 				new ConsoleMenuItem("log","Enable logging (log is " + (Trace.Listeners.Count > 1 ? "enabled":"disabled") + ")"),
 			};
 			List<ConsoleMenuItem> choices = new List<ConsoleMenuItem>() {
@@ -997,6 +1031,9 @@ namespace PingCastle
 				case "advanced regenerate":
 					PerformAdvancedRegenerateReport = true;
 					return DisplayState.AskForFile;
+				case "advanced conso":
+					PerformAdvancedConsolidation = true;
+					return DisplayState.AskForDir;
 				case "log":
 					if (Trace.Listeners.Count <= 1)
 						EnableLogFile();
@@ -1071,61 +1108,83 @@ namespace PingCastle
 			return DisplayState.Run;
 		}
 
-        // interactive interface
-        private bool RunInteractiveMode()
-        {
-            tasks.InteractiveMode = true;
-            Stack<DisplayState> states = new Stack<DisplayState>();
-            var state = DisplayState.MainMenu;
+		DisplayState DisplayAskForDirectory()
+		{
+			string dir = null;
+			if (PerformAdvancedConsolidation)
+			{
+				dir = null;
+				while (String.IsNullOrEmpty(dir) || !Directory.Exists(dir))
+				{
+					ConsoleMenu.Title = "Select a config xml files directory";
+					ConsoleMenu.Information = "Please specify the directory of the data xml files.";
+					dir = ConsoleMenu.AskForString();
+					ConsoleMenu.Notice = "The directory " + dir + " was not found";
+				}
+				tasks.AdvancedConsoDirectory = dir;
+			}
+			tasks.EncryptReport = false;
+			return DisplayState.Run;
+		}
 
-            states.Push(state);
-            while (states.Count > 0 && states.Peek() != DisplayState.Run)
-            {
-                switch (state)
-                {
-                    case DisplayState.MainMenu:
-                        state = DisplayMainMenu();
-                        break;
-                    case DisplayState.ScannerMenu:
-                        state = DisplayScannerMenu();
-                        break;
-                    case DisplayState.AskForServer:
-                        state = DisplayAskServer();
-                        break;
-                    case DisplayState.AskForScannerParameter:
-                        state = DisplayAskForScannerParameter();
-                        break;
-                    case DisplayState.AvancedMenu:
-                        state = DisplayAdvancedMenu();
-                        break;
-                    case DisplayState.AskForFile:
-                        state = DisplayAskForFile();
-                        break;
-                    case DisplayState.ProtocolMenu:
-                        state = DisplayProtocolMenu();
-                        break;
-                    default:
-                        // defensive programming
-                        if (state != DisplayState.Exit)
-                        {
-                            Console.WriteLine("No implementation of state " + state);
-                            state = DisplayState.Exit;
-                        }
-                        break;
-                }
-                if (state == DisplayState.Exit)
-                {
-                    states.Pop();
-                    if (states.Count > 0)
-                        state = states.Peek();
-                }
-                else
-                {
-                    states.Push(state);
-                }
-            }
-            return (states.Count > 0);
-        }
+		// interactive interface
+		private bool RunInteractiveMode()
+		{
+			tasks.InteractiveMode = true;
+			Stack<DisplayState> states = new Stack<DisplayState>();
+			var state = DisplayState.MainMenu;
+
+			states.Push(state);
+			while (states.Count > 0 && states.Peek() != DisplayState.Run)
+			{
+				switch (state)
+				{
+					case DisplayState.MainMenu:
+						state = DisplayMainMenu();
+						break;
+					case DisplayState.ScannerMenu:
+						state = DisplayScannerMenu();
+						break;
+					case DisplayState.AskForServer:
+						state = DisplayAskServer();
+						break;
+					case DisplayState.AskForScannerParameter:
+						state = DisplayAskForScannerParameter();
+						break;
+					case DisplayState.AvancedMenu:
+						state = DisplayAdvancedMenu();
+						break;
+					case DisplayState.AskForFile:
+						state = DisplayAskForFile();
+						break;
+					case DisplayState.AskForDir:
+						state = DisplayAskForDirectory();
+						break;
+					case DisplayState.ProtocolMenu:
+						state = DisplayProtocolMenu();
+						break;
+					default:
+						// defensive programming
+						if (state != DisplayState.Exit)
+						{
+							Console.WriteLine("No implementation of state " + state);
+							state = DisplayState.Exit;
+						}
+						break;
+				}
+				if (state == DisplayState.Exit)
+				{
+					states.Pop();
+					if (states.Count > 0)
+						state = states.Peek();
+				}
+				else
+				{
+					states.Push(state);
+				}
+			}
+			return (states.Count > 0);
+		}
 
 		private static void DisplayHelp()
 		{
@@ -1148,6 +1207,7 @@ namespace PingCastle
 			Console.WriteLine("  --carto             : perform a quick cartography with domains surrounding");
 			Console.WriteLine("");
 			Console.WriteLine("  --healthcheck       : perform the healthcheck (step1)");
+			Console.WriteLine("    --add-data <xml> : add advanced data to scan result");
 			Console.WriteLine("    --api-endpoint <> : upload report via api call eg: http://server");
 			Console.WriteLine("    --api-key  <key>  : and using the api key as registered");
 			Console.WriteLine("    --explore-trust   : on domains of a forest, after the healthcheck, do the hc on all trusted domains except domains of the forest and forest trusts");
@@ -1179,6 +1239,7 @@ namespace PingCastle
 			Console.WriteLine("  --generate-key      : generate and display a new RSA key for encryption");
 			Console.WriteLine("");
 			Console.WriteLine("  --hc-conso          : consolidate multiple healthcheck xml reports (step2)");
+			Console.WriteLine("  --advanced-hc-conso <data directory> : consolidate multiple healthcheck xml reports adding custom data by xml files");
 			Console.WriteLine("    --center-on <domain> : center the simplified graph on this domain");
 			Console.WriteLine("                         default is the domain with the most links");
 			Console.WriteLine("    --xmls <path>     : specify the path containing xml (default: current directory)");

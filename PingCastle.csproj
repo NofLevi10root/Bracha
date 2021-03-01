@@ -102,6 +102,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Addition\CustomConsolidationData.cs" />
     <Compile Include="Addition\CustomDocumentationLine.cs" />
     <Compile Include="Addition\CustomHealthCheckData.cs" />
     <Compile Include="Addition\CustomHealthCheckRiskRule.cs" />
@@ -112,6 +113,8 @@
     <Compile Include="Addition\CustomRiskRuleCategory.cs" />
     <Compile Include="Addition\CustomRuleComputation.cs" />
     <Compile Include="Addition\CustomRuleDetails.cs" />
+    <Compile Include="Addition\CustomTable.cs" />
+    <Compile Include="Addition\CustomTableColumn.cs" />
     <Compile Include="ADWS\IADConnection.cs" />
     <Compile Include="ADWS\LinuxConnection.cs" />
     <Compile Include="ADWS\LinuxFileConnection.cs" />
@@ -474,7 +477,6 @@ powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "Process
   </Target>
   -->
   <Target Name="AfterBuild">
-    <Copy SourceFiles="bin\$(Configuration)\PingCastle.exe.config" 
-          DestinationFolder="bin\$(Configuration)\app.publish" />
+    <Copy SourceFiles="bin\$(Configuration)\PingCastle.exe.config" DestinationFolder="bin\$(Configuration)\app.publish" />
   </Target>
 </Project>

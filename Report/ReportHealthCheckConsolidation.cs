@@ -4,6 +4,10 @@
 //
 // Licensed under the Non-Profit OSL. See LICENSE file in the project root for full license information.
 //
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
 using PingCastle.Data;
 using PingCastle.Healthcheck;
 using PingCastle.Rules;
@@ -19,12 +23,12 @@ namespace PingCastle.Report
     {
         private PingCastleReportCollection<HealthcheckData> Report;
 
-        public string GenerateReportFile(PingCastleReportCollection<HealthcheckData> report, ADHealthCheckingLicense license, string filename)
-        {
-            Report = report;
-            Brand(license);
-            return GenerateReportFile(filename);
-        }
+		public string GenerateReportFile(PingCastleReportCollection<HealthcheckData> report, ADHealthCheckingLicense license, string filename)
+		{
+			Report = report;
+			Brand(license);
+			return GenerateReportFile(filename);
+		}
 
         public string GenerateRawContent(PingCastleReportCollection<HealthcheckData> report, string selectedTab = null)
         {
@@ -74,7 +78,7 @@ $('table').not('.model_table').DataTable(
 #endif
 			GenerateNavigation("Consolidation", null, DateTime.Now);
 			GenerateAbout(@"<p><strong>Generated with <a href=""https://10root.com"">10Root RisX</a> powered by <a href=""https://www.pingcastle.com"">Ping Castle</a> all rights reserved</strong></p>
-< p>Open source components:</p>
+<p>Open source components:</p>
 <ul>
 <li><a href=""https://getbootstrap.com/"">Bootstrap</a> licensed under the <a href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
 <li><a href=""https://datatables.net/"">DataTables</a> licensed under the <a href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>

@@ -25,6 +25,7 @@ namespace PingCastle.Report
         protected string ReportID;
         protected string PingCastleEnterpriseBaseUrl = "https://www.pingcastle.com/reports/";
 		protected CustomHealthCheckData CustomData;
+		protected CustomConsolidationData CustomConsoData;
 
         protected GetUrlDelegate GetUrlCallback;
 
