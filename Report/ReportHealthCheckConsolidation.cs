@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using PingCastle.Addition;
 using PingCastle.Data;
 using PingCastle.Healthcheck;
 using PingCastle.Rules;
@@ -22,6 +23,15 @@ namespace PingCastle.Report
 		public string GenerateReportFile(PingCastleReportCollection<HealthcheckData> report, ADHealthCheckingLicense license, string filename)
 		{
 			Report = report;
+			CustomConsoData = null;
+			Brand(license);
+			return GenerateReportFile(filename);
+		}
+
+		public string GenerateReportFile(PingCastleReportCollection<HealthcheckData> report, ADHealthCheckingLicense license, string filename, CustomConsolidationData customConsoData)
+		{
+			Report = report;
+			CustomConsoData = customConsoData;
 			Brand(license);
 			return GenerateReportFile(filename);
 		}
@@ -74,7 +84,7 @@ $('table').not('.model_table').DataTable(
 #endif
 			GenerateNavigation("Consolidation", null, DateTime.Now);
 			GenerateAbout(@"<p><strong>Generated with <a href=""https://10root.com"">10Root RisX</a> powered by <a href=""https://www.pingcastle.com"">Ping Castle</a> all rights reserved</strong></p>
-< p>Open source components:</p>
+<p>Open source components:</p>
 <ul>
 <li><a href=""https://getbootstrap.com/"">Bootstrap</a> licensed under the <a href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
 <li><a href=""https://datatables.net/"">DataTables</a> licensed under the <a href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>

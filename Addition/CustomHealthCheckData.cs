@@ -15,6 +15,9 @@ namespace PingCastle.Addition
     public class CustomHealthCheckData
     {
         #region Properties
+        [XmlElement("Domain")]
+        public string Domain { get; set; }
+
         [XmlArray("RiskRuleCategories")]
         [XmlArrayItem(ElementName = "RiskRuleCategory")]
         public List<CustomRiskRuleCategory> Categories { get; set; }
@@ -35,6 +38,10 @@ namespace PingCastle.Addition
         [XmlArrayItem(ElementName = "InformationSection")]
         public List<CustomInformationSection> InformationSections { get; set; }
 
+        [XmlArray("Tables")]
+        [XmlArrayItem(ElementName = "Table")]
+        public List<CustomTable> Tables { get; set; }
+
         [XmlIgnore]
         public Dictionary<string, List<List<string>>> DictCustomTables { get; set; } // [tableName/SectionName][rows][cols]
         #endregion
@@ -54,6 +61,7 @@ namespace PingCastle.Addition
             Models = new List<CustomRiskModelCategory>();
             RiskRules = new List<CustomRiskRule>();
             HealthRules = new List<CustomHealthCheckRiskRule>();
+            Tables = new List<CustomTable>();
 
             dictCategories = new Dictionary<string, CustomRiskRuleCategory>();
             dictModels = new Dictionary<string, CustomRiskModelCategory>();

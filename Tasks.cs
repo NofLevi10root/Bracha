@@ -41,6 +41,7 @@ namespace PingCastle
 		public List<string> NodesToInvestigate = new List<string>();
 		public string FileOrDirectory = null;
 		public string CustomConfigFileOrDirectory = null;
+		public string AdvancedConsoDirectory = null;
 		public PingCastleReportDataExportLevel ExportLevel = PingCastleReportDataExportLevel.Normal;
 		public string sendXmlTo;
 		public string sendHtmlTo;
@@ -65,8 +66,8 @@ namespace PingCastle
 		public bool AnalyzeReachableDomains;
 		public string botPipe;
 
-		Dictionary<string, string> xmlreports = new Dictionary<string, string>();
-		Dictionary<string, string> htmlreports = new Dictionary<string, string>();
+		public Dictionary<string, string> xmlreports = new Dictionary<string, string>(); // Addition -> I've changed it from [] to [public]
+		public Dictionary<string, string> htmlreports = new Dictionary<string, string>();// Addition -> I've changed it from [] to [public]
 
 		public bool GenerateKeyTask()
 		{
@@ -439,17 +440,46 @@ namespace PingCastle
 							WriteInRed("The directory " + FileOrDirectory + " doesn't exist");
 							return;
 						}
+						bool advancedGeneration = false;
+						if (!string.IsNullOrEmpty(AdvancedConsoDirectory))
+							advancedGeneration = true;
+						if (advancedGeneration && FileOrDirectory.ToLower() == AdvancedConsoDirectory.ToLower())
+                        {
+							WriteInRed("The reports directory and the data directory cannot be the same");
+							return;
+						}
 						var consolidation = PingCastleReportHelper<T>.LoadXmls(FileOrDirectory, FilterReportDate);
 						if (consolidation.Count == 0)
 						{
 							WriteInRed("No report has been found. Please generate one with RisX and try again. The task will stop.");
 							return;
 						}
+						// create here dictionary with all the domains as keys, and foreach value generated custom data
 						if (typeof(T) == typeof(HealthcheckData))
 						{
 							var hcconso = consolidation as PingCastleReportCollection<HealthcheckData>;
 							var report = new ReportHealthCheckConsolidation();
-							report.GenerateReportFile(hcconso, License, "ad_hc_summary.html");
+							if(advancedGeneration == true)
+                            {
+								CustomConsolidationData customData = new CustomConsolidationData();
+								foreach(var file in Directory.GetFiles(AdvancedConsoDirectory, "*.xml"))
+                                {
+									if(!customData.AddData(file))
+                                    {
+										WriteInRed("The " + file + " data file, missing the <Domain> Element.");
+										return;
+									}
+                                }
+								foreach(var domain in hcconso)
+                                {
+									customData.MergeDomainData(domain);
+                                }
+								report.GenerateReportFile(hcconso, License, "ad_hc_summary.html", customData);
+							}
+							else
+                            {
+								report.GenerateReportFile(hcconso, License, "ad_hc_summary.html");
+                            }
 							ReportHealthCheckMapBuilder nodeAnalyzer = new ReportHealthCheckMapBuilder(hcconso, License);
 							nodeAnalyzer.Log = Console.WriteLine;
 							nodeAnalyzer.GenerateReportFile("ad_hc_summary_full_node_map.html");
