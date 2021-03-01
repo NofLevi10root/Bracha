@@ -19,9 +19,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using PingCastle.Data;
 using System.DirectoryServices;
-using PingCastle.Report;
 using PingCastle.Addition;
 
 namespace PingCastle

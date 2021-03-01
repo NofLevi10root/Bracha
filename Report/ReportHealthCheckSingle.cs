@@ -19,6 +19,7 @@ using PingCastle.Rules;
 using PingCastle.Healthcheck;
 using PingCastle.Data;
 using PingCastle.Graph.Database;
+using PingCastle.Addition;
 
 namespace PingCastle.Report
 {
@@ -941,7 +942,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 			if(CustomData.DictCustomTables.ContainsKey(section.Id) && CustomData.DictCustomTables[section.Id].Count > 0)//Add Table
 			{
 				var tableData = CustomData.DictCustomTables[section.Id];
-				AddBeginTable();
+				AddBeginTable(section.Name);
 
 				foreach(var header in tableData[0])
                 {
