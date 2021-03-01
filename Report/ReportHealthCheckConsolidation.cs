@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using PingCastle.Addition;
 using PingCastle.Data;
 using PingCastle.Healthcheck;
 using PingCastle.Rules;
@@ -26,6 +27,15 @@ namespace PingCastle.Report
 		public string GenerateReportFile(PingCastleReportCollection<HealthcheckData> report, ADHealthCheckingLicense license, string filename)
 		{
 			Report = report;
+			CustomConsoData = null;
+			Brand(license);
+			return GenerateReportFile(filename);
+		}
+
+		public string GenerateReportFile(PingCastleReportCollection<HealthcheckData> report, ADHealthCheckingLicense license, string filename, CustomConsolidationData customConsoData)
+		{
+			Report = report;
+			CustomConsoData = customConsoData;
 			Brand(license);
 			return GenerateReportFile(filename);
 		}

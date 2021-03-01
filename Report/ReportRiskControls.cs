@@ -387,6 +387,155 @@ namespace PingCastle.Report
 			<i class=""risk_model_high"">&nbsp;</i> score higher than 30 - major risks identified
 			</div>
 		</div>");
+		}
+
+		protected void GenerateAdvancedRiskModelPanel(List<HealthcheckRiskRule> rules, int numberOfDomain = 1)
+		{
+			Add(@"
+		<div class=""row d-print-none""><div class=""col-lg-12"">
+			<a data-toggle=""collapse"" data-target=""#riskModel"">
+				<h2>Risk model</h2>
+			</a>
+		</div></div>
+		<div class=""row collapse show d-print-none"" id=""riskModel"">
+			<div class=""col-md-12 table-responsive"">
+				<table class=""model_table"">
+					<thead><tr><th></th><th>Stale Objects</th><th>Privileged accounts</th><th>Trusts</th><th>Anomalies</th>" 
+					+ CustomRiskRuleCategory.ParseCategoriesToTableHeaders(CustomData.Categories)
+					+ @"</tr></thead>
+					<tbody>
+");
+
+
+            var riskmodel = new Dictionary<string, List<CustomRiskModelCategory>>();
+			foreach(var category in Enum.GetValues(typeof(RiskRuleCategory)))
+            {
+				riskmodel[category.ToString()] = new List<CustomRiskModelCategory>();
+			}
+			foreach(var category in CustomData.Categories)
+            {
+				riskmodel[category.Id] = new List<CustomRiskModelCategory>();
+            }
+
+			for (int j = 1; j <= 4; j++)
+			{
+				for (int i = 0; ; i++)
+				{
+					int id = (1000 * j + i);
+					if (Enum.IsDefined(typeof(RiskModelCategory), id))
+					{
+						riskmodel[((RiskRuleCategory)j).ToString()].Add(new CustomRiskModelCategory((RiskModelCategory)id));
+					}
+					else
+						break;
+				}
+			}
+
+			foreach(var model in CustomData.Models)
+            {
+				riskmodel[model.Category].Add(model);
+            }
+			foreach(var category in riskmodel.Keys)
+            {
+				riskmodel[category].Sort((CustomRiskModelCategory a, CustomRiskModelCategory b) =>
+				{
+					return string.Compare(a.Description, b.Description);
+				});
+            }
+			for (int i = 0; ; i++)
+			{
+				string line = "<tr>";
+				bool HasValue = false;
+				foreach (var category in riskmodel.Keys)
+				{
+					if (i < riskmodel[category].Count)
+					{
+						HasValue = true;
+						CustomRiskModelCategory model = riskmodel[category][i];
+						int score = 0;
+						int numrules = 0;
+						List<HealthcheckRiskRule> rulematched = new List<HealthcheckRiskRule>();
+						foreach (HealthcheckRiskRule rule in rules)
+						{
+							if (rule.Model.ToString() == model.Id)
+							{
+								numrules++;
+								score += rule.Points;
+								rulematched.Add(rule);
+							}
+						}
+						foreach(var rule in CustomData.HealthRules)
+                        {
+							if(rule.Model == model.Id)
+                            {
+								numrules++;
+								score += rule.Points;
+								rulematched.Add(CustomHealthCheckRiskRule.ParseToHealthcheckRiskRule(rule));
+							}
+						}
+						string tdclass = "";
+						if (numrules == 0)
+						{
+							tdclass = "model_good";
+						}
+						else if (score == 0)
+						{
+							tdclass = "model_info";
+						}
+						else if (score <= 10 * numberOfDomain)
+						{
+							tdclass = "model_toimprove";
+						}
+						else if (score <= 30 * numberOfDomain)
+						{
+							tdclass = "model_warning";
+						}
+						else
+						{
+							tdclass = "model_danger";
+						}
+						string tooltip = "Rules: " + numrules + " Score: " + (numberOfDomain == 0 ? 100 : score / numberOfDomain);
+						string tooltipdetail = null;
+						rulematched.Sort((HealthcheckRiskRule a, HealthcheckRiskRule b)
+							=> { return a.Points.CompareTo(b.Points); });
+
+						foreach (var rule in rulematched)
+						{
+							tooltipdetail += ReportHelper.Encode(rule.Rationale) + "<br>";
+							var hcrule = CustomRiskRule.GetFromRuleBase(RuleSet<T>.GetRuleFromID(rule.RiskId));
+							if (hcrule == null)
+								hcrule = CustomData.GetRiskRule(rule.RiskId);
+							
+							if (hcrule != null && !string.IsNullOrEmpty(hcrule.ReportLocation))
+							{
+								tooltipdetail += "<small  class='text-muted'>" + ReportHelper.Encode(hcrule.ReportLocation) + "</small><br>";
+							}
+						}
+						line += "<td class=\"model_cell " + tdclass + "\"><div class=\"div_model\" placement=\"auto right\" data-toggle=\"popover\" title=\"" +
+							tooltip + "\" data-html=\"true\" data-content=\"" +
+							(String.IsNullOrEmpty(tooltipdetail) ? "No rule matched" : "<p>" + tooltipdetail + "</p>") + "\"><span class=\"small\">" + model.Description + "</span></div></td>";
+					}
+					else
+						line += "<td class=\"model_empty_cell\"></td>";
+				}
+				line += "</tr>";
+				if (HasValue)
+					Add(line);
+				else
+					break;
+			}
+			Add(@"
+					</tbody>
+				</table>
+			</div>
+			<div class=""col-md-12"" id=""maturityModel"">
+		Legend: <br>
+			<i class=""risk_model_none"">&nbsp;</i> score is 0 - no risk identified but some improvements detected<br>
+			<i class=""risk_model_low"">&nbsp;</i> score between 1 and 10  - a few actions have been identified<br>
+			<i class=""risk_model_medium"">&nbsp;</i> score between 10 and 30 - rules should be looked with attention<br>
+			<i class=""risk_model_high"">&nbsp;</i> score higher than 30 - major risks identified
+			</div>
+		</div>");
         }
 
         protected void GenerateIndicatorPanel(string id, string title, RiskRuleCategory category, List<HealthcheckRiskRule> rules, List<RuleBase<HealthcheckData>> applicableRules)
@@ -566,15 +715,12 @@ namespace PingCastle.Report
 			GenerateAccordionDetail("rules" + optionalId + safeRuleId, "rules" + category, rule.Rationale, rule.Points, true,
 				() =>
 				{
-					if (hcrule == null)
-					{
-					}
-					else
+					if (hcrule != null)
 					{
 						Add("<h3>");
 						Add(hcrule.Title);
 						Add("</h3>\r\n<strong>Rule ID:</strong><p class=\"text-justify\">");
-						Add(hcrule.RiskId);
+						Add(hcrule.Id);
 						Add("</p>\r\n<strong>Description:</strong><p class=\"text-justify\">");
 						Add(NewLineToBR(hcrule.Description));
 						Add("</p>\r\n<strong>Technical explanation:</strong><p class=\"text-justify\">");

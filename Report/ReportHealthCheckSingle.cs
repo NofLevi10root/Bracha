@@ -15,6 +15,10 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using PingCastle.Rules;
+using PingCastle.Healthcheck;
+using PingCastle.Data;
+using PingCastle.Graph.Database;
 
 namespace PingCastle.Report
 {

@@ -1101,9 +1101,41 @@ namespace PingCastle
 				ConsoleMenu.Title = "Select an existing report";
 				ConsoleMenu.Information = "Please specify the report to open.";
 				file = ConsoleMenu.AskForString();
-				ConsoleMenu.Notice = "The file " + file + " was not found";
+				if(String.IsNullOrEmpty(file))
+					ConsoleMenu.Notice = "The file " + file + " was not found";
 			}
 			tasks.FileOrDirectory = file;
+			if (PerformAdvancedRegenerateReport)
+            {
+				file = null;
+				while (String.IsNullOrEmpty(file) || !File.Exists(file))
+				{
+					ConsoleMenu.Title = "Select a config xml file";
+					ConsoleMenu.Information = "Please specify the config to use.";
+					file = ConsoleMenu.AskForString();
+					ConsoleMenu.Notice = "The file " + file + " was not found";
+				}
+				tasks.CustomConfigFileOrDirectory = file;
+			}
+			tasks.EncryptReport = false;
+			return DisplayState.Run;
+		}
+
+		DisplayState DisplayAskForDirectory()
+		{
+			string dir = null;
+			if (PerformAdvancedConsolidation)
+			{
+				dir = null;
+				while (String.IsNullOrEmpty(dir) || !Directory.Exists(dir))
+				{
+					ConsoleMenu.Title = "Select a config xml files directory";
+					ConsoleMenu.Information = "Please specify the directory of the data xml files.";
+					dir = ConsoleMenu.AskForString();
+					ConsoleMenu.Notice = "The directory " + dir + " was not found";
+				}
+				tasks.AdvancedConsoDirectory = dir;
+			}
 			tasks.EncryptReport = false;
 			return DisplayState.Run;
 		}
