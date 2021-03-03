@@ -239,7 +239,8 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             {
 				foreach(var section in CustomData.InformationSections)
                 {
-					GenerateSection(section.Id, section.Name, () =>  GenerateAdvancedCustomSection(section));
+                    if(section.Show)
+					    GenerateSection(section.Id, section.Name, () =>  GenerateAdvancedCustomSection(section));
                 }
             }
 		}
@@ -1179,6 +1180,24 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                         if (!string.IsNullOrEmpty(child.Value))
                         {
                             GenerateSubSection(child.Value);
+                        }
+                        break;
+                    case CustomSectionChildType.Modal:
+                        if (!string.IsNullOrEmpty(child.Id) && !string.IsNullOrEmpty(child.Value) && child.Id != section.Id)
+                        {
+                            Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
+                            Add(GenerateModalAdminGroupIdFromGroupName(child.Id));
+                            Add(@""">");
+                            AddEncoded(child.Value);
+                            Add("</a></td>");
+
+                            AddBeginModal(GenerateModalAdminGroupIdFromGroupName(child.Id), child.Value, ShowModalType.XL);
+                            var modalSection = CustomData.GetSection(child.Id);
+                            if(modalSection != null)
+                            {
+                                GenerateAdvancedCustomSection(modalSection);
+                            }
+                            AddEndModal();
                         }
                         break;
                 }

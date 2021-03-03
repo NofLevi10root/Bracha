@@ -20,7 +20,8 @@ namespace PingCastle.Addition
         Chart,
         Table,
         Paragraph,
-        SubSectionTitle
+        SubSectionTitle,
+        Modal
     }
     #endregion
 }

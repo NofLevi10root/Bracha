@@ -13,6 +13,7 @@ namespace PingCastle.Addition
         [XmlArray("Children")]
         [XmlArrayItem("Child")]
         public List<CustomInformationSectionChild> Children { get; set; }
+        public bool Show { get; set; } = true;
         #endregion
     }
 }
