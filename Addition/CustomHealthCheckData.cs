@@ -41,6 +41,9 @@ namespace PingCastle.Addition
         [XmlArray("Tables")]
         [XmlArrayItem(ElementName = "Table")]
         public List<CustomTable> Tables { get; set; }
+        [XmlArray("Charts")]
+        [XmlArrayItem(ElementName = "Chart")]
+        public List<CustomChart> Charts { get; set; }
         #endregion
 
         #region Fields
@@ -50,6 +53,7 @@ namespace PingCastle.Addition
         private readonly Dictionary<string, CustomRiskRule> dictRiskRules;
         private readonly Dictionary<string, CustomTable> dictTables;
         private readonly Dictionary<string, CustomInformationSection> dictSections;
+        private readonly Dictionary<string, CustomChart> dictCharts;
         #endregion
 
         #region Constructors
@@ -61,12 +65,14 @@ namespace PingCastle.Addition
             HealthRules = new List<CustomHealthCheckRiskRule>();
             InformationSections = new List<CustomInformationSection>();
             Tables = new List<CustomTable>();
+            Charts = new List<CustomChart>();
 
             dictCategories = new Dictionary<string, CustomRiskRuleCategory>();
             dictModels = new Dictionary<string, CustomRiskModelCategory>();
             dictRiskRules = new Dictionary<string, CustomRiskRule>();
             dictTables = new Dictionary<string, CustomTable>();
             dictSections = new Dictionary<string, CustomInformationSection>();
+            dictCharts = new Dictionary<string, CustomChart>();
         }
         #endregion
 
@@ -121,6 +127,13 @@ namespace PingCastle.Addition
                 table.SetInitData();
             }
             #endregion
+
+            #region Add Charts
+            foreach (var chart in Charts)
+            {
+                dictCharts.Add(chart.Id, chart);
+            }
+            #endregion
             #region Add Categories To Dictionary
             foreach (var category in Categories)
             {
@@ -164,17 +177,21 @@ namespace PingCastle.Addition
                         {
                             if (detail.FilePath.StartsWith(@".\"))
                                 detail.FilePath = dataDirectory + "\\" + detail.FilePath.Substring(2);
-                            if(detail.Type == CustomDetailsType.Table)
+                            if(detail.Type == CustomDetailsType.SharedChart)
                             {
-                                healthRule.Details = detail.ParseToDetails();
+                                if (string.IsNullOrEmpty(detail.Id))
+                                    continue;
+
+                                if (dictCharts.ContainsKey(detail.Id))
+                                    dictCharts[detail.Id].AddDetail(detail);
                             }
                             else if(detail.Type == CustomDetailsType.SharedTable)
                             {
-                                if (string.IsNullOrEmpty(detail.TableId))
+                                if (string.IsNullOrEmpty(detail.Id))
                                     continue;
-                                if (!dictTables.ContainsKey(detail.TableId))
-                                    dictTables.Add(detail.TableId, new CustomTable());
-                                dictTables[detail.TableId].AddDetail(detail);
+                                if (dictTables.ContainsKey(detail.Id))
+                                    dictTables[detail.Id].AddDetail(detail);
+
                             }
                         }
                         
@@ -284,6 +301,12 @@ namespace PingCastle.Addition
         {
             if (dictTables.ContainsKey(id))
                 return dictTables[id];
+            return null;
+        }
+        public CustomChart GetChart(string id)
+        {
+            if (dictCharts.ContainsKey(id))
+                return dictCharts[id];
             return null;
         }
         #endregion

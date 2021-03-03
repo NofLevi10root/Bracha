@@ -15,10 +15,6 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using PingCastle.Rules;
-using PingCastle.Healthcheck;
-using PingCastle.Data;
-using PingCastle.Graph.Database;
 using PingCastle.Addition;
 
 namespace PingCastle.Report
@@ -350,28 +346,47 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 Add("</span> you need to fix the following rules:</p>");
                 GenerateAccordion("rulesmaturity", () =>
                 {
-					List<HealthcheckRiskRule> levelRules = new List<HealthcheckRiskRule>();
+                    SortedDictionary<int, List<object>> levelRules = new SortedDictionary<int, List<object>>(); // need to oppose the sorting
 					foreach(var rule in Report.RiskRules)
                     {
-						if (l.Contains(rule.RiskId))
-							levelRules.Add(rule);
+                        if (l.Contains(rule.RiskId))
+                        {
+                            if (!levelRules.ContainsKey(rule.Points))
+                                levelRules.Add(rule.Points, new List<object>());
+                            levelRules[rule.Points].Add(rule);
+                        }
                     }
 					if(CustomData != null)
                     {
 						foreach(var rule in CustomData.HealthRules)
                         {
 							if (l.Contains(rule.RiskId))
-								levelRules.Add(CustomHealthCheckRiskRule.ParseToHealthcheckRiskRule(rule));
+                            {
+                                if (!levelRules.ContainsKey(rule.Points))
+                                    levelRules.Add(rule.Points, new List<object>());
+                                levelRules[rule.Points].Add(rule);
+                            }
                         }
                     }
-                    levelRules.Sort((HealthcheckRiskRule a, HealthcheckRiskRule b)
-                        =>
-                    {
-                        return -a.Points.CompareTo(b.Points);
-                    });
+                    //levelRules.Sort((HealthcheckRiskRule a, HealthcheckRiskRule b)
+                    //    =>
+                    //{
+                    //    return -a.Points.CompareTo(b.Points);
+                    //});
 
-                    foreach (var rule in levelRules)
-						GenerateIndicatorPanelDetail("maturity", rule);
+                    foreach (var listRule in levelRules)
+                    {
+                        foreach(var rule in listRule.Value)
+                        {
+                            if (rule is HealthcheckRiskRule)
+                                GenerateIndicatorPanelDetail("maturity", rule as HealthcheckRiskRule);
+                            else if (rule is CustomHealthCheckRiskRule)
+                                GenerateAdvancedIndicatorPanelDetail("maturity", rule as CustomHealthCheckRiskRule);
+
+                        }
+
+                    }
+						
                 });
             }
 
@@ -481,6 +496,15 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             }
             AddEndRow();
             AddEndTable();
+            if(CustomData != null)
+            {
+                var section = CustomData.GetSection("DomainInformation");
+                if(section != null)
+                {
+                    GenerateAdvancedCustomSection(section);
+                    CustomData.InformationSections.Remove(section);
+                }
+            }
         }
 
         #endregion domain info
@@ -582,6 +606,15 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 }
             }
             GenerateDomainSIDHistoryList(Report.UserAccountData);
+            if (CustomData != null)
+            {
+                var section = CustomData.GetSection("UserInformation");
+                if (section != null)
+                {
+                    GenerateAdvancedCustomSection(section);
+                    CustomData.InformationSections.Remove(section);
+                }
+            }
         }
 
         private void AddPasswordDistributionChart(List<HealthcheckPwdDistributionData> input, string id, Dictionary<int, string> tooltips = null)
@@ -970,6 +1003,15 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             GenerateOperatingSystemList();
             GenerateDomainSIDHistoryList(Report.ComputerAccountData);
             GenerateDCInformation();
+            if (CustomData != null)
+            {
+                var section = CustomData.GetSection("ComputerInformation");
+                if (section != null)
+                {
+                    GenerateAdvancedCustomSection(section);
+                    CustomData.InformationSections.Remove(section);
+                }
+            }
         }
 
 		private void GenerateOperatingSystemList()
@@ -1091,12 +1133,11 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 		}
 		private void GenerateAdvancedCustomSection(CustomInformationSection section)
         {
-			AddParagraph(section.Explanation);
 			foreach(var child in section.Children)
             {
                 switch(child.Type)
                 {
-                    case "Table":
+                    case CustomSectionChildType.Table:
                         var table = CustomData.GetTable(child.Id);
                         if(table != null)
                         {
@@ -1125,7 +1166,20 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                             AddEndTable();
                         }
                         break;
-                    case "Chart":
+                    case CustomSectionChildType.Chart:
+                        var chart = CustomData.GetChart(child.Id);
+                        if (chart != null)
+                            Add(chart.GetChartString());
+                        break;
+                    case CustomSectionChildType.Paragraph:
+                        if(!string.IsNullOrEmpty(child.Value))
+                            AddParagraph(child.Value);
+                        break;
+                    case CustomSectionChildType.SubSectionTitle:
+                        if (!string.IsNullOrEmpty(child.Value))
+                        {
+                            GenerateSubSection(child.Value);
+                        }
                         break;
                 }
             }
@@ -1415,6 +1469,15 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     });
                 Add("</div></div>");
             }
+            if (CustomData != null)
+            {
+                var section = CustomData.GetSection("AdminGroups");
+                if (section != null)
+                {
+                    GenerateAdvancedCustomSection(section);
+                    CustomData.InformationSections.Remove(section);
+                }
+            }
         }
 
         private void ComputePrivilegedDistribution(List<HealthcheckPwdDistributionData> lastLogon, Dictionary<int, string> tooltips, List<HealthcheckPwdDistributionData> pwdLastSet, Dictionary<int, string> tooltips2)
@@ -1640,6 +1703,15 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             GenerateCompromissionGraphIndirectLinksInformation();
             GenerateCompromissionGraphDetailedAnalysis();
             GenerateCompromissionGraphJasonOutput();
+            if (CustomData != null)
+            {
+                var section = CustomData.GetSection("ControlPathsAnalysis");
+                if (section != null)
+                {
+                    GenerateAdvancedCustomSection(section);
+                    CustomData.InformationSections.Remove(section);
+                }
+            }
         }
 
         protected void GenerateCompromissionGraphDependanciesInformation()
@@ -2592,6 +2664,15 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 ");
             }
 
+            if (CustomData != null)
+            {
+                var section = CustomData.GetSection("TrustsInformation");
+                if (section != null)
+                {
+                    GenerateAdvancedCustomSection(section);
+                    CustomData.InformationSections.Remove(section);
+                }
+            }
         }
         #endregion trust
 
@@ -3123,6 +3204,16 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 }
 
             }
+
+            if (CustomData != null)
+            {
+                var section = CustomData.GetSection("Anomalies");
+                if (section != null)
+                {
+                    GenerateAdvancedCustomSection(section);
+                    CustomData.InformationSections.Remove(section);
+                }
+            }
         }
         #endregion anomaly
 
@@ -3243,6 +3334,15 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 }
             }
             AddEndTable();
+            if (CustomData != null)
+            {
+                var section = CustomData.GetSection("PasswordPolicies");
+                if (section != null)
+                {
+                    GenerateAdvancedCustomSection(section);
+                    CustomData.InformationSections.Remove(section);
+                }
+            }
         }
 
         #endregion password policies
@@ -3704,6 +3804,16 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                         AddEndRow();
                     }
                     AddEndTable();
+                }
+            }
+
+            if (CustomData != null)
+            {
+                var section = CustomData.GetSection("GPOInformation");
+                if (section != null)
+                {
+                    GenerateAdvancedCustomSection(section);
+                    CustomData.InformationSections.Remove(section);
                 }
             }
         }

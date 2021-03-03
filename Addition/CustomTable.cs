@@ -28,7 +28,6 @@ namespace PingCastle.Addition
             foreach (var col in Columns)
                 dictCols[col.Header] = col;
         }
-
         public void AddDetail(CustomRuleDetails detail)
         {
             if (!File.Exists(detail.FilePath))
@@ -75,6 +74,34 @@ namespace PingCastle.Addition
                     }
                 }
             }
+        }
+        public static List<string> GetTable(string filePath)
+        {
+            if (!File.Exists(filePath))
+                return null;
+
+            var lines = File.ReadAllLines(filePath);
+            if (lines.Length == 0)
+                return null;
+            List<string> output = new List<string>();
+
+            List<string> headers = new List<string>();
+
+            foreach (var part in lines[0].Split(',')) // Headers
+            {
+                headers.Add(part.Trim().Replace(" ", "#$%%$#") + ": ");
+            }
+            for (int i = 1; i < lines.Length; i++) // Rows
+            {
+                var lineParts = lines[i].Split(',');
+                StringBuilder builder = new StringBuilder();
+                for (int q = 0; q < lineParts.Length; q++)
+                {
+                    builder.Append(headers[q] + lineParts[q] + " ");
+                }
+                output.Add(builder.ToString());
+            }
+            return output;
         }
         #endregion
     }

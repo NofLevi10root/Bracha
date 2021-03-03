@@ -13,10 +13,6 @@ using PingCastle.Data;
 using PingCastle.Healthcheck;
 using PingCastle.Rules;
 using PingCastle.template;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 
 namespace PingCastle.Report
 {

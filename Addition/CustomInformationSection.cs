@@ -10,7 +10,6 @@ namespace PingCastle.Addition
         #region Properties
         public string Id { get; set; }
         public string Name { get; set; }
-        public string Explanation { get; set; }
         [XmlArray("Children")]
         [XmlArrayItem("Child")]
         public List<CustomInformationSectionChild> Children { get; set; }

@@ -446,7 +446,7 @@ namespace PingCastle.Report
 							foreach(var rule in CustomData.HealthRules)
                             {
 								if (rule.Category == category.ToString())
-									GenerateIndicatorPanelDetail(rule.Category, CustomHealthCheckRiskRule.ParseToHealthcheckRiskRule(rule));
+									GenerateAdvancedIndicatorPanelDetail(rule.Category, rule);
                             }
                         }
 					});
@@ -500,7 +500,7 @@ namespace PingCastle.Report
 					foreach (CustomHealthCheckRiskRule rule in CustomData.HealthRules)
 					{
 						if (rule.Category == category)
-							GenerateIndicatorPanelDetail(category, CustomHealthCheckRiskRule.ParseToHealthcheckRiskRule(rule));
+							GenerateAdvancedIndicatorPanelDetail(category, rule);
 					}
 				});
 			}
@@ -587,6 +587,7 @@ namespace PingCastle.Report
 							Add("</p>");
 						}
 					}
+					
 					if ((rule.Details != null && rule.Details.Count > 0) || (hcrule != null && !String.IsNullOrEmpty(hcrule.ReportLocation)))
 					{
 						Add("<strong>Details:</strong>");
@@ -663,6 +664,124 @@ namespace PingCastle.Report
                     }
                 });
         }
-        #endregion indicators
-    }
+
+		protected void GenerateAdvancedIndicatorPanelDetail(string category, CustomHealthCheckRiskRule rule, string optionalId = null)
+		{
+			string safeRuleId = rule.RiskId.Replace("$", "dollar");
+			var hcrule = CustomRiskRule.GetFromRuleBase(RuleSet<T>.GetRuleFromID(rule.RiskId));
+			if (CustomData != null && hcrule == null)
+			{
+				hcrule = CustomData.GetRiskRule(rule.RiskId);
+			}
+			GenerateAccordionDetail("rules" + optionalId + safeRuleId, "rules" + category, rule.Rationale, rule.Points, true,
+				() =>
+				{
+					if (hcrule != null)
+					{
+						Add("<h3>");
+						Add(hcrule.Title);
+						Add("</h3>\r\n<strong>Rule ID:</strong><p class=\"text-justify\">");
+						Add(hcrule.Id);
+						Add("</p>\r\n<strong>Description:</strong><p class=\"text-justify\">");
+						Add(NewLineToBR(hcrule.Description));
+						Add("</p>\r\n<strong>Technical explanation:</strong><p class=\"text-justify\">");
+						Add(NewLineToBR(hcrule.TechnicalExplanation));
+						Add("</p>\r\n<strong>Advised solution:</strong><p class=\"text-justify\">");
+						Add(NewLineToBR(hcrule.Solution));
+						Add("</p>\r\n<strong>Points:</strong><p>");
+						Add(NewLineToBR(hcrule.GetComputationModelString()));
+						Add("</p>\r\n");
+						if (!String.IsNullOrEmpty(hcrule.Documentation))
+						{
+							Add("<strong>Documentation:</strong><p>");
+							Add(hcrule.Documentation);
+							Add("</p>");
+						}
+					}
+					if((rule.RuleDetails != null && rule.RuleDetails.Count > 0) || (hcrule != null && !String.IsNullOrEmpty(hcrule.ReportLocation)))
+					{
+						Add("<strong>Details:</strong>");
+						if (!String.IsNullOrEmpty(hcrule.ReportLocation))
+						{
+							Add("<p>");
+							Add(hcrule.ReportLocation);
+							Add("</p>");
+						}
+						if (rule.RuleDetails != null && rule.RuleDetails.Count > 0)
+						{
+							foreach(var detail in rule.RuleDetails)
+                            {
+								if(detail.Type == CustomDetailsType.Table)
+                                {
+									var tableLines = CustomTable.GetTable(detail.FilePath);
+									if (tableLines == null)
+										continue;
+									var firstLineParts = tableLines[0].Split(' ');
+									if (firstLineParts.Length > 1 && firstLineParts[0].EndsWith(":"))
+									{
+										var tokens = new List<string>();
+										for (int i = 0; i < firstLineParts.Length; i++)
+										{
+											if (!string.IsNullOrEmpty(firstLineParts[i]) && firstLineParts[i].EndsWith(":"))
+											{
+												tokens.Add(firstLineParts[i]);
+											}
+										}
+										Add(@"<div class=""row"">
+			<div class=""col-md-12 table-responsive"">
+				<table class=""table table-striped table-bordered"">
+					<thead><tr>");
+										foreach (var token in tokens)
+										{
+											Add("<th>");
+											string parsedToken = token.Replace("#$%%$#", " ");
+											AddEncoded(parsedToken.Substring(0, parsedToken.Length - 1));
+											Add("</th>");
+										}
+										Add("</tr></thead><tbody>");
+										foreach (var d in tableLines)
+										{
+											if (string.IsNullOrEmpty(d))
+												continue;
+											Add("<tr>");
+											var t = d.Split(' ');
+											for (int i = 0, j = 0; i < t.Length && j <= tokens.Count; i++)
+											{
+												if (j < tokens.Count && t[i] == tokens[j])
+												{
+													if (j != 0)
+														Add("</td>");
+													j++;
+													Add("<td>");
+												}
+												else
+												{
+													Add(t[i]);
+													Add(" ");
+												}
+											}
+											Add("</td>");
+											Add("</tr>");
+										}
+										Add("</tbody></table></div></div>");
+
+									}
+									else
+									{
+										Add("<p>");
+										Add(String.Join("<br>\r\n", tableLines.ToArray()));
+										Add("</p>");
+									}
+								}
+								else if(detail.Type == CustomDetailsType.Chart)
+                                {
+									Add(CustomChart.GetChart(detail.FilePath, CustomData.GetChart(detail.Id)));
+                                }
+                            }							
+						}
+					}
+				});
+		}
+		#endregion indicators
+	}
 }

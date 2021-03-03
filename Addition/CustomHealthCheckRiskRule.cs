@@ -34,8 +34,8 @@ namespace PingCastle.Addition
         public string Model { get; set; }
         public string RiskId { get; set; }
         public string Rationale { get; set; }
-        [XmlIgnore]
-        public List<string> Details { get; set; }
+        //[XmlIgnore]
+        //public List<string> Details { get; set; }
         [XmlArray("Details")]
         [XmlArrayItem("Detail")]
         public List<CustomRuleDetails> RuleDetails { get; set; } = new List<CustomRuleDetails>();
@@ -49,7 +49,6 @@ namespace PingCastle.Addition
                 RiskId = rule.RiskId,
                 Points = rule.Points,
                 Rationale = rule.Rationale,
-                Details = rule.Details
             };
             if (Enum.IsDefined(typeof(RiskRuleCategory), rule.Category))
                 output.Category = (RiskRuleCategory)Enum.Parse(typeof(RiskRuleCategory), rule.Category);
