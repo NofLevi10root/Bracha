@@ -169,13 +169,6 @@ namespace PingCastle
 			if (PerformHealthCheckReport)
 			{
 				if (!tasks.AnalysisTask<HealthcheckData>()) return;
-				// Addition
-				if (tasks.xmlreports.Count > 0 && !string.IsNullOrEmpty(tasks.Server) && !string.IsNullOrEmpty(tasks.CustomConfigFileOrDirectory))
-				{
-					//get only one -- need to implement for * [ can get names from tasks.xmlreports]
-					tasks.FileOrDirectory = "ad_hc_" + tasks.Server + ".xml";
-					if (!tasks.AdvancedRegenerateHtmlTask()) return;
-				}
 			}
 			if (PerformHealthCheckConsolidation || PerformAdvancedConsolidation || (PerformHealthCheckReport && tasks.Server == "*" && tasks.InteractiveMode))
 			{

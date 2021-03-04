@@ -146,7 +146,7 @@ $('table').not('.model_table').DataTable(
             GenerateSectionFluid("Anomalies", GenerateAnomalyDetail, selectedTab);
             GenerateSectionFluid("Password Policies", GeneratePasswordPoliciesDetail, selectedTab);
             GenerateSectionFluid("GPO", GenerateGPODetail, selectedTab);
-
+            
             Add(@"
 		</div>
 	</div>
@@ -165,6 +165,7 @@ $('table').not('.model_table').DataTable(
             AddBeginTableData();
             foreach (HealthcheckData data in Report)
             {
+                
                 foreach (HealthcheckRiskRule rule in data.RiskRules)
                 {
                     AddBeginRow();
@@ -175,6 +176,27 @@ $('table').not('.model_table').DataTable(
                     AddCellText(RuleSet<HealthcheckData>.GetRuleDescription(rule.RiskId));
                     AddCellText(rule.Rationale);
                     AddEndRow();
+                }
+                if (CustomConsoData != null && CustomConsoData.DomainsData.ContainsKey(data.DomainFQDN))
+                {
+                    foreach(var rule in CustomConsoData.DomainsData[data.DomainFQDN].HealthRules)
+                    {
+                        AddBeginRow();
+                        AddPrintDomain(data.Domain);
+                        AddCellText(rule.Category);
+                        AddCellText(rule.RiskId);
+                        AddCellNum(rule.Points);
+                        if (CustomConsoData.GetRiskRule(rule.RiskId, out var riskRule))
+                        {
+                            AddCellText(riskRule.Description);
+                        }
+                        else
+                        {
+                            AddCellText("");
+                        }
+                        AddCellText(rule.Rationale);
+                        AddEndRow();
+                    }
                 }
             }
             AddEndTable();
@@ -236,7 +258,10 @@ $('table').not('.model_table').DataTable(
             {
                 rules.AddRange(data.RiskRules);
             }
-            GenerateRiskModelPanel(rules, Report.Count);
+            if (CustomConsoData != null)
+                GenerateAdvancedRiskModelPanel(rules, Report.Count, true);
+            else
+                GenerateRiskModelPanel(rules, Report.Count);
             GenerateIndicatorsTable();
         }
 
@@ -256,6 +281,11 @@ $('table').not('.model_table').DataTable(
             AddHeaderText("Privileged accounts");
             AddHeaderText("Trusts");
             AddHeaderText("Anomalies");
+            if(CustomConsoData != null)
+            {
+                foreach (var category in CustomConsoData.Categories)
+                    AddHeaderText(category.Name);
+            }
             AddHeaderText("Generated");
             AddBeginTableData();
             foreach (HealthcheckData data in Report)
@@ -268,6 +298,20 @@ $('table').not('.model_table').DataTable(
                 AddCellNumScore(data.PrivilegiedGroupScore);
                 AddCellNumScore(data.TrustScore);
                 AddCellNumScore(data.AnomalyScore);
+                if(CustomConsoData != null)
+                {
+                    foreach(var category in CustomConsoData.Categories)
+                    {
+                        if(CustomConsoData.DomainsData.ContainsKey(data.DomainFQDN) && CustomConsoData.DomainsData[data.DomainFQDN].GetCategory(category.Id, out var _category))
+                        {
+                            AddCellNumScore(_category.Score);
+                        }
+                        else
+                        {
+                            AddCellNumScore(0);
+                        }
+                    }
+                }
                 AddCellDate(data.GenerationDate);
                 AddEndRow();
             }

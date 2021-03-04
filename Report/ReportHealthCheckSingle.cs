@@ -412,8 +412,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             {
 				foreach(var rule in CustomData.HealthRules)
                 {
-					var hcrule = CustomData.GetRiskRule(rule.RiskId);
-					if (hcrule == null)
+                    if(!CustomData.GetRiskRule(rule.RiskId, out var hcrule))
 						continue;
 					int level = hcrule.Maturity;
 					if(!output.ContainsKey(level))
@@ -449,8 +448,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             }
             if (CustomData != null)
             {
-                var custTable = CustomData.GetTable("Domain information");
-                if(custTable != null)
+                if(CustomData.GetTable("Domain information", out var custTable))
                 {
                     for (int i = 1; i < custTable.Columns.Count; i++)
                     {
@@ -483,8 +481,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             }
             if (CustomData != null)
             {
-                var custTable = CustomData.GetTable("Domain information");
-                if(custTable != null)
+                if(CustomData.GetTable("Domain information", out var custTable))
                 {
                     for (int i = 1; i < custTable.Columns.Count; i++)
                     {
@@ -499,8 +496,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             AddEndTable();
             if(CustomData != null)
             {
-                var section = CustomData.GetSection("DomainInformation");
-                if(section != null)
+                if(CustomData.GetSection("DomainInformation", out var section))
                 {
                     GenerateAdvancedCustomSection(section);
                     CustomData.InformationSections.Remove(section);
@@ -549,8 +545,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             AddAccountCheckHeader(false);
             if (CustomData != null)
             {
-                var custTable = CustomData.GetTable("Account analysis list");
-                if (custTable != null)
+                if (CustomData.GetTable("Account analysis list", out var custTable))
                 {
                     for (int i = 1; i < custTable.Columns.Count; i++)
                     {
@@ -578,8 +573,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             SectionList("usersaccordion", "sectionreversiblenuser", Report.UserAccountData.NumberReversibleEncryption, Report.UserAccountData.ListReversibleEncryption);
             if (CustomData != null)
             {
-                var custTable = CustomData.GetTable("Account analysis list");
-                if (custTable != null)
+                if (CustomData.GetTable("Account analysis list", out var custTable))
                 {
                     for (int i = 1; i < custTable.Columns.Count; i++)
                     {
@@ -609,8 +603,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             GenerateDomainSIDHistoryList(Report.UserAccountData);
             if (CustomData != null)
             {
-                var section = CustomData.GetSection("UserInformation");
-                if (section != null)
+                if (CustomData.GetSection("UserInformation", out var section))
                 {
                     GenerateAdvancedCustomSection(section);
                     CustomData.InformationSections.Remove(section);
@@ -898,8 +891,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             }
             if (CustomData != null)
             {
-                var custTable = CustomData.GetTable("SID History list");
-                if (custTable != null)
+                if (CustomData.GetTable("SID History list", out var custTable))
                 {
                     for (int i = 1; i < custTable.Columns.Count; i++)
                     {
@@ -931,8 +923,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 }
                 if (CustomData != null)
                 {
-                    var custTable = CustomData.GetTable("SID History list");
-                    if (custTable != null)
+                    if (CustomData.GetTable("SID History list", out var custTable))
                     {
                         for (int i = 1; i < custTable.Columns.Count; i++)
                         {
@@ -959,8 +950,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             AddAccountCheckHeader(true);
             if (CustomData != null)
             {
-                var custTable = CustomData.GetTable("Computer information list");
-                if (custTable != null)
+                if (CustomData.GetTable("Computer information list", out var custTable))
                 {
                     for (int i = 1; i < custTable.Columns.Count; i++)
                     {
@@ -985,8 +975,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             SectionList("computersaccordion", "sectionreversiblencomputer", Report.ComputerAccountData.NumberReversibleEncryption, Report.ComputerAccountData.ListReversibleEncryption);
             if (CustomData != null)
             {
-                var custTable = CustomData.GetTable("Computer information list");
-                if (custTable != null)
+                if (CustomData.GetTable("Computer information list", out var custTable))
                 {
                     for (int i = 1; i < custTable.Columns.Count; i++)
                     {
@@ -1006,8 +995,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             GenerateDCInformation();
             if (CustomData != null)
             {
-                var section = CustomData.GetSection("ComputerInformation");
-                if (section != null)
+                if (CustomData.GetSection("ComputerInformation", out var section))
                 {
                     GenerateAdvancedCustomSection(section);
                     CustomData.InformationSections.Remove(section);
@@ -1026,8 +1014,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 				AddHeaderText("Count");
                 if (CustomData != null)
                 {
-                    var custTable = CustomData.GetTable("Operating System list");
-                    if (custTable != null)
+                    if (CustomData.GetTable("Operating System list", out var custTable))
                     {
                         for (int i = 1; i < custTable.Columns.Count; i++)
                         {
@@ -1053,8 +1040,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 						AddCellNum(os.NumberOfOccurence);
                         if (CustomData != null)
                         {
-                            var custTable = CustomData.GetTable("Operating System list");
-                            if (custTable != null)
+                            if (CustomData.GetTable("Operating System list", out var custTable))
                             {
                                 for (int i = 1; i < custTable.Columns.Count; i++)
                                 {
@@ -1080,8 +1066,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 				AddBeginTableData();
                 if (CustomData != null)
                 {
-                    var custTable = CustomData.GetTable("Operating System list");
-                    if (custTable != null)
+                    if (CustomData.GetTable("Operating System list", out var custTable))
                     {
                         for (int i = 1; i < custTable.Columns.Count; i++)
                         {
@@ -1114,8 +1099,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 						AddCellNum(os.data.NumberReversibleEncryption);
                         if (CustomData != null)
                         {
-                            var custTable = CustomData.GetTable("Operating System list");
-                            if (custTable != null)
+                            if (CustomData.GetTable("Operating System list", out var custTable))
                             {
                                 for (int i = 1; i < custTable.Columns.Count; i++)
                                 {
@@ -1139,8 +1123,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 switch(child.Type)
                 {
                     case CustomSectionChildType.Table:
-                        var table = CustomData.GetTable(child.Id);
-                        if(table != null)
+                        if(CustomData.GetTable(child.Id, out var table))
                         {
                             AddBeginTable(table.Id);
 
@@ -1168,8 +1151,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                         }
                         break;
                     case CustomSectionChildType.Chart:
-                        var chart = CustomData.GetChart(child.Id);
-                        if (chart != null)
+                        if (CustomData.GetChart(child.Id, out var chart))
                             Add(chart.GetChartString());
                         break;
                     case CustomSectionChildType.Paragraph:
@@ -1192,8 +1174,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                             Add("</a></td>");
 
                             AddBeginModal(GenerateModalAdminGroupIdFromGroupName(child.Id), child.Value, ShowModalType.XL);
-                            var modalSection = CustomData.GetSection(child.Id);
-                            if(modalSection != null)
+                            if(CustomData.GetSection(child.Id, out var modalSection))
                             {
                                 GenerateAdvancedCustomSection(modalSection);
                             }
@@ -1236,8 +1217,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                             }
                             if (CustomData != null)
                             {
-                                var custTable = CustomData.GetTable("Domain Controllers list");
-                                if (custTable != null)
+                                if (CustomData.GetTable("Domain Controllers list", out var custTable))
                                 {
                                     for (int i = 1; i < custTable.Columns.Count; i++)
                                     {
@@ -1279,8 +1259,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                                 }
                                 if (CustomData != null)
                                 {
-                                    var custTable = CustomData.GetTable("Domain Controllers list");
-                                    if (custTable != null)
+                                    if (CustomData.GetTable("Domain Controllers list", out var custTable))
                                     {
                                         for (int i = 1; i < custTable.Columns.Count; i++)
                                         {
@@ -1334,8 +1313,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 }
                 if (CustomData != null)
                 {
-                    var custTable = CustomData.GetTable("Admin groups list");
-                    if (custTable != null)
+                    if (CustomData.GetTable("Admin groups list", out var custTable))
                     {
                         for (int i = 1; i < custTable.Columns.Count; i++)
                         {
@@ -1390,8 +1368,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     }
                     if (CustomData != null)
                     {
-                        var custTable = CustomData.GetTable("Admin groups list");
-                        if (custTable != null)
+                        if (CustomData.GetTable("Admin groups list", out var custTable))
                         {
                             for (int i = 1; i < custTable.Columns.Count; i++)
                             {
@@ -1490,8 +1467,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             }
             if (CustomData != null)
             {
-                var section = CustomData.GetSection("AdminGroups");
-                if (section != null)
+                if (CustomData.GetSection("AdminGroups", out var section))
                 {
                     GenerateAdvancedCustomSection(section);
                     CustomData.InformationSections.Remove(section);
@@ -1724,8 +1700,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             GenerateCompromissionGraphJasonOutput();
             if (CustomData != null)
             {
-                var section = CustomData.GetSection("ControlPathsAnalysis");
-                if (section != null)
+                if (CustomData.GetSection("ControlPathsAnalysis", out var section))
                 {
                     GenerateAdvancedCustomSection(section);
                     CustomData.InformationSections.Remove(section);
@@ -1758,8 +1733,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             }
             if (CustomData != null)
             {
-                var custTable = CustomData.GetTable("Compromission graph dependancies list");
-                if (custTable != null)
+                if (CustomData.GetTable("Compromission graph dependancies list", out var custTable))
                 {
                     for (int i = 1; i < custTable.Columns.Count; i++)
                     {
@@ -1816,8 +1790,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 }
                 if (CustomData != null)
                 {
-                    var custTable = CustomData.GetTable("Compromission graph dependancies list");
-                    if (custTable != null)
+                    if (CustomData.GetTable("Compromission graph dependancies list", out var custTable))
                     {
                         for (int i = 1; i < custTable.Columns.Count; i++)
                         {
@@ -1850,8 +1823,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             AddHeaderText("Max ratio", "Indicates in percentage the value of (number of indirect users / number of direct users) if at least one direct users exists. Else the value is zero.");
             if (CustomData != null)
             {
-                var custTable = CustomData.GetTable("Compromission Grapth Indirect links list");
-                if (custTable != null)
+                if (CustomData.GetTable("Compromission Grapth Indirect links list", out var custTable))
                 {
                     for (int i = 1; i < custTable.Columns.Count; i++)
                     {
@@ -1888,8 +1860,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 }
                 if (CustomData != null)
                 {
-                    var custTable = CustomData.GetTable("Compromission Grapth Indirect links list");
-                    if (custTable != null)
+                    if (CustomData.GetTable("Compromission Grapth Indirect links list", out var custTable))
                     {
                         for (int i = 1; i < custTable.Columns.Count; i++)
                         {
@@ -1937,8 +1908,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 AddHeaderText("Detail");
                 if (CustomData != null)
                 {
-                    var custTable = CustomData.GetTable("Summary of group");
-                    if (custTable != null)
+                    if (CustomData.GetTable("Summary of group", out var custTable))
                     {
                         for (int i = 1; i < custTable.Columns.Count; i++)
                         {
@@ -2088,8 +2058,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             }
             if (CustomData != null)
             {
-                var custTable = CustomData.GetTable("Summary of group");
-                if (custTable != null)
+                if (CustomData.GetTable("Summary of group", out var custTable))
                 {
                     for (int i = 1; i < custTable.Columns.Count; i++)
                     {
@@ -2466,8 +2435,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             AddHeaderText("Is Active ?", "The account used to store the secret should be modified every 30 days if it is active. It indicates if a change occured during the last 40 days");
             if (CustomData != null)
             {
-                var custTable = CustomData.GetTable("Trusts list");
-                if (custTable != null)
+                if (CustomData.GetTable("Trusts list", out var custTable))
                 {
                     for (int i = 1; i < custTable.Columns.Count; i++)
                     {
@@ -2531,8 +2499,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 AddCellText((trust.IsActive ? "TRUE" : "FALSE"), true, trust.IsActive);
                 if (CustomData != null)
                 {
-                    var custTable = CustomData.GetTable("Trusts list");
-                    if (custTable != null)
+                    if (CustomData.GetTable("Trusts list", out var custTable))
                     {
                         for (int i = 1; i < custTable.Columns.Count; i++)
                         {
@@ -2556,8 +2523,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 			AddHeaderText("Creation date");
             if (CustomData != null)
             {
-                var custTable = CustomData.GetTable("Reachable domains list");
-                if (custTable != null)
+                if (CustomData.GetTable("Reachable domains list", out var custTable) != null)
                 {
                     for (int i = 1; i < custTable.Columns.Count; i++)
                     {
@@ -2615,8 +2581,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     Add(@"</td>");
                     if (CustomData != null)
                     {
-                        var custTable = CustomData.GetTable("Reachable domains list");
-                        if (custTable != null)
+                        if (CustomData.GetTable("Reachable domains list", out var custTable) != null)
                         {
                             for (int i = 1; i < custTable.Columns.Count; i++)
                             {
@@ -2650,8 +2615,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     AddCellText("Unknown");
                     if (CustomData != null)
                     {
-                        var custTable = CustomData.GetTable("Reachable domains list");
-                        if (custTable != null)
+                        if (CustomData.GetTable("Reachable domains list", out var custTable))
                         {
                             for (int i = 1; i < custTable.Columns.Count; i++)
                             {
@@ -2685,8 +2649,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 
             if (CustomData != null)
             {
-                var section = CustomData.GetSection("TrustsInformation");
-                if (section != null)
+                if (CustomData.GetSection("TrustsInformation", out var section))
                 {
                     GenerateAdvancedCustomSection(section);
                     CustomData.InformationSections.Remove(section);
@@ -2786,8 +2749,7 @@ Here is the list of servers configured for WEF found in GPO</p>
                                 AddHeaderText("Server");
                                 if (CustomData != null)
                                 {
-                                    var custTable = CustomData.GetTable("WEF list");
-                                    if (custTable != null)
+                                    if (CustomData.GetTable("WEF list", out var custTable))
                                     {
                                         for (int i = 1; i < custTable.Columns.Count; i++)
                                         {
@@ -2820,8 +2782,7 @@ Here is the list of servers configured for WEF found in GPO</p>
                                     AddCellText(info.Server);
                                     if (CustomData != null)
                                     {
-                                        var custTable = CustomData.GetTable("WEF list");
-                                        if (custTable != null)
+                                        if (CustomData.GetTable("WEF list", out var custTable))
                                         {
                                             for (int i = 1; i < custTable.Columns.Count; i++)
                                             {
@@ -2920,8 +2881,7 @@ Hackers can then perform a reconnaissance of the environement with only a networ
                                     AddHeaderText("Domain Controller");
                                     if (CustomData != null)
                                     {
-                                        var custTable = CustomData.GetTable("Null session list");
-                                        if (custTable != null)
+                                        if (CustomData.GetTable("Null session list", out var custTable))
                                         {
                                             for (int i = 1; i < custTable.Columns.Count; i++)
                                             {
@@ -2941,8 +2901,7 @@ Hackers can then perform a reconnaissance of the environement with only a networ
                                             AddCellText(DC.DCName);
                                             if (CustomData != null)
                                             {
-                                                var custTable = CustomData.GetTable("Null session list");
-                                                if (custTable != null)
+                                                if (CustomData.GetTable("Null session list", out var custTable))
                                                 {
                                                     for (int i = 1; i < custTable.Columns.Count; i++)
                                                     {
@@ -2994,8 +2953,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 AddHeaderText("Count");
                 if (CustomData != null)
                 {
-                    var custTable = CustomData.GetTable("Logon script list");
-                    if (custTable != null)
+                    if (CustomData.GetTable("Logon script list", out var custTable))
                     {
                         for (int i = 1; i < custTable.Columns.Count; i++)
                         {
@@ -3024,8 +2982,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddCellNum(script.NumberOfOccurence);
                     if (CustomData != null)
                     {
-                        var custTable = CustomData.GetTable("Logon script list");
-                        if (custTable != null)
+                        if (CustomData.GetTable("Logon script list", out var custTable))
                         {
                             for (int i = 1; i < custTable.Columns.Count; i++)
                             {
@@ -3084,8 +3041,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                                 AddHeaderText("SC Logon");
                                 if (CustomData != null)
                                 {
-                                    var custTable = CustomData.GetTable("Certificates list");
-                                    if (custTable != null)
+                                    if (CustomData.GetTable("Certificates list", out var custTable))
                                     {
                                         for (int i = 1; i < custTable.Columns.Count; i++)
                                         {
@@ -3148,8 +3104,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                                     AddCellText(SCLogonAllowed.ToString());
                                     if (CustomData != null)
                                     {
-                                        var custTable = CustomData.GetTable("Certificates list");
-                                        if (custTable != null)
+                                        if (CustomData.GetTable("Certificates list", out var custTable))
                                         {
                                             for (int i = 1; i < custTable.Columns.Count; i++)
                                             {
@@ -3186,8 +3141,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddHeaderText("Entry");
                     if (CustomData != null)
                     {
-                        var custTable = CustomData.GetTable("LDAP forbidden list");
-                        if (custTable != null)
+                        if (CustomData.GetTable("LDAP forbidden list", out var custTable))
                         {
                             for (int i = 1; i < custTable.Columns.Count; i++)
                             {
@@ -3205,8 +3159,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                         AddCellText(e);
                         if (CustomData != null)
                         {
-                            var custTable = CustomData.GetTable("LDAP forbidden list");
-                            if (custTable != null)
+                            if (CustomData.GetTable("LDAP forbidden list", out var custTable))
                             {
                                 for (int i = 1; i < custTable.Columns.Count; i++)
                                 {
@@ -3226,8 +3179,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
 
             if (CustomData != null)
             {
-                var section = CustomData.GetSection("Anomalies");
-                if (section != null)
+                if (CustomData.GetSection("Anomalies", out var section))
                 {
                     GenerateAdvancedCustomSection(section);
                     CustomData.InformationSections.Remove(section);
@@ -3255,8 +3207,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
             AddHeaderText("Reset account counter locker after");
             if (CustomData != null)
             {
-                var custTable = CustomData.GetTable("Password policies list");
-                if (custTable != null)
+                if (CustomData.GetTable("Password policies list", out var custTable))
                 {
                     for (int i = 1; i < custTable.Columns.Count; i++)
                     {
@@ -3285,8 +3236,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddPSOStringValue(policy, "ResetLockoutCount");
                     if (CustomData != null)
                     {
-                        var custTable = CustomData.GetTable("Password policies list");
-                        if (custTable != null)
+                        if (CustomData.GetTable("Password policies list", out var custTable))
                         {
                             for (int i = 1; i < custTable.Columns.Count; i++)
                             {
@@ -3312,8 +3262,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
             AddHeaderText("Grace Period (seconds)");
             if (CustomData != null)
             {
-                var custTable = CustomData.GetTable("Screensaver policies list");
-                if (custTable != null)
+                if (CustomData.GetTable("Screensaver policies list", out var custTable))
                 {
                     for (int i = 1; i < custTable.Columns.Count; i++)
                     {
@@ -3337,8 +3286,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddPSOStringValue(policy, "ScreenSaverGracePeriod");
                     if (CustomData != null)
                     {
-                        var custTable = CustomData.GetTable("Screensaver policies list");
-                        if (custTable != null)
+                        if (CustomData.GetTable("Screensaver policies list", out var custTable))
                         {
                             for (int i = 1; i < custTable.Columns.Count; i++)
                             {
@@ -3355,8 +3303,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
             AddEndTable();
             if (CustomData != null)
             {
-                var section = CustomData.GetSection("PasswordPolicies");
-                if (section != null)
+                if (CustomData.GetSection("PasswordPolicies", out var section))
                 {
                     GenerateAdvancedCustomSection(section);
                     CustomData.InformationSections.Remove(section);
@@ -3383,8 +3330,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 AddHeaderText("Other");
                 if (CustomData != null)
                 {
-                    var custTable = CustomData.GetTable("Obfuscated passwords list");
-                    if (custTable != null)
+                    if (CustomData.GetTable("Obfuscated passwords list", out var custTable))
                     {
                         for (int i = 1; i < custTable.Columns.Count; i++)
                         {
@@ -3407,8 +3353,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddCellText(password.Other);
                     if (CustomData != null)
                     {
-                        var custTable = CustomData.GetTable("Obfuscated passwords list");
-                        if (custTable != null)
+                        if (CustomData.GetTable("Obfuscated passwords list", out var custTable))
                         {
                             for (int i = 1; i < custTable.Columns.Count; i++)
                             {
@@ -3444,8 +3389,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 AddHeaderText("Member of");
                 if (CustomData != null)
                 {
-                    var custTable = CustomData.GetTable("Restricted groups list");
-                    if (custTable != null)
+                    if (CustomData.GetTable("Restricted groups list", out var custTable))
                     {
                         for (int i = 1; i < custTable.Columns.Count; i++)
                         {
@@ -3466,8 +3410,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddCellText(membership.MemberOf);
                     if (CustomData != null)
                     {
-                        var custTable = CustomData.GetTable("Restricted groups list");
-                        if (custTable != null)
+                        if (CustomData.GetTable("Restricted groups list", out var custTable))
                         {
                             for (int i = 1; i < custTable.Columns.Count; i++)
                             {
@@ -3491,8 +3434,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
             AddHeaderText("Value");
             if (CustomData != null)
             {
-                var custTable = CustomData.GetTable("Security settings list");
-                if (custTable != null)
+                if (CustomData.GetTable("Security settings list", out var custTable))
                 {
                     for (int i = 1; i < custTable.Columns.Count; i++)
                     {
@@ -3518,8 +3460,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                         AddLsaSettingsValue(property.Property, property.Value);
                         if (CustomData != null)
                         {
-                            var custTable = CustomData.GetTable("Security settings list");
-                            if (custTable != null)
+                            if (CustomData.GetTable("Security settings list", out var custTable))
                             {
                                 for (int i = 1; i < custTable.Columns.Count; i++)
                                 {
@@ -3551,8 +3492,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 AddHeaderText("Value");
                 if (CustomData != null)
                 {
-                    var custTable = CustomData.GetTable("Audit settings list");
-                    if (custTable != null)
+                    if (CustomData.GetTable("Audit settings list", out var custTable))
                     {
                         for (int i = 1; i < custTable.Columns.Count; i++)
                         {
@@ -3575,8 +3515,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                         AddCellText(GetAuditSimpleValue(a.Value));
                         if (CustomData != null)
                         {
-                            var custTable = CustomData.GetTable("Audit settings list");
-                            if (custTable != null)
+                            if (CustomData.GetTable("Audit settings list", out var custTable))
                             {
                                 for (int i = 1; i < custTable.Columns.Count; i++)
                                 {
@@ -3601,8 +3540,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                         AddCellText(GetAuditSimpleValue(a.Value));
                         if (CustomData != null)
                         {
-                            var custTable = CustomData.GetTable("Audit settings list");
-                            if (custTable != null)
+                            if (CustomData.GetTable("Audit settings list", out var custTable))
                             {
                                 for (int i = 1; i < custTable.Columns.Count; i++)
                                 {
@@ -3629,8 +3567,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 AddHeaderText("Members");
                 if (CustomData != null)
                 {
-                    var custTable = CustomData.GetTable("Privileges list");
-                    if (custTable != null)
+                    if (CustomData.GetTable("Privileges list", out var custTable))
                     {
                         for (int i = 1; i < custTable.Columns.Count; i++)
                         {
@@ -3651,8 +3588,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddCellText(right.User);
                     if (CustomData != null)
                     {
-                        var custTable = CustomData.GetTable("Privileges list");
-                        if (custTable != null)
+                        if (CustomData.GetTable("Privileges list", out var custTable))
                         {
                             for (int i = 1; i < custTable.Columns.Count; i++)
                             {
@@ -3680,8 +3616,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddHeaderText("Members");
                     if (CustomData != null)
                     {
-                        var custTable = CustomData.GetTable("Login list");
-                        if (custTable != null)
+                        if (CustomData.GetTable("Login list", out var custTable))
                         {
                             for (int i = 1; i < custTable.Columns.Count; i++)
                             {
@@ -3704,8 +3639,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                         AddCellText(right.User);
                         if (CustomData != null)
                         {
-                            var custTable = CustomData.GetTable("Login list");
-                            if (custTable != null)
+                            if (CustomData.GetTable("Login list", out var custTable))
                             {
                                 for (int i = 1; i < custTable.Columns.Count; i++)
                                 {
@@ -3734,8 +3668,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 AddHeaderText("Parameters");
                 if (CustomData != null)
                 {
-                    var custTable = CustomData.GetTable("GPO login script list");
-                    if (custTable != null)
+                    if (CustomData.GetTable("GPO login script list", out var custTable))
                     {
                         for (int i = 1; i < custTable.Columns.Count; i++)
                         {
@@ -3758,8 +3691,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddCellText(loginscript.Parameters);
                     if (CustomData != null)
                     {
-                        var custTable = CustomData.GetTable("GPO login script list");
-                        if (custTable != null)
+                        if (CustomData.GetTable("GPO login script list", out var custTable))
                         {
                             for (int i = 1; i < custTable.Columns.Count; i++)
                             {
@@ -3786,8 +3718,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddHeaderText("File");
                     if (CustomData != null)
                     {
-                        var custTable = CustomData.GetTable("GPO deployed files list");
-                        if (custTable != null)
+                        if (CustomData.GetTable("GPO deployed files list", out var custTable))
                         {
                             for (int i = 1; i < custTable.Columns.Count; i++)
                             {
@@ -3808,8 +3739,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                         AddCellText(file.FileName);
                         if (CustomData != null)
                         {
-                            var custTable = CustomData.GetTable("GPO deployed files list");
-                            if (custTable != null)
+                            if (CustomData.GetTable("GPO deployed files list", out var custTable))
                             {
                                 for (int i = 1; i < custTable.Columns.Count; i++)
                                 {
@@ -3828,8 +3758,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
 
             if (CustomData != null)
             {
-                var section = CustomData.GetSection("GPOInformation");
-                if (section != null)
+                if (CustomData.GetSection("GPOInformation", out var section))
                 {
                     GenerateAdvancedCustomSection(section);
                     CustomData.InformationSections.Remove(section);

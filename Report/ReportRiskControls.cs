@@ -239,8 +239,12 @@ namespace PingCastle.Report
 			</div>
 		</div>");
 		}
-		protected void GenerateAdvancedRiskModelPanel(List<HealthcheckRiskRule> rules, int numberOfDomain = 1)
+		protected void GenerateAdvancedRiskModelPanel(List<HealthcheckRiskRule> rules, int numberOfDomain = 1, bool conso = false)
 		{
+			var categories = conso ? CustomConsoData.Categories : CustomData.Categories;
+			var models = conso ? CustomConsoData.Models : CustomData.Models;
+			var hcrules = conso ? CustomConsoData.HealthRules : CustomData.HealthRules;
+
 			Add(@"
 		<div class=""row d-print-none""><div class=""col-lg-12"">
 			<a data-toggle=""collapse"" data-target=""#riskModel"">
@@ -251,7 +255,7 @@ namespace PingCastle.Report
 			<div class=""col-md-12 table-responsive"">
 				<table class=""model_table"">
 					<thead><tr><th></th><th>Stale Objects</th><th>Privileged accounts</th><th>Trusts</th><th>Anomalies</th>" 
-					+ CustomRiskRuleCategory.ParseCategoriesToTableHeaders(CustomData.Categories)
+					+ CustomRiskRuleCategory.ParseCategoriesToTableHeaders(categories)
 					+ @"</tr></thead>
 					<tbody>
 ");
@@ -262,7 +266,7 @@ namespace PingCastle.Report
             {
 				riskmodel[category.ToString()] = new List<CustomRiskModelCategory>();
 			}
-			foreach(var category in CustomData.Categories)
+			foreach(var category in categories)
             {
 				riskmodel[category.Id] = new List<CustomRiskModelCategory>();
             }
@@ -281,7 +285,7 @@ namespace PingCastle.Report
 				}
 			}
 
-			foreach(var model in CustomData.Models)
+			foreach(var model in models)
             {
 				riskmodel[model.Category].Add(model);
             }
@@ -314,7 +318,7 @@ namespace PingCastle.Report
 								rulematched.Add(rule);
 							}
 						}
-						foreach(var rule in CustomData.HealthRules)
+						foreach(var rule in hcrules)
                         {
 							if(rule.Model == model.Id)
                             {
@@ -354,7 +358,12 @@ namespace PingCastle.Report
 							tooltipdetail += ReportHelper.Encode(rule.Rationale) + "<br>";
 							var hcrule = CustomRiskRule.GetFromRuleBase(RuleSet<T>.GetRuleFromID(rule.RiskId));
 							if (hcrule == null)
-								hcrule = CustomData.GetRiskRule(rule.RiskId);
+                            {
+								if (conso)
+									CustomConsoData.GetRiskRule(rule.RiskId, out hcrule);
+								else
+									CustomData.GetRiskRule(rule.RiskId, out hcrule);
+                            }
 							
 							if (hcrule != null && !string.IsNullOrEmpty(hcrule.ReportLocation))
 							{
@@ -560,7 +569,7 @@ namespace PingCastle.Report
 			var hcrule = CustomRiskRule.GetFromRuleBase(RuleSet<T>.GetRuleFromID(rule.RiskId));
 			if(CustomData != null && hcrule == null)
             {
-				hcrule = CustomData.GetRiskRule(rule.RiskId);
+				CustomData.GetRiskRule(rule.RiskId, out hcrule);
 			}
 			GenerateAccordionDetail("rules" + optionalId + safeRuleId, "rules" + category, rule.Rationale, rule.Points, true,
 				() =>
@@ -671,7 +680,7 @@ namespace PingCastle.Report
 			var hcrule = CustomRiskRule.GetFromRuleBase(RuleSet<T>.GetRuleFromID(rule.RiskId));
 			if (CustomData != null && hcrule == null)
 			{
-				hcrule = CustomData.GetRiskRule(rule.RiskId);
+				CustomData.GetRiskRule(rule.RiskId, out hcrule);
 			}
 			GenerateAccordionDetail("rules" + optionalId + safeRuleId, "rules" + category, rule.Rationale, rule.Points, true,
 				() =>
@@ -775,7 +784,8 @@ namespace PingCastle.Report
 								}
 								else if(detail.Type == CustomDetailsType.Chart)
                                 {
-									Add(CustomChart.GetChart(detail.FilePath, CustomData.GetChart(detail.Id)));
+									CustomData.GetChart(detail.Id, out var chart);
+									Add(CustomChart.GetChart(detail.FilePath, chart));
                                 }
                             }							
 						}

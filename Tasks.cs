@@ -60,6 +60,7 @@ namespace PingCastle
 
 		public Dictionary<string, string> xmlreports = new Dictionary<string, string>(); // Addition -> I've changed it from [] to [public]
 		public Dictionary<string, string> htmlreports = new Dictionary<string, string>();// Addition -> I've changed it from [] to [public]
+        private Dictionary<string, CustomHealthCheckData> domainsCustomData;
 
         public bool GenerateKeyTask()
         {
@@ -191,6 +192,26 @@ namespace PingCastle
         public bool AnalysisTask<T>() where T : IPingCastleReport
         {
             string[] servers = Server.Split(',');
+            if(!string.IsNullOrEmpty(CustomConfigFileOrDirectory) && File.Exists(CustomConfigFileOrDirectory))
+            {
+                domainsCustomData = new Dictionary<string, CustomHealthCheckData>();
+                if(Directory.Exists(CustomConfigFileOrDirectory))
+                {
+                    foreach(var file in Directory.GetFiles(CustomConfigFileOrDirectory, "*.xml"))
+                    {
+                        var domainData = CustomHealthCheckData.LoadXML(file);
+                        if(!string.IsNullOrEmpty(domainData.Domain) && !domainsCustomData.ContainsKey(domainData.Domain))
+                        {
+                            domainsCustomData[domainData.Domain] = domainData;
+                        }
+                    }
+                }
+                else if(File.Exists(CustomConfigFileOrDirectory))
+                {
+                    var domainData = CustomHealthCheckData.LoadXML(CustomConfigFileOrDirectory);
+                    domainsCustomData[domainData.Domain] = domainData;
+                }
+            }
             foreach (string server in servers)
             {
                 AnalysisTask<T>(server);
@@ -409,7 +430,17 @@ namespace PingCastle
                     string domain = pingCastleReport.Domain.DomainName;
                     DisplayAdvancement("Generating html report");
                     var enduserReportGenerator = PingCastleFactory.GetEndUserReportGenerator<T>();
-                    htmlreports[domain] = enduserReportGenerator.GenerateReportFile(pingCastleReport, License, pingCastleReport.GetHumanReadableFileName());
+
+                    if(domainsCustomData != null && domainsCustomData.ContainsKey(domain))
+                    {
+                        domainsCustomData[domain].FillData(pingCastleReport as HealthcheckData);
+                        domainsCustomData[domain].MergeData(pingCastleReport as HealthcheckData);
+                        htmlreports[domain] = enduserReportGenerator.GenerateReportFile(pingCastleReport, License, pingCastleReport.GetHumanReadableFileName(), domainsCustomData[domain]);
+                    }
+                    else
+                    {
+                        htmlreports[domain] = enduserReportGenerator.GenerateReportFile(pingCastleReport, License, pingCastleReport.GetHumanReadableFileName());
+                    }
                     DisplayAdvancement("Generating xml file for consolidation report" + (EncryptReport ? " (encrypted)" : ""));
                     pingCastleReport.SetExportLevel(ExportLevel);
                     xmlreports[domain] = DataHelper<T>.SaveAsXml(pingCastleReport, pingCastleReport.GetMachineReadableFileName(), EncryptReport);
@@ -437,7 +468,7 @@ namespace PingCastle
 							advancedGeneration = true;
 						if (advancedGeneration && FileOrDirectory.ToLower() == AdvancedConsoDirectory.ToLower())
                         {
-							WriteInRed("The reports directory and the data directory cannot be the same");
+							WriteInRed("The reports directory and the data directory cannot be the same: " + FileOrDirectory);
 							return;
 						}
 						var consolidation = PingCastleReportHelper<T>.LoadXmls(FileOrDirectory, FilterReportDate);
@@ -454,17 +485,17 @@ namespace PingCastle
 							if(advancedGeneration == true)
                             {
 								CustomConsolidationData customData = new CustomConsolidationData();
-								foreach(var file in Directory.GetFiles(AdvancedConsoDirectory, "*.xml"))
+                                foreach (var file in Directory.GetFiles(AdvancedConsoDirectory, "*.xml"))
                                 {
-									if(!customData.AddData(file))
+                                    if (!customData.AddData(file))
                                     {
-										WriteInRed("The " + file + " data file, missing the <Domain> Element.");
-										return;
-									}
+                                        WriteInRed("The " + file + " data file, missing the <Domain> Element.");
+                                        return;
+                                    }
                                 }
-								foreach(var domain in hcconso)
+                                foreach (var domain in hcconso)
                                 {
-									customData.MergeDomainData(domain);
+                                    customData.MergeDomainData(domain);
                                 }
 								report.GenerateReportFile(hcconso, License, "ad_hc_summary.html", customData);
 							}
@@ -542,9 +573,9 @@ namespace PingCastle
 						}
 						var fi = new FileInfo(FileOrDirectory);
 						var healthcheckData = DataHelper<HealthcheckData>.LoadXml(FileOrDirectory);
-						var customHealthCheckData = CustomHealthCheckData.LoadXML(CustomConfigFileOrDirectory);
-						customHealthCheckData.MergeData(healthcheckData);
+                        var customHealthCheckData = CustomHealthCheckData.LoadXML(CustomConfigFileOrDirectory);
 						customHealthCheckData.FillData(healthcheckData);
+						customHealthCheckData.MergeData(healthcheckData);
 						var endUserReportGenerator = PingCastleFactory.GetEndUserReportGenerator<HealthcheckData>();
 						endUserReportGenerator.GenerateReportFile(healthcheckData, License, healthcheckData.GetHumanReadableFileName(), customHealthCheckData);
 					}

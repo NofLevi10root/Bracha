@@ -163,8 +163,7 @@ namespace PingCastle.Addition
             #region Fill Health Risk Rules Data
             foreach (var healthRule in HealthRules)
             {
-                var rule = GetRiskRule(healthRule.RiskId);
-                if (rule != null)
+                if (GetRiskRule(healthRule.RiskId, out var rule))
                 {
                     rule.SetReportLocation();
                     rule.SetDocumentation();
@@ -225,6 +224,12 @@ namespace PingCastle.Addition
                 }
             }
             #endregion
+            
+
+        }
+        public void MergeData(HealthcheckData healthData)
+        {
+            healthData.MaturityLevel = GetMaturityLevel(healthData.MaturityLevel);
             #region Set Global Score
             healthData.GlobalScore = Math.Max(healthData.AnomalyScore, healthData.PrivilegiedGroupScore);
             healthData.GlobalScore = Math.Max(healthData.GlobalScore, healthData.StaleObjectsScore);
@@ -234,11 +239,6 @@ namespace PingCastle.Addition
                 healthData.GlobalScore = Math.Max(healthData.GlobalScore, category.Score);
             }
             #endregion
-
-        }
-        public void MergeData(HealthcheckData healthData)
-        {
-            healthData.MaturityLevel = GetMaturityLevel(healthData.MaturityLevel);
         }
         public int CountCategoryHealthRules(string category)
         {
@@ -260,17 +260,12 @@ namespace PingCastle.Addition
             }
             return output;
         }
-        public CustomRiskRule GetRiskRule(string ruleId)
-        {
-            return dictRiskRules.ContainsKey(ruleId) ? dictRiskRules[ruleId] : null;
-        }
         private int GetMaturityLevel(int oldMaturity)
         {
             int min = oldMaturity;
             foreach(var rule in HealthRules)
             {
-                var hcrule = GetRiskRule(rule.RiskId);
-                if(hcrule != null)
+                if(GetRiskRule(rule.RiskId, out var hcrule))
                 {
                     min = Math.Min(min, hcrule.Maturity);
                 }
@@ -291,23 +286,55 @@ namespace PingCastle.Addition
             }
             return output;
         }
-        public CustomInformationSection GetSection(string id)
+        public bool GetRiskRule(string ruleId, out CustomRiskRule riskRule)
+        {
+            if(dictRiskRules.ContainsKey(ruleId))
+            {
+                riskRule = dictRiskRules[ruleId];
+                return true;
+            }
+            riskRule = null;
+            return false;
+        }
+        public bool GetSection(string id, out CustomInformationSection section)
         {
             if (dictSections.ContainsKey(id))
-                return dictSections[id];
-            return null;
+            {
+                section = dictSections[id];
+                return true;
+            }
+            section = null;
+            return false;
         }
-        public CustomTable GetTable(string id)
+        public bool GetTable(string id, out CustomTable table)
         {
             if (dictTables.ContainsKey(id))
-                return dictTables[id];
-            return null;
+            {
+                table = dictTables[id];
+                return true;
+            }
+            table = null;
+            return false;
         }
-        public CustomChart GetChart(string id)
+        public bool GetChart(string id, out CustomChart chart)
         {
             if (dictCharts.ContainsKey(id))
-                return dictCharts[id];
-            return null;
+            {
+                chart = dictCharts[id];
+                return true;
+            }
+            chart = null;
+            return false;
+        }
+        public bool GetCategory(string id, out CustomRiskRuleCategory category)
+        {
+            if (dictCategories.ContainsKey(id))
+            {
+                category =  dictCategories[id];
+                return true;
+            }
+            category = null;
+            return false;
         }
         #endregion
     }
