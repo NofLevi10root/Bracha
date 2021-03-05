@@ -700,7 +700,6 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 if (tooltips != null && tooltips.ContainsKey(i))
                     tooltip = tooltips[i];
                 Add(@"<rect class=""bar"" fill=""#Fa9C1A"" x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
-                //Add(@"<rect class=""bar"" fill=""#00B0D2"" x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
                 AddEncoded(tooltip);
                 Add(@"""></rect>");
             }
@@ -723,7 +722,6 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 if (string.IsNullOrEmpty(tooltip))
                     tooltip = value.ToString();
                 Add(@"<rect class=""bar"" fill=""#Fa9C1A"" x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
-                //Add(@"<rect class=""bar"" fill=""#00B0D2"" x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
                 AddEncoded(tooltip);
                 Add(@"""></rect>");
             }
@@ -2523,7 +2521,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 			AddHeaderText("Creation date");
             if (CustomData != null)
             {
-                if (CustomData.GetTable("Reachable domains list", out var custTable) != null)
+                if (CustomData.GetTable("Reachable domains list", out var custTable))
                 {
                     for (int i = 1; i < custTable.Columns.Count; i++)
                     {
@@ -2581,7 +2579,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     Add(@"</td>");
                     if (CustomData != null)
                     {
-                        if (CustomData.GetTable("Reachable domains list", out var custTable) != null)
+                        if (CustomData.GetTable("Reachable domains list", out var custTable))
                         {
                             for (int i = 1; i < custTable.Columns.Count; i++)
                             {

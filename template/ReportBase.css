@@ -21,8 +21,11 @@ html
 	a {
 		/*color: #fa9c1a;*/
 		color: #000000;
+		
 	}
-
+	a[data-toggle="modal"]{
+		color: #fa9c1a;
+	}
 	a:hover {
 		color: #58595b;
 	}
