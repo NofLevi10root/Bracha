@@ -10,8 +10,9 @@ namespace PingCastle.Addition
     {
         #region Properties
         public string Id { get; set; }
-        public string Category { get; set; }
         public string Model { get; set; }
+        [XmlIgnore]
+        public string Category { get; set; }
         [XmlIgnore]
         public int Maturity { get; set; }
         [XmlElement(ElementName = "Maturity")]
@@ -136,7 +137,7 @@ namespace PingCastle.Addition
         public void SetReportLocation()
         {
             if (ReportLocationHelper != null && ReportLocationHelper.Target != null)
-            ReportLocation =  "The detail can be found in <a href=\"#" + ReportLocationHelper.Target + "\">" + ReportLocationHelper.TargetTitle + "</a>";
+            ReportLocation =  "The detail can be found in <a href=\"#" + ReportLocationHelper.Target + "\">" + ReportLocationHelper.Text + "</a>";
         }
         public void SetDocumentation()
         {

@@ -8,7 +8,7 @@ namespace PingCastle.Addition
     {
         #region Properties
         public string Target { get; set; }
-        public string TargetTitle { get; set; }
+        public string Text { get; set; }
         #endregion
     }
 }

@@ -10,8 +10,8 @@ namespace PingCastle.Addition
         #region Properties
         public string Id { get; set; }
         public string Name { get; set; }
-        public string DetailsId { get; set; }
         public string Explanation { get; set; }
+        [XmlIgnore]
         public int Score { get; set; } = 0;
         #endregion
 

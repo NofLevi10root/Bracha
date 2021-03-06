@@ -18,12 +18,12 @@ namespace PingCastle.Addition
         [XmlElement("Domain")]
         public string Domain { get; set; }
 
-        [XmlArray("RiskRuleCategories")]
-        [XmlArrayItem(ElementName = "RiskRuleCategory")]
+        [XmlArray("Categories")]
+        [XmlArrayItem(ElementName = "Category")]
         public List<CustomRiskRuleCategory> Categories { get; set; }
 
-        [XmlArray("RiskModelCategories")]
-        [XmlArrayItem(ElementName = "RiskModelCategory")]
+        [XmlArray("Models")]
+        [XmlArrayItem(ElementName = "Model")]
         public List<CustomRiskModelCategory> Models { get; set; }
 
         [XmlArray("RiskRules")]

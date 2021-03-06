@@ -30,12 +30,12 @@ namespace PingCastle.Addition
                 }
             }
         }
+        [XmlIgnore]
         public string Category { get; set; }
+        [XmlIgnore]
         public string Model { get; set; }
         public string RiskId { get; set; }
         public string Rationale { get; set; }
-        //[XmlIgnore]
-        //public List<string> Details { get; set; }
         [XmlArray("Details")]
         [XmlArrayItem("Detail")]
         public List<CustomRuleDetails> RuleDetails { get; set; } = new List<CustomRuleDetails>();
