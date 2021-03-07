@@ -33,7 +33,7 @@ namespace PingCastle
 		public List<string> NodesToInvestigate = new List<string>();
 		public string FileOrDirectory = null;
 		public string CustomConfigFileOrDirectory = null;
-		public string AdvancedConsoDirectory = null;
+        public bool AddCustsomData = false;
 		public PingCastleReportDataExportLevel ExportLevel = PingCastleReportDataExportLevel.Normal;
 		public string sendXmlTo;
 		public string sendHtmlTo;
@@ -463,10 +463,7 @@ namespace PingCastle
 							WriteInRed("The directory " + FileOrDirectory + " doesn't exist");
 							return;
 						}
-						bool advancedGeneration = false;
-						if (!string.IsNullOrEmpty(AdvancedConsoDirectory))
-							advancedGeneration = true;
-						if (advancedGeneration && FileOrDirectory.ToLower() == AdvancedConsoDirectory.ToLower())
+						if (AddCustsomData && FileOrDirectory.ToLower() == CustomConfigFileOrDirectory.ToLower())
                         {
 							WriteInRed("The reports directory and the data directory cannot be the same: " + FileOrDirectory);
 							return;
@@ -482,10 +479,10 @@ namespace PingCastle
 						{
 							var hcconso = consolidation as PingCastleReportCollection<HealthcheckData>;
 							var report = new ReportHealthCheckConsolidation();
-							if(advancedGeneration == true)
+							if(AddCustsomData == true)
                             {
 								CustomConsolidationData customData = new CustomConsolidationData();
-                                foreach (var file in Directory.GetFiles(AdvancedConsoDirectory, "*.xml"))
+                                foreach (var file in Directory.GetFiles(CustomConfigFileOrDirectory, "*.xml"))
                                 {
                                     if (!customData.AddData(file))
                                     {
@@ -547,37 +544,25 @@ namespace PingCastle
 							WriteInRed("The file " + FileOrDirectory + " doesn't exist");
 							return;
 						}
-						var fi = new FileInfo(FileOrDirectory);
+                        if (AddCustsomData && !File.Exists(CustomConfigFileOrDirectory))
+                        {
+                            WriteInRed("The file " + CustomConfigFileOrDirectory + " doesn't exist");
+                            return;
+                        }
+                        var fi = new FileInfo(FileOrDirectory);
 						var healthcheckData = DataHelper<HealthcheckData>.LoadXml(FileOrDirectory);
 						var endUserReportGenerator = PingCastleFactory.GetEndUserReportGenerator<HealthcheckData>();
-						endUserReportGenerator.GenerateReportFile(healthcheckData, License, healthcheckData.GetHumanReadableFileName());
-					}
-				);
-		}
-
-		public bool AdvancedRegenerateHtmlTask()
-		{
-			return StartTask("Advanced regenerate html report",
-					() =>
-					{
-						if (!File.Exists(FileOrDirectory))
-						{
-							WriteInRed("The file " + FileOrDirectory + " doesn't exist");
-							return;
-						}
-
-						if (!File.Exists(CustomConfigFileOrDirectory))
-						{
-							WriteInRed("The file " + CustomConfigFileOrDirectory + " doesn't exist");
-							return;
-						}
-						var fi = new FileInfo(FileOrDirectory);
-						var healthcheckData = DataHelper<HealthcheckData>.LoadXml(FileOrDirectory);
-                        var customHealthCheckData = CustomHealthCheckData.LoadXML(CustomConfigFileOrDirectory);
-						customHealthCheckData.FillData(healthcheckData);
-						customHealthCheckData.MergeData(healthcheckData);
-						var endUserReportGenerator = PingCastleFactory.GetEndUserReportGenerator<HealthcheckData>();
-						endUserReportGenerator.GenerateReportFile(healthcheckData, License, healthcheckData.GetHumanReadableFileName(), customHealthCheckData);
+                        if(AddCustsomData)
+                        {
+                            var customHealthCheckData = CustomHealthCheckData.LoadXML(CustomConfigFileOrDirectory);
+                            customHealthCheckData.FillData(healthcheckData);
+                            customHealthCheckData.MergeData(healthcheckData);
+                            endUserReportGenerator.GenerateReportFile(healthcheckData, License, healthcheckData.GetHumanReadableFileName(), customHealthCheckData);
+                        }
+                        else
+                        {
+						    endUserReportGenerator.GenerateReportFile(healthcheckData, License, healthcheckData.GetHumanReadableFileName());
+                        }
 					}
 				);
 		}

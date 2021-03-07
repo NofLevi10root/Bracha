@@ -28,13 +28,13 @@ namespace PingCastle
 	{
 		bool PerformHealthCheckReport = false;
 		bool PerformHealthCheckConsolidation = false;
-		private bool PerformAdvancedConsolidation = false;
 		bool PerformGenerateKey = false;
 		bool PerformCarto = false;
 		bool PerformUploadAllReport;
 		bool PerformHCRules = false;
 		private bool PerformRegenerateReport;
-		private bool PerformAdvancedRegenerateReport;
+		private bool GetAdditionFileOrDirectory = false;
+		private string AdditionPathType = "Either";
 		private bool PerformHealthCheckReloadReport;
 		bool PerformHealthCheckGenerateDemoReports;
 		bool PerformScanner = false;
@@ -170,7 +170,7 @@ namespace PingCastle
 			{
 				if (!tasks.AnalysisTask<HealthcheckData>()) return;
 			}
-			if (PerformHealthCheckConsolidation || PerformAdvancedConsolidation || (PerformHealthCheckReport && tasks.Server == "*" && tasks.InteractiveMode))
+			if (PerformHealthCheckConsolidation || (PerformHealthCheckReport && tasks.Server == "*" && tasks.InteractiveMode))
 			{
 				if (!tasks.ConsolidationTask<HealthcheckData>()) return;
 			}
@@ -181,10 +181,6 @@ namespace PingCastle
 			if (PerformRegenerateReport)
 			{
 				if (!tasks.RegenerateHtmlTask()) return;
-			}
-			if (PerformAdvancedRegenerateReport) // maybe add here Or To Run On Results
-			{
-				if (!tasks.AdvancedRegenerateHtmlTask()) return;
 			}
 			if (PerformHealthCheckReloadReport)
 			{
@@ -302,10 +298,30 @@ namespace PingCastle
 								return false;
 							}
 							tasks.CustomConfigFileOrDirectory = args[++i];
-							if (!File.Exists(tasks.CustomConfigFileOrDirectory))
-							{
-								WriteInRed("The file " + tasks.CustomConfigFileOrDirectory + " doesn't exist");
-								return false;
+							tasks.AddCustsomData = true;
+							if(AdditionPathType == "Either")
+                            {
+								if (!File.Exists(tasks.CustomConfigFileOrDirectory) && !Directory.Exists(tasks.CustomConfigFileOrDirectory))
+								{
+									WriteInRed("The path '" + tasks.CustomConfigFileOrDirectory + "' doesn't exist");
+									return false;
+								}
+							}
+							else if(AdditionPathType == "File")
+                            {
+								if (!File.Exists(tasks.CustomConfigFileOrDirectory))
+								{
+									WriteInRed("The file '" + tasks.CustomConfigFileOrDirectory + "' doesn't exist");
+									return false;
+								}
+							}
+							else if(AdditionPathType == "Directory")
+                            {
+								if (!Directory.Exists(tasks.CustomConfigFileOrDirectory))
+								{
+									WriteInRed("The directory '" + tasks.CustomConfigFileOrDirectory + "' doesn't exist");
+									return false;
+								}
 							}
 							break;
 						case "--api-endpoint":
@@ -396,6 +412,7 @@ namespace PingCastle
 							break;
 						case "--regen-report":
 							PerformRegenerateReport = true;
+							AdditionPathType = "File";
 							if (i + 1 >= args.Length)
 							{
 								WriteInRed("argument for --regen-report is mandatory");
@@ -403,16 +420,7 @@ namespace PingCastle
 							}
 							tasks.FileOrDirectory = args[++i];
 							break;
-						case "--advanced-regen-report":
-							PerformAdvancedRegenerateReport = true;
-							if (i + 2 >= args.Length)
-							{
-								WriteInRed("arguments for --advanced-regen-report is mandatory");
-								return false;
-							}
-							tasks.FileOrDirectory = args[++i];
-							tasks.CustomConfigFileOrDirectory = args[++i];
-							break;
+
 						case "--generate-fake-reports":
 							PerformGenerateFakeReport = true;
 							break;
@@ -421,18 +429,11 @@ namespace PingCastle
 							break;
 						case "--healthcheck":
 							PerformHealthCheckReport = true;
+							AdditionPathType = "Either";
 							break;
 						case "--hc-conso":
 							PerformHealthCheckConsolidation = true;
-							break;
-						case "--advanced-hc-conso":
-							PerformAdvancedConsolidation = true;
-							if (i + 1 >= args.Length)
-							{
-								WriteInRed("argument for --advanced-hc-conso is mandatory");
-								return false;
-							}
-							tasks.AdvancedConsoDirectory = args[++i];
+							AdditionPathType = "Directory";
 							break;
 						case "--help":
 							DisplayHelp();
@@ -747,8 +748,8 @@ namespace PingCastle
 				}
 				Trace.WriteLine("After parsing arguments");
 			}
-			if (!PerformHealthCheckReport && !PerformHealthCheckConsolidation && !PerformAdvancedConsolidation
-				&& !PerformRegenerateReport && !PerformAdvancedRegenerateReport && !PerformHealthCheckReloadReport && !delayedInteractiveMode
+			if (!PerformHealthCheckReport && !PerformHealthCheckConsolidation
+				&& !PerformRegenerateReport  && !PerformHealthCheckReloadReport && !delayedInteractiveMode
 				&& !PerformScanner
 				&& !PerformGenerateKey && !PerformHealthCheckGenerateDemoReports && !PerformCarto
 				&& !PerformUploadAllReport
@@ -756,7 +757,7 @@ namespace PingCastle
 				&& !PerformGenerateFakeReport
 				&& !PerformBot)
 			{
-				WriteInRed("You must choose at least one value among --healthcheck --hc-conso --advanced-hc-conso --advanced-export --advanced-report --nullsession --carto");
+				WriteInRed("You must choose at least one value among --healthcheck --hc-conso --advanced-export --advanced-report --nullsession --carto");
 				DisplayHelp();
 				return false;
 			}
@@ -865,7 +866,6 @@ namespace PingCastle
 			AskForScannerParameter,
 			ProtocolMenu,
 			AskForFile,
-			AskForDir, // Addition
 		}
 
 		DisplayState DisplayMainMenu()
@@ -979,8 +979,7 @@ namespace PingCastle
 			PerformGenerateKey = false;
 			PerformHealthCheckReloadReport = false;
 			PerformRegenerateReport = false;
-			PerformAdvancedRegenerateReport = false;
-			PerformAdvancedConsolidation = false;
+			PerformHealthCheckConsolidation = false;
 			PerformHCRules = false;
 			List<ConsoleMenuItem> choices = new List<ConsoleMenuItem>() {
 				new ConsoleMenuItem("protocol","Change the protocol used to query the AD (LDAP, ADWS, ...)"),
@@ -1018,11 +1017,15 @@ namespace PingCastle
 					PerformRegenerateReport = true;
 					return DisplayState.AskForFile;
 				case "advanced regenerate":
-					PerformAdvancedRegenerateReport = true;
+					PerformRegenerateReport = true;
+					AdditionPathType = "File";
+					GetAdditionFileOrDirectory = true;
 					return DisplayState.AskForFile;
 				case "advanced conso":
-					PerformAdvancedConsolidation = true;
-					return DisplayState.AskForDir;
+					PerformHealthCheckConsolidation = true;
+					AdditionPathType = "Directory";
+					GetAdditionFileOrDirectory = true;
+					return DisplayState.AskForFile;
 				case "log":
 					if (Trace.Listeners.Count <= 1)
 						EnableLogFile();
@@ -1034,35 +1037,37 @@ namespace PingCastle
 			}
 		}
 
-			DisplayState DisplayProtocolMenu()
+		DisplayState DisplayProtocolMenu()
+		{
+			List<ConsoleMenuItem> choices = new List<ConsoleMenuItem>() {
+			new ConsoleMenuItem("ADWSThenLDAP","default: ADWS then if failed, LDAP"),
+			new ConsoleMenuItem("ADWSOnly","use only ADWS"),
+			new ConsoleMenuItem("LDAPOnly","use only LDAP"),
+			new ConsoleMenuItem("LDAPThenADWS","LDAP then if failed, ADWS"),
+		};
+
+			ConsoleMenu.Title = "What protocol do you want to use?";
+			ConsoleMenu.Information = "ADWS (Active Directory Web Service - tcp/9389) is the fastest protocol but is limited 5 sessions in parallele and a 30 minutes windows. LDAP is more stable but slower.\r\nCurrent protocol: [" + ADWebService.ConnectionType + "]";
+			int defaultChoice = 1;
+			for (int i = 0; i < choices.Count; i++)
 			{
-				List<ConsoleMenuItem> choices = new List<ConsoleMenuItem>() {
-				new ConsoleMenuItem("ADWSThenLDAP","default: ADWS then if failed, LDAP"),
-				new ConsoleMenuItem("ADWSOnly","use only ADWS"),
-				new ConsoleMenuItem("LDAPOnly","use only LDAP"),
-				new ConsoleMenuItem("LDAPThenADWS","LDAP then if failed, ADWS"),
-			};
-
-				ConsoleMenu.Title = "What protocol do you want to use?";
-				ConsoleMenu.Information = "ADWS (Active Directory Web Service - tcp/9389) is the fastest protocol but is limited 5 sessions in parallele and a 30 minutes windows. LDAP is more stable but slower.\r\nCurrent protocol: [" + ADWebService.ConnectionType + "]";
-				int defaultChoice = 1;
-				for (int i = 0; i < choices.Count; i++)
-				{
-					if (choices[i].Choice == ADWebService.ConnectionType.ToString())
-						defaultChoice = 1 + i;
-				}
-				int choice = ConsoleMenu.SelectMenu(choices, defaultChoice);
-				if (choice == 0)
-					return DisplayState.Exit;
-
-				string whattodo = choices[choice - 1].Choice;
-				ADWebService.ConnectionType = (ADConnectionType)Enum.Parse(typeof(ADConnectionType), whattodo);
-				return DisplayState.Exit;
+				if (choices[i].Choice == ADWebService.ConnectionType.ToString())
+					defaultChoice = 1 + i;
 			}
+			int choice = ConsoleMenu.SelectMenu(choices, defaultChoice);
+			if (choice == 0)
+				return DisplayState.Exit;
 
-			DisplayState DisplayAskForFile()
-			{
-				string file = null;
+			string whattodo = choices[choice - 1].Choice;
+			ADWebService.ConnectionType = (ADConnectionType)Enum.Parse(typeof(ADConnectionType), whattodo);
+			return DisplayState.Exit;
+		}
+
+		DisplayState DisplayAskForFile()
+		{
+			string file = null;
+			if(!PerformHealthCheckConsolidation)
+            {
 				while (String.IsNullOrEmpty(file) || !File.Exists(file))
 				{
 					ConsoleMenu.Title = "Select an existing report";
@@ -1072,205 +1077,200 @@ namespace PingCastle
 						ConsoleMenu.Notice = "The file " + file + " was not found";
 				}
 				tasks.FileOrDirectory = file;
-				if (PerformAdvancedRegenerateReport)
-				{
-					file = null;
-					while (String.IsNullOrEmpty(file) || !File.Exists(file))
-					{
-						ConsoleMenu.Title = "Select a config xml file";
-						ConsoleMenu.Information = "Please specify the config to use.";
-						file = ConsoleMenu.AskForString();
-						ConsoleMenu.Notice = "The file " + file + " was not found";
-					}
-					tasks.CustomConfigFileOrDirectory = file;
-				}
-				tasks.EncryptReport = false;
-				return DisplayState.Run;
 			}
-			DisplayState DisplayAskForDirectory()
+			if (GetAdditionFileOrDirectory)
 			{
-				string dir = null;
-				if (PerformAdvancedConsolidation)
+				file = null;
+				ConsoleMenu.Title = "Set Paths";
+				while (String.IsNullOrEmpty(file) 
+					|| (AdditionPathType == "Either" &&  !File.Exists(file) && !Directory.Exists(file)) 
+					|| (AdditionPathType == "File" && !File.Exists(file)) 
+					|| (AdditionPathType == "Directory" && !Directory.Exists(file)))
 				{
-					dir = null;
-					while (String.IsNullOrEmpty(dir) || !Directory.Exists(dir))
-					{
-						ConsoleMenu.Title = "Select a config xml files directory";
-						ConsoleMenu.Information = "Please specify the directory of the data xml files.";
-						dir = ConsoleMenu.AskForString();
-						ConsoleMenu.Notice = "The directory " + dir + " was not found";
+					if(AdditionPathType == "Either")
+                    {
+						ConsoleMenu.Information = "Select the addition data path:";
 					}
-					tasks.AdvancedConsoDirectory = dir;
-				}
-				tasks.EncryptReport = false;
-				return DisplayState.Run;
-			}
+					else if(AdditionPathType == "File")
+                    {
+						ConsoleMenu.Information = "Select the addition data file (Xml) path:";
+					}
+					else if(AdditionPathType == "Directory")
+                    {
+						ConsoleMenu.Information = "Select the addition data directory path:";
+					}
 
-			// interactive interface
-			private bool RunInteractiveMode()
+					
+					file = ConsoleMenu.AskForString();
+					ConsoleMenu.Notice = "The path '" + file + "' was not found";
+				}
+				tasks.CustomConfigFileOrDirectory = file;
+				tasks.AddCustsomData = true;
+			}
+			tasks.EncryptReport = false;
+			return DisplayState.Run;
+		}
+
+		// interactive interface
+		private bool RunInteractiveMode()
+		{
+			tasks.InteractiveMode = true;
+			Stack<DisplayState> states = new Stack<DisplayState>();
+			var state = DisplayState.MainMenu;
+
+			states.Push(state);
+			while (states.Count > 0 && states.Peek() != DisplayState.Run)
 			{
-				tasks.InteractiveMode = true;
-				Stack<DisplayState> states = new Stack<DisplayState>();
-				var state = DisplayState.MainMenu;
-
-				states.Push(state);
-				while (states.Count > 0 && states.Peek() != DisplayState.Run)
+				switch (state)
 				{
-					switch (state)
-					{
-						case DisplayState.MainMenu:
-							state = DisplayMainMenu();
-							break;
-						case DisplayState.ScannerMenu:
-							state = DisplayScannerMenu();
-							break;
-						case DisplayState.AskForServer:
-							state = DisplayAskServer();
-							break;
-						case DisplayState.AskForScannerParameter:
-							state = DisplayAskForScannerParameter();
-							break;
-						case DisplayState.AvancedMenu:
-							state = DisplayAdvancedMenu();
-							break;
-						case DisplayState.AskForFile:
-							state = DisplayAskForFile();
-							break;
-						case DisplayState.AskForDir:
-							state = DisplayAskForDirectory();
-							break;
-						case DisplayState.ProtocolMenu:
-							state = DisplayProtocolMenu();
-							break;
-						default:
-							// defensive programming
-							if (state != DisplayState.Exit)
-							{
-								Console.WriteLine("No implementation of state " + state);
-								state = DisplayState.Exit;
-							}
-							break;
-					}
-					if (state == DisplayState.Exit)
-					{
-						states.Pop();
-						if (states.Count > 0)
-							state = states.Peek();
-					}
-					else
-					{
-						states.Push(state);
-					}
+					case DisplayState.MainMenu:
+						state = DisplayMainMenu();
+						break;
+					case DisplayState.ScannerMenu:
+						state = DisplayScannerMenu();
+						break;
+					case DisplayState.AskForServer:
+						state = DisplayAskServer();
+						break;
+					case DisplayState.AskForScannerParameter:
+						state = DisplayAskForScannerParameter();
+						break;
+					case DisplayState.AvancedMenu:
+						state = DisplayAdvancedMenu();
+						break;
+					case DisplayState.AskForFile:
+						state = DisplayAskForFile();
+						break;
+					case DisplayState.ProtocolMenu:
+						state = DisplayProtocolMenu();
+						break;
+					default:
+						// defensive programming
+						if (state != DisplayState.Exit)
+						{
+							Console.WriteLine("No implementation of state " + state);
+							state = DisplayState.Exit;
+						}
+						break;
 				}
-				return (states.Count > 0);
+				if (state == DisplayState.Exit)
+				{
+					states.Pop();
+					if (states.Count > 0)
+						state = states.Peek();
+				}
+				else
+				{
+					states.Push(state);
+				}
 			}
+			return (states.Count > 0);
+		}
 
-			private static void DisplayHelp()
+		private static void DisplayHelp()
+		{
+			Console.WriteLine("switch:");
+			Console.WriteLine("  --add-data <xml> : add advanced data to [--healthcheck | --hc-conso | --regen-report");
+			Console.WriteLine("  --help              : display this message");
+			Console.WriteLine("  --interactive       : force the interactive mode");
+			Console.WriteLine("  --log               : generate a log file");
+			Console.WriteLine("  --log-console       : add log to the console");
+			Console.WriteLine("  --log-samba <option>: enable samba login (example: 10)");
+			Console.WriteLine("");
+			Console.WriteLine("Common options when connecting to the AD");
+			Console.WriteLine("  --server <server>   : use this server (default: current domain controller)");
+			Console.WriteLine("                        the special value * or *.forest do the healthcheck for all domains");
+			Console.WriteLine("  --port <port>       : the port to use for ADWS or LDPA (default: 9389 or 389)");
+			Console.WriteLine("  --user <user>       : use this user (default: integrated authentication)");
+			Console.WriteLine("  --password <pass>   : use this password (default: asked on a secure prompt)");
+			Console.WriteLine("  --protocol <proto>  : selection the protocol to use among LDAP or ADWS (fastest)");
+			Console.WriteLine("                      : ADWSThenLDAP (default), ADWSOnly, LDAPOnly, LDAPThenADWS");
+			Console.WriteLine("");
+			Console.WriteLine("  --carto             : perform a quick cartography with domains surrounding");
+			Console.WriteLine("");
+			Console.WriteLine("  --healthcheck       : perform the healthcheck (step1)");
+			Console.WriteLine("    --api-endpoint <> : upload report via api call eg: http://server");
+			Console.WriteLine("    --api-key  <key>  : and using the api key as registered");
+			Console.WriteLine("    --explore-trust   : on domains of a forest, after the healthcheck, do the hc on all trusted domains except domains of the forest and forest trusts");
+			Console.WriteLine("    --explore-forest-trust : on root domain of a forest, after the healthcheck, do the hc on all forest trusts discovered");
+			Console.WriteLine("    --explore-trust and --explore-forest-trust can be run together");
+			Console.WriteLine("    --explore-exception <domains> : comma separated values of domains that will not be explored automatically");
+			Console.WriteLine("");
+			Console.WriteLine("    --encrypt         : use an RSA key stored in the .config file to crypt the content of the xml report");
+			Console.WriteLine("    --level <level>   : specify the amount of data found in the xml file");
+			Console.WriteLine("                      : level: Full, Normal, Light");
+			Console.WriteLine("    --no-enum-limit   : remove the max 100 users limitation in html report");
+			Console.WriteLine("    --reachable       : add reachable domains to the list of discovered domains");
+			Console.WriteLine("    --sendXmlTo <emails>: send xml reports to a mailbox (comma separated email)");
+			Console.WriteLine("    --sendHtmlTo <emails>: send html reports to a mailbox");
+			Console.WriteLine("    --sendAllTo <emails>: send html reports to a mailbox");
+			Console.WriteLine("    --notifyMail <emails>: add email notification when the mail is received");
+			Console.WriteLine("    --smtplogin <user>: allow smtp credentials ...");
+			Console.WriteLine("    --smtppass <pass> : ... to be entered on the command line");
+			Console.WriteLine("    --smtptls         : enable TLS/SSL in SMTP if used on other port than 465 and 587");
+			Console.WriteLine("    --skip-null-session: do not test for null session");
+			Console.WriteLine("    --webdirectory <dir>: upload the xml report to a webdav server");
+			Console.WriteLine("    --webuser <user>  : optional user and password");
+			Console.WriteLine("    --webpassword <password>");
+			Console.WriteLine("");
+			Console.WriteLine("    --I-swear-I-paid-win7-support : meaningless");
+			Console.WriteLine("");
+			Console.WriteLine("--rules               : Generate an html containing all the rules used by RisX");
+			Console.WriteLine("");
+			Console.WriteLine("  --generate-key      : generate and display a new RSA key for encryption");
+			Console.WriteLine("");
+			Console.WriteLine("  --hc-conso          : consolidate multiple healthcheck xml reports (step2)");
+			Console.WriteLine("    --center-on <domain> : center the simplified graph on this domain");
+			Console.WriteLine("                         default is the domain with the most links");
+			Console.WriteLine("    --xmls <path>     : specify the path containing xml (default: current directory)");
+			Console.WriteLine("    --filter-date <date>: filter report generated after the date.");
+			Console.WriteLine("");
+			Console.WriteLine("  --regen-report <xml> : regenerate a html report based on a xml report");
+			Console.WriteLine("  --reload-report <xml> : regenerate a xml report based on a xml report");
+			Console.WriteLine("                          any healthcheck switches (send email, ..) can be reused");
+			Console.WriteLine("    --level <level>   : specify the amount of data found in the xml file");
+			Console.WriteLine("                      : level: Full, Normal, Light (default: Normal)");
+			Console.WriteLine("    --encrypt         : use an RSA key stored in the .config file to crypt the content of the xml report");
+			Console.WriteLine("                        the absence of this switch on an encrypted report will produce a decrypted report");
+			Console.WriteLine("");
+			Console.WriteLine("  --graph             : perform the light compromise graph computation directly to the AD");
+			Console.WriteLine("    --encrypt         : use an RSA key stored in the .config file to crypt the content of the xml report");
+			Console.WriteLine("    --max-depth       : maximum number of relation to explore (default:30)");
+			Console.WriteLine("    --max-nodes       : maximum number of node to include (default:1000)");
+			Console.WriteLine("    --node <node>     : create a report based on a object");
+			Console.WriteLine("                      : example: \"cn=name\" or \"name\"");
+			Console.WriteLine("    --nodes <file>    : create x report based on the nodes listed on a file");
+			Console.WriteLine("");
+			Console.WriteLine("  --scanner <type>    : perform a scan on one of all computers of the domain (using --server)");
+			var scanner = PingCastleFactory.GetAllScanners();
+			var scannerNames = new List<string>(scanner.Keys);
+			scannerNames.Sort();
+			foreach (var scannerName in scannerNames)
 			{
-				Console.WriteLine("switch:");
-				Console.WriteLine("  --help              : display this message");
-				Console.WriteLine("  --interactive       : force the interactive mode");
-				Console.WriteLine("  --log               : generate a log file");
-				Console.WriteLine("  --log-console       : add log to the console");
-				Console.WriteLine("  --log-samba <option>: enable samba login (example: 10)");
-				Console.WriteLine("");
-				Console.WriteLine("Common options when connecting to the AD");
-				Console.WriteLine("  --server <server>   : use this server (default: current domain controller)");
-				Console.WriteLine("                        the special value * or *.forest do the healthcheck for all domains");
-				Console.WriteLine("  --port <port>       : the port to use for ADWS or LDPA (default: 9389 or 389)");
-				Console.WriteLine("  --user <user>       : use this user (default: integrated authentication)");
-				Console.WriteLine("  --password <pass>   : use this password (default: asked on a secure prompt)");
-				Console.WriteLine("  --protocol <proto>  : selection the protocol to use among LDAP or ADWS (fastest)");
-				Console.WriteLine("                      : ADWSThenLDAP (default), ADWSOnly, LDAPOnly, LDAPThenADWS");
-				Console.WriteLine("");
-				Console.WriteLine("  --carto             : perform a quick cartography with domains surrounding");
-				Console.WriteLine("");
-				Console.WriteLine("  --healthcheck       : perform the healthcheck (step1)");
-				Console.WriteLine("    --add-data <xml> : add advanced data to scan result");
-				Console.WriteLine("    --api-endpoint <> : upload report via api call eg: http://server");
-				Console.WriteLine("    --api-key  <key>  : and using the api key as registered");
-				Console.WriteLine("    --explore-trust   : on domains of a forest, after the healthcheck, do the hc on all trusted domains except domains of the forest and forest trusts");
-				Console.WriteLine("    --explore-forest-trust : on root domain of a forest, after the healthcheck, do the hc on all forest trusts discovered");
-				Console.WriteLine("    --explore-trust and --explore-forest-trust can be run together");
-				Console.WriteLine("    --explore-exception <domains> : comma separated values of domains that will not be explored automatically");
-				Console.WriteLine("");
-				Console.WriteLine("    --encrypt         : use an RSA key stored in the .config file to crypt the content of the xml report");
-				Console.WriteLine("    --level <level>   : specify the amount of data found in the xml file");
-				Console.WriteLine("                      : level: Full, Normal, Light");
-				Console.WriteLine("    --no-enum-limit   : remove the max 100 users limitation in html report");
-				Console.WriteLine("    --reachable       : add reachable domains to the list of discovered domains");
-				Console.WriteLine("    --sendXmlTo <emails>: send xml reports to a mailbox (comma separated email)");
-				Console.WriteLine("    --sendHtmlTo <emails>: send html reports to a mailbox");
-				Console.WriteLine("    --sendAllTo <emails>: send html reports to a mailbox");
-				Console.WriteLine("    --notifyMail <emails>: add email notification when the mail is received");
-				Console.WriteLine("    --smtplogin <user>: allow smtp credentials ...");
-				Console.WriteLine("    --smtppass <pass> : ... to be entered on the command line");
-				Console.WriteLine("    --smtptls         : enable TLS/SSL in SMTP if used on other port than 465 and 587");
-				Console.WriteLine("    --skip-null-session: do not test for null session");
-				Console.WriteLine("    --webdirectory <dir>: upload the xml report to a webdav server");
-				Console.WriteLine("    --webuser <user>  : optional user and password");
-				Console.WriteLine("    --webpassword <password>");
-				Console.WriteLine("");
-				Console.WriteLine("    --I-swear-I-paid-win7-support : meaningless");
-				Console.WriteLine("");
-				Console.WriteLine("--rules               : Generate an html containing all the rules used by RisX");
-				Console.WriteLine("");
-				Console.WriteLine("  --generate-key      : generate and display a new RSA key for encryption");
-				Console.WriteLine("");
-				Console.WriteLine("  --hc-conso          : consolidate multiple healthcheck xml reports (step2)");
-				Console.WriteLine("  --advanced-hc-conso <data directory> : consolidate multiple healthcheck xml reports adding custom data by xml files");
-				Console.WriteLine("    --center-on <domain> : center the simplified graph on this domain");
-				Console.WriteLine("                         default is the domain with the most links");
-				Console.WriteLine("    --xmls <path>     : specify the path containing xml (default: current directory)");
-				Console.WriteLine("    --filter-date <date>: filter report generated after the date.");
-				Console.WriteLine("");
-				Console.WriteLine("  --regen-report <xml> : regenerate a html report based on a xml report");
-				Console.WriteLine("  --advanced-regen-report <base:xml> <additions:xml> : regenerate a html report based on a xml report and a custom data xml file");
-				Console.WriteLine("  --reload-report <xml> : regenerate a xml report based on a xml report");
-				Console.WriteLine("                          any healthcheck switches (send email, ..) can be reused");
-				Console.WriteLine("    --level <level>   : specify the amount of data found in the xml file");
-				Console.WriteLine("                      : level: Full, Normal, Light (default: Normal)");
-				Console.WriteLine("    --encrypt         : use an RSA key stored in the .config file to crypt the content of the xml report");
-				Console.WriteLine("                        the absence of this switch on an encrypted report will produce a decrypted report");
-				Console.WriteLine("");
-				Console.WriteLine("  --graph             : perform the light compromise graph computation directly to the AD");
-				Console.WriteLine("    --encrypt         : use an RSA key stored in the .config file to crypt the content of the xml report");
-				Console.WriteLine("    --max-depth       : maximum number of relation to explore (default:30)");
-				Console.WriteLine("    --max-nodes       : maximum number of node to include (default:1000)");
-				Console.WriteLine("    --node <node>     : create a report based on a object");
-				Console.WriteLine("                      : example: \"cn=name\" or \"name\"");
-				Console.WriteLine("    --nodes <file>    : create x report based on the nodes listed on a file");
-				Console.WriteLine("");
-				Console.WriteLine("  --scanner <type>    : perform a scan on one of all computers of the domain (using --server)");
-				var scanner = PingCastleFactory.GetAllScanners();
-				var scannerNames = new List<string>(scanner.Keys);
-				scannerNames.Sort();
-				foreach (var scannerName in scannerNames)
-				{
-					Type scannerType = scanner[scannerName];
-					IScanner iscanner = PingCastleFactory.LoadScanner(scannerType);
-					Console.ForegroundColor = ConsoleColor.Yellow;
-					Console.WriteLine(iscanner.Name);
-					Console.ResetColor();
-					Console.WriteLine(iscanner.Description);
-				}
-				Console.WriteLine("  options for scanners:");
-				Console.WriteLine("    --scmode-single   : force scanner to check one single computer");
-				Console.WriteLine("    --scmode-workstation : force scanner to check workstations");
-				Console.WriteLine("    --scmode-server   : force scanner to check servers");
-				Console.WriteLine("    --scmode-dc       : force scanner to check dc");
-				Console.WriteLine("    --nslimit <number>: Limit the number of users to enumerate (default: unlimited)");
-				Console.WriteLine("    --foreigndomain <sid> : foreign domain targeted using its FQDN or sids");
-				Console.WriteLine("                        Example of SID: S-1-5-21-4005144719-3948538632-2546531719");
-				Console.WriteLine("");
-				Console.WriteLine("  --upload-all-reports: use the API to upload all reports in the current directory");
-				Console.WriteLine("    --api-endpoint <> : upload report via api call eg: http://server");
-				Console.WriteLine("    --api-key  <key>  : and using the api key as registered");
-				Console.WriteLine("                        Note: do not forget to set --level Full to send all the information available");
-				Console.WriteLine("");
-
+				Type scannerType = scanner[scannerName];
+				IScanner iscanner = PingCastleFactory.LoadScanner(scannerType);
+				Console.ForegroundColor = ConsoleColor.Yellow;
+				Console.WriteLine(iscanner.Name);
+				Console.ResetColor();
+				Console.WriteLine(iscanner.Description);
 			}
+			Console.WriteLine("  options for scanners:");
+			Console.WriteLine("    --scmode-single   : force scanner to check one single computer");
+			Console.WriteLine("    --scmode-workstation : force scanner to check workstations");
+			Console.WriteLine("    --scmode-server   : force scanner to check servers");
+			Console.WriteLine("    --scmode-dc       : force scanner to check dc");
+			Console.WriteLine("    --nslimit <number>: Limit the number of users to enumerate (default: unlimited)");
+			Console.WriteLine("    --foreigndomain <sid> : foreign domain targeted using its FQDN or sids");
+			Console.WriteLine("                        Example of SID: S-1-5-21-4005144719-3948538632-2546531719");
+			Console.WriteLine("");
+			Console.WriteLine("  --upload-all-reports: use the API to upload all reports in the current directory");
+			Console.WriteLine("    --api-endpoint <> : upload report via api call eg: http://server");
+			Console.WriteLine("    --api-key  <key>  : and using the api key as registered");
+			Console.WriteLine("                        Note: do not forget to set --level Full to send all the information available");
+			Console.WriteLine("");
+
 		}
 	}
+}
 
 
