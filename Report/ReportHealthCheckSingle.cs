@@ -130,14 +130,14 @@ $(document).ready(function(){
 		protected override void GenerateBodyInformation()
 		{
 			GenerateNavigation("HealthCheck report", Report.DomainFQDN, Report.GenerationDate);
-			GenerateAbout(@"<p><strong>Generated with <a href=""https://10root.com"">10Root RisX</a> powered by <a href=""https://www.pingcastle.com"">Ping Castle</a> all rights reserved</strong></p>
+			GenerateAbout(@"<p><strong>Generated with <a class=""hyperlink"" href=""https://10root.com"">10Root RisX</a> powered by <a class=""hyperlink"" href=""https://www.pingcastle.com"">Ping Castle</a> all rights reserved</strong></p>
 <p>Open source components:</p>
 <ul>
-<li><a href=""https://getbootstrap.com/"">Bootstrap</a> licensed under the <a href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
-<li><a href=""https://datatables.net/"">DataTables</a> licensed under the <a href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
-<li><a href=""https://popper.js.org/"">Popper.js</a> licensed under the <a href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
-<li><a href=""https://jquery.org"">JQuery</a> licensed under the <a href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
-<li><a href=""http://visjs.org/"">vis.js</a> licensed under the <a href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
+<li><a class=""hyperlink"" href=""https://getbootstrap.com/"">Bootstrap</a> licensed under the <a class=""hyperlink"" href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
+<li><a class=""hyperlink"" href=""https://datatables.net/"">DataTables</a> licensed under the <a class=""hyperlink"" href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
+<li><a class=""hyperlink"" href=""https://popper.js.org/"">Popper.js</a> licensed under the <a class=""hyperlink"" href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
+<li><a class=""hyperlink"" href=""https://jquery.org"">JQuery</a> licensed under the <a class=""hyperlink"" href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
+<li><a class=""hyperlink"" href=""http://visjs.org/"">vis.js</a> licensed under the <a class=""hyperlink"" href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
 </ul>");
 
             Add(@"
@@ -255,10 +255,10 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 
         protected void GenerateMaturityInformation()
         {
-            Add(@"<p>This section represents the maturity score (inspired from <a href='https://www.cert.ssi.gouv.fr/dur/CERTFR-2020-DUR-001/'>ANSSI</a>).</p>");
+            Add(@"<p>This section represents the maturity score (inspired from <a class=""hyperlink"" href='https://www.cert.ssi.gouv.fr/dur/CERTFR-2020-DUR-001/'>ANSSI</a>).</p>");
             if (string.IsNullOrEmpty(_license.Edition))
             {
-                AddParagraph("This feature is reserved for customers who have <a href='https://www.pingcastle.com/services/'>purchased a license</a>");
+                AddParagraph("This feature is reserved for customers who have <a class=\"hyperlink\" href='https://www.pingcastle.com/services/'>purchased a license</a>");
                 return;
             }
             var data = GetCurrentMaturityLevel();
@@ -592,7 +592,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 GenerateSubSection("Password Age Distribution", "passworddistribution");
                 if (string.IsNullOrEmpty(_license.Edition))
                 {
-                    AddParagraph("This feature is reserved for customers who have <a href='https://www.pingcastle.com/services/'>purchased a license</a>");
+                    AddParagraph("This feature is reserved for customers who have <a class=\"hyperlink\" href='https://www.pingcastle.com/services/'>purchased a license</a>");
                 }
                 else
                 {
@@ -1708,11 +1708,12 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 
         protected void GenerateCompromissionGraphDependanciesInformation()
         {
-            AddParagraph("This section focuses on permissions issues that can be exploited to take control of the domain.<br>This is an advanced section that should be examined after having looked at the <a href='#admingroups'>Admin Groups</a> section.");
+            AddParagraph("This section focuses on permissions issues that can be exploited to take control of the domain.<br>This is an advanced section that should be examined after having looked at the <a class=\"hyperlink\" href='#admingroups'>Admin Groups</a> section.");
             GenerateSubSection("Foreign domain involved", "cgtrust");
             AddParagraph("This analysis focuses on accounts found in control path and located in other domains.");
             if (Report.ControlPaths.Dependancies == null || Report.ControlPaths.Dependancies.Count == 0)
             {
+                AddParagraph("No operative link with other domains has been found.");
                 AddParagraph("No operative link with other domains has been found.");
                 return;
             }
@@ -2636,7 +2637,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 AddParagraph("The account AZUREADSSOACC is used under the hood to provide SSO functionalities with AzureAD.");
                 Add(@"
 		<div class=""row""><div class=""col-lg-12"">
-<p>The password of the AZUREADSSOACC account should be changed twice every 40 days using this <a href=""https://itpro-tips.com/wp-content/uploads/files/TechnetGallery/Azure-AD-SSO-Key-Rollover-d2f1604a.zip"">script</a></p>
+<p>The password of the AZUREADSSOACC account should be changed twice every 40 days using this <a class=""hyperlink"" href=""https://itpro-tips.com/wp-content/uploads/files/TechnetGallery/Azure-AD-SSO-Key-Rollover-d2f1604a.zip"">script</a></p>
 <p>You can use the version gathered using replication metadata from two reports to guess the frequency of the password change or if the two consecutive resets has been done. Version starts at 1.</p>
 <p><strong>AZUREADSSOACC password last changed: </strong> " + Report.AzureADSSOLastPwdChange.ToString("u") + @"
 <strong>version: </strong> " + Report.AzureADSSOVersion + @"
@@ -2708,7 +2709,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             GenerateSubSection("Backup", "backup");
             Add(@"
 		<div class=""row""><div class=""col-lg-12"">
-<p>The program checks the last date of the AD backup. This date is computed using the replication metadata of the attribute dsaSignature (<a href=""https://technet.microsoft.com/en-us/library/jj130668(v=ws.10).aspx"">reference</a>).</p>
+<p>The program checks the last date of the AD backup. This date is computed using the replication metadata of the attribute dsaSignature (<a class=""hyperlink"" href=""https://technet.microsoft.com/en-us/library/jj130668(v=ws.10).aspx"">reference</a>).</p>
 <p><strong>Last backup date: </strong> " + (Report.LastADBackup == DateTime.MaxValue ? "<span class=\"unticked\">Never</span>" : (Report.LastADBackup == DateTime.MinValue ? "<span class=\"unticked\">Not checked (older version of PingCastle)</span>" : Report.LastADBackup.ToString("u"))) + @"</p>
 		</div></div>
 ");
@@ -2716,7 +2717,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             GenerateSubSection("LAPS", "laps");
             Add(@"
 		<div class=""row""><div class=""col-lg-12"">
-<p><a href=""https://support.microsoft.com/en-us/kb/3062591"">LAPS</a> is used to have a unique local administrator password on all workstations / servers of the domain.
+<p><a class=""hyperlink"" href=""https://support.microsoft.com/en-us/kb/3062591"">LAPS</a> is used to have a unique local administrator password on all workstations / servers of the domain.
 Then this password is changed at a fixed interval. The risk is when a local administrator hash is retrieved and used on other workstation in a pass-the-hash attack.</p>
 <p>Mitigation: having a process when a new workstation is created or install LAPS and apply it through a GPO</p>
 <p><strong>LAPS installation date: </strong> " + (Report.LAPSInstalled == DateTime.MaxValue ? "<span class=\"unticked\">Never</span>" : (Report.LAPSInstalled == DateTime.MinValue ? "<span class=\"unticked\">Not checked (older version of PingCastle)</span>" : Report.LAPSInstalled.ToString("u"))) + @"</p>
@@ -2726,7 +2727,7 @@ Then this password is changed at a fixed interval. The risk is when a local admi
             Add(@"
 		<div class=""row""><div class=""col-lg-12"">
 <p>Windows Event Forwarding is a native mechanism used to collect logs on all workstations / servers of the domain.
-Microsoft recommends to <a href=""https://docs.microsoft.com/en-us/windows/threat-protection/use-windows-event-forwarding-to-assist-in-instrusion-detection"">Use Windows Event Forwarding to help with intrusion detection</a>
+Microsoft recommends to <a class=""hyperlink"" href=""https://docs.microsoft.com/en-us/windows/threat-protection/use-windows-event-forwarding-to-assist-in-instrusion-detection"">Use Windows Event Forwarding to help with intrusion detection</a>
 Here is the list of servers configured for WEF found in GPO</p>
 <p><strong>Number of WEF configuration found: </strong> " + (Report.GPOEventForwarding.Count) + @"</p>
 		</div></div>
@@ -2808,7 +2809,7 @@ Here is the list of servers configured for WEF found in GPO</p>
             Add(@"
 		<div class=""row""><div class=""col-lg-12"">
 <p>The account password for the <em>krbtgt</em> account should be rotated twice yearly at a minimum. More frequent password rotations are recommended, with 40 days the current recommendation by ANSSI. Additional rotations based on external events, such as departure of an employee who had privileged network access, are also strongly recommended.</p>
-<p>You can perform this action using this <a href=""https://github.com/microsoft/New-KrbtgtKeys.ps1"">script</a></p>
+<p>You can perform this action using this <a class=""hyperlink"" href=""https://github.com/microsoft/New-KrbtgtKeys.ps1"">script</a></p>
 <p>You can use the version gathered using replication metadata from two reports to guess the frequency of the password change or if the two consecutive resets has been done. Version starts at 1.</p>
 <p><strong>Kerberos password last changed: </strong> " + Report.KrbtgtLastChangeDate.ToString("u") + @"
 <strong>version: </strong> " + Report.KrbtgtLastVersion + @"
@@ -3479,8 +3480,8 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
             {
                 GenerateSubSection("Audit settings", "auditsettings");
                 AddParagraph(@"Audit settings allow the system to generate logs which are useful to detect intrusions. Here are the settings found in GPO.");
-                AddParagraph("Simple audit events are <a href='https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-gpsb/01f8e057-f6a8-4d6e-8a00-99bcd241b403'>described here</a> and Advanced audit events are <a href='https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-gpac/77878370-0712-47cd-997d-b07053429f6d'>described here</a>");
-                AddParagraph("You can get a list of all audit settings with the command line: <code>auditpol.exe /get /category:*</code> (<a href='https://blogs.technet.microsoft.com/askds/2011/03/11/getting-the-effective-audit-policy-in-windows-7-and-2008-r2/'>source</a>)");
+                AddParagraph("Simple audit events are <a class=\"hyperlink\" href='https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-gpsb/01f8e057-f6a8-4d6e-8a00-99bcd241b403'>described here</a> and Advanced audit events are <a href='https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-gpac/77878370-0712-47cd-997d-b07053429f6d'>described here</a>");
+                AddParagraph("You can get a list of all audit settings with the command line: <code>auditpol.exe /get /category:*</code> (<a class=\"hyperlink\" href='https://blogs.technet.microsoft.com/askds/2011/03/11/getting-the-effective-audit-policy-in-windows-7-and-2008-r2/'>source</a>)");
                 AddParagraph("Simple audit settings are located in: Computer Configuration / Policies / Windows Settings / Security Settings / Local Policies / Audit Policy. Simple audit settings are named [Simple Audit].");
                 AddParagraph("Advanced audit settings are located in: Computer Configuration / Policies / Windows Settings / Security Settings / Advanced Audit Policy Configuration. There category is displayed below.");
                 AddBeginTable("Audit settings list");

@@ -18,17 +18,18 @@ html
 		/*color: #Fa9C1A;*/
 		color: #000000;
 	}
+	.hyperlink {
+		color: #007bff;
+	}
 	a {
-		/*color: #fa9c1a;*/
 		color: #000000;
-		
 	}
 	a[data-toggle="modal"]{
 		color: #fa9c1a;
 	}
-	a:hover {
+/*	a:hover {
 		color: #58595b;
-	}
+	}*/
 }
 #wrapper {
 	box-shadow:0 0 8px rgba(0,0,0,0.25);

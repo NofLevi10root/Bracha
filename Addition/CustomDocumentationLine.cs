@@ -19,7 +19,7 @@ namespace PingCastle.Addition
             StringBuilder builder = new StringBuilder();
             if(!string.IsNullOrEmpty(line.Target))
             {
-                builder.Append("<a href=\"" + line.Target + "\">");
+                builder.Append("<a class=\"hyperlink\" href=\"" + line.Target + "\">");
             }
             if(!string.IsNullOrEmpty(line.Text))
             {

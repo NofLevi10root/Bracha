@@ -121,7 +121,7 @@ namespace PingCastle.Rules
                     );
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    lines[i] = "<a href=\"" + lines[i] + "\">" + lines[i] + "</a>";
+                    lines[i] = "<a class=\"hyperlink\" href=\"" + lines[i] + "\">" + lines[i] + "</a>";
                 }
                 Documentation = string.Join("<br>\r\n", lines);
             }

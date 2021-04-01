@@ -236,7 +236,7 @@
     <value>To solve this security issue, you should change the ownership of the domain controller to match the "Domain Administrators" group.
 To control the ownership of domain controller objects, you can use the following PowerShell command: 
 &lt;i&gt;Get-ADComputer -server my.domain.to.check -LDAPFilter "(&amp;(objectCategory=computer)(|(primarygroupid=521)(primarygroupid=516)))" -properties name, ntsecuritydescriptor | select name,{$_.ntsecuritydescriptor.Owner}&lt;/i&gt;.
-To change it you can edit the owner of an object using &lt;a href="https://docs.microsoft.com/en-us/sysinternals/downloads/adexplorer"&gt;adexplorer.exe&lt;/a&gt;. First, locate the DC object then right click to select properties. Open the security tab and press the advanced button. You then have a new dialog with an owner tab. Select the owner and change it for the domain administrators group. You’re done (no reboot needed)</value>
+To change it you can edit the owner of an object using &lt;a class="hyperlink" href="https://docs.microsoft.com/en-us/sysinternals/downloads/adexplorer"&gt;adexplorer.exe&lt;/a&gt;. First, locate the DC object then right click to select properties. Open the security tab and press the advanced button. You then have a new dialog with an owner tab. Select the owner and change it for the domain administrators group. You’re done (no reboot needed)</value>
   </data>
   <data name="P_DCOwner_Rationale" xml:space="preserve">
     <value>{count} domain controller(s) have been found where the owner is not the Domain Admins group or the Enterprise Admins group</value>
@@ -632,7 +632,7 @@ Second, a more manual way is to essentially reset the password manually once, th
     <value>The purpose is to ensure that all Administrator Accounts have the configuration flag "this account is sensitive and cannot be delegated" (and are not member of the built-in group "Protected Users" when your domain functional level is at least Windows Server 2012 R2).</value>
   </data>
   <data name="P_Delegated_Solution" xml:space="preserve">
-    <value>To correct the situation, you should make sure that all your Administrator Accounts has the check-box "This account is sensitive and cannot be delegated" active or add your Administrator Accounts to the built-in group "Protected Users" if your domain functional level is at least Windows Server 2012 R2 (some functionalities may not work properly afterwards, you should check the <a href="https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/manage/how-to-configure-protected-accounts">official documentation</a>). Please note that there is a section bellow in this report named "Admin Groups" which give more information.</value>
+    <value>To correct the situation, you should make sure that all your Administrator Accounts has the check-box "This account is sensitive and cannot be delegated" active or add your Administrator Accounts to the built-in group "Protected Users" if your domain functional level is at least Windows Server 2012 R2 (some functionalities may not work properly afterwards, you should check the <a class="hyperlink" href="https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/manage/how-to-configure-protected-accounts">official documentation</a>). Please note that there is a section bellow in this report named "Admin Groups" which give more information.</value>
   </data>
   <data name="P_Delegated_Rationale" xml:space="preserve">
     <value>Presence of Admin accounts which have not the flag "this account is sensitive and cannot be delegated": {count}</value>
@@ -1123,7 +1123,7 @@ It is possible to verify the results provided by the RisX solution by using a Ka
   </data>
   <data name="A_PwdGPO_TechnicalExplanation" xml:space="preserve">
     <value>A check is performed to identify passwords in the GPO. If a password is identified through the RisX solution, it means that it can be identified through many other means by attackers, and that the account should be considered compromised. 
-Do note that the AES key used to encrypt passwords in GPOs has been made public for interoperability reasons, which is why even an encrypted password is compromised. It has been revealed in &lt;a href="https://msdn.microsoft.com/en-us/library/cc422924.aspx"&gt;this page&lt;/a&gt;</value>
+Do note that the AES key used to encrypt passwords in GPOs has been made public for interoperability reasons, which is why even an encrypted password is compromised. It has been revealed in &lt;a class="hyperlink" href="https://msdn.microsoft.com/en-us/library/cc422924.aspx"&gt;this page&lt;/a&gt;</value>
   </data>
   <data name="A_ReversiblePwd_TechnicalExplanation" xml:space="preserve">
     <value>The policy "Store passwords using reversible encryption" is enabled. In this case, it means that the password is actually stored in clear text in the &lt;i&gt;supplementalCredential&lt;/i&gt; attribute of the account and that it can be retrieved using DCSync attack.</value>
@@ -1770,214 +1770,214 @@ SeManageVolumePrivilege can be use to reset the security descriptor on the C vol
     <value>GPO: {0} Account: {1} Privilege: {2}</value>
   </data>
   <data name="A_AdminSDHolder_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in the &lt;a href="#admincountequalsone"&gt;AdminSDHolder User List&lt;/a&gt;</value>
+    <value>The detail can be found in the &lt;a class="hyperlink" href="#admincountequalsone"&gt;AdminSDHolder User List&lt;/a&gt;</value>
   </data>
   <data name="A_AnonymousAuthorizedGPO_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
   </data>
   <data name="A_BackupMetadata_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#backup"&gt;Backup&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#backup"&gt;Backup&lt;/a&gt;</value>
   </data>
   <data name="A_MD2IntermediateCert_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#certificates"&gt;Certificates&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#certificates"&gt;Certificates&lt;/a&gt;</value>
   </data>
   <data name="A_MD2RootCert_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#certificates"&gt;Certificates&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#certificates"&gt;Certificates&lt;/a&gt;</value>
   </data>
   <data name="A_MD4IntermediateCert_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#certificates"&gt;Certificates&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#certificates"&gt;Certificates&lt;/a&gt;</value>
   </data>
   <data name="A_MD4RootCert_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#certificates"&gt;Certificates&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#certificates"&gt;Certificates&lt;/a&gt;</value>
   </data>
   <data name="A_MD5IntermediateCert_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#certificates"&gt;Certificates&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#certificates"&gt;Certificates&lt;/a&gt;</value>
   </data>
   <data name="A_MD5RootCert_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#certificates"&gt;Certificates&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#certificates"&gt;Certificates&lt;/a&gt;</value>
   </data>
   <data name="A_SHA0IntermediateCert_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#certificates"&gt;Certificates&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#certificates"&gt;Certificates&lt;/a&gt;</value>
   </data>
   <data name="A_SHA0RootCert_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#certificates"&gt;Certificates&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#certificates"&gt;Certificates&lt;/a&gt;</value>
   </data>
   <data name="A_SHA1IntermediateCert_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#certificates"&gt;Certificates&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#certificates"&gt;Certificates&lt;/a&gt;</value>
   </data>
   <data name="A_SHA1RootCert_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#certificates"&gt;Certificates&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#certificates"&gt;Certificates&lt;/a&gt;</value>
   </data>
   <data name="A_WeakRSARootCert_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#certificates"&gt;Certificates&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#certificates"&gt;Certificates&lt;/a&gt;</value>
   </data>
   <data name="A_DC_Spooler_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="A_Krbtgt_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#krbtgt"&gt;Krbtgt&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#krbtgt"&gt;Krbtgt&lt;/a&gt;</value>
   </data>
   <data name="A_LAPS_Not_Installed_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#laps"&gt;LAPS&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#laps"&gt;LAPS&lt;/a&gt;</value>
   </data>
   <data name="A_LMHashAuthorized_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
   </data>
   <data name="A_MinPwdLen_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#passwordpolicies"&gt;Password policies&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#passwordpolicies"&gt;Password policies&lt;/a&gt;</value>
   </data>
   <data name="A_NotEnoughDC_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="A_NullSession_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt; and  &lt;a href="#nullsession"&gt;Null Session&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt; and  &lt;a class="hyperlink" href="#nullsession"&gt;Null Session&lt;/a&gt;</value>
   </data>
   <data name="A_PwdGPO_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in the &lt;a href="#gpoobfuscatedpassword"&gt;Obfuscated Passwords&lt;/a&gt;</value>
+    <value>The detail can be found in the &lt;a class="hyperlink" href="#gpoobfuscatedpassword"&gt;Obfuscated Passwords&lt;/a&gt;</value>
   </data>
   <data name="A_LimitBlankPasswordUse_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
   </data>
   <data name="A_ReversiblePwd_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
   </data>
   <data name="A_ProtectedUsers_ReportLocation" xml:space="preserve">
-    <value>The schema version is indicated in &lt;a href="#domaininformation"&gt;Domain Information&lt;/a&gt;</value>
+    <value>The schema version is indicated in &lt;a class="hyperlink" href="#domaininformation"&gt;Domain Information&lt;/a&gt;</value>
   </data>
   <data name="A_NoServicePolicy_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#passwordpolicies"&gt;Password Policies&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#passwordpolicies"&gt;Password Policies&lt;/a&gt;</value>
   </data>
   <data name="A_SmartCardRequired_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#smartcardmandatorywithnopasswordchange"&gt;Smart Card and Password&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#smartcardmandatorywithnopasswordchange"&gt;Smart Card and Password&lt;/a&gt;</value>
   </data>
   <data name="A_SMB2SignatureNotEnabled_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="A_SMB2SignatureNotRequired_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="P_AdminNum_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
   </data>
   <data name="P_DangerousExtendedRight_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#admindelegation"&gt;Delegations&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#admindelegation"&gt;Delegations&lt;/a&gt;</value>
   </data>
   <data name="P_DCOwner_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="P_Delegated_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
   </data>
   <data name="P_DelegationEveryone_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#admindelegation"&gt;Delegations&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#admindelegation"&gt;Delegations&lt;/a&gt;</value>
   </data>
   <data name="P_DelegationKeyAdmin_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#admindelegation"&gt;Delegations&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#admindelegation"&gt;Delegations&lt;/a&gt;</value>
   </data>
   <data name="P_DelegationLoginScript_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#gpologin"&gt;GPO Login script&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#gpologin"&gt;GPO Login script&lt;/a&gt;</value>
   </data>
   <data name="P_ExchangeAdminSDHolder_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#admindelegation"&gt;Delegations&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#admindelegation"&gt;Delegations&lt;/a&gt;</value>
   </data>
   <data name="P_OperatorsEmpty_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
   </data>
   <data name="P_PrivilegeEveryone_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#gpoprivileges"&gt;Privileges&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#gpoprivileges"&gt;Privileges&lt;/a&gt;</value>
   </data>
   <data name="P_SchemaAdmin_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
   </data>
   <data name="P_ServiceDomainAdmin_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
   </data>
   <data name="P_UnconstrainedDelegation_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
   </data>
   <data name="P_UnkownDelegation_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#admindelegation"&gt;Delegations&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#admindelegation"&gt;Delegations&lt;/a&gt;</value>
   </data>
   <data name="S_DC_NotUpdated_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="S_DC_SubnetMissing_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="S_DesEnabled_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
   </data>
   <data name="S_Duplicate_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
   </data>
   <data name="S_Inactive_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
   </data>
   <data name="S_NoPreAuth_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
   </data>
   <data name="S_Vuln_MS14_068_ReportLocation" xml:space="preserve">
-    <value>The startup time of domain controllers can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The startup time of domain controllers can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="S_Vuln_MS17_010_ReportLocation" xml:space="preserve">
-    <value>The startup time of domain controllers can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The startup time of domain controllers can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="S_OS_2000_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#operatingsystems"&gt;Operating Systems&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#operatingsystems"&gt;Operating Systems&lt;/a&gt;</value>
   </data>
   <data name="S_OS_2003_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#operatingsystems"&gt;Operating Systems&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#operatingsystems"&gt;Operating Systems&lt;/a&gt;</value>
   </data>
   <data name="S_DC_2000_ReportLocation" xml:space="preserve">
-    <value>The operating system of domain controllers can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The operating system of domain controllers can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="S_DC_2003_ReportLocation" xml:space="preserve">
-    <value>The operating system of domain controllers can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The operating system of domain controllers can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="S_OS_NT_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#operatingsystems"&gt;Operating Systems&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#operatingsystems"&gt;Operating Systems&lt;/a&gt;</value>
   </data>
   <data name="S_OS_XP_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#operatingsystems"&gt;Operating Systems&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#operatingsystems"&gt;Operating Systems&lt;/a&gt;</value>
   </data>
   <data name="S_PrimaryGroup_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
   </data>
   <data name="S_C_PrimaryGroup_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
   </data>
   <data name="S_PwdNotRequired_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
   </data>
   <data name="S_Reversible_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
   </data>
   <data name="S_C_Reversible_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
   </data>
   <data name="S_SIDHistory_ReportLocation" xml:space="preserve">
-    <value>The SIDHistory detail can be found in &lt;a href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt; and a quick summary in &lt;a href="#sidhistory"&gt;SID History&lt;/a&gt;</value>
+    <value>The SIDHistory detail can be found in &lt;a class="hyperlink" href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt; and a quick summary in &lt;a class="hyperlink" href="#sidhistory"&gt;SID History&lt;/a&gt;</value>
   </data>
   <data name="S_SMB_v1_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="T_Downlevel_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#discovereddomains"&gt;Trusts section&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#discovereddomains"&gt;Trusts section&lt;/a&gt;</value>
   </data>
   <data name="T_Inactive_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#discovereddomains"&gt;Trusts section&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#discovereddomains"&gt;Trusts section&lt;/a&gt;</value>
   </data>
   <data name="T_ScriptOutOfDomain_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#gpologin"&gt;GPO Login script&lt;/a&gt; and in &lt;a href="#logonscripts"&gt;Logon Scripts&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#gpologin"&gt;GPO Login script&lt;/a&gt; and in &lt;a class="hyperlink" href="#logonscripts"&gt;Logon Scripts&lt;/a&gt;</value>
   </data>
   <data name="T_SIDFiltering_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#discovereddomains"&gt;Trusts section&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#discovereddomains"&gt;Trusts section&lt;/a&gt;</value>
   </data>
   <data name="T_SIDHistorySameDomain" xml:space="preserve">
-    <value>The SIDHistory detail can be found in &lt;a href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt; and a quick summary in &lt;a href="#sidhistory"&gt;SID History&lt;/a&gt;</value>
+    <value>The SIDHistory detail can be found in &lt;a class="hyperlink" href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt; and a quick summary in &lt;a class="hyperlink" href="#sidhistory"&gt;SID History&lt;/a&gt;</value>
   </data>
   <data name="T_SIDHistoryUnknownDomain_ReportLocation" xml:space="preserve">
-    <value>The SIDHistory detail can be found in &lt;a href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt; and a quick summary in &lt;a href="#sidhistory"&gt;SID History&lt;/a&gt;</value>
+    <value>The SIDHistory detail can be found in &lt;a class="hyperlink" href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt; and a quick summary in &lt;a class="hyperlink" href="#sidhistory"&gt;SID History&lt;/a&gt;</value>
   </data>
   <data name="P_ExchangePrivEsc_Description" xml:space="preserve">
     <value>The purpose is to ensure that Exchange Installation did not introduce privilege escalation vulnerabilites by modifying domain permissions</value>
@@ -2033,7 +2033,7 @@ As an alternative, the file GptTmpl.inf can be manually edited.</value>
     <value>GPO: {0} Account: {1} Privilege: {2}</value>
   </data>
   <data name="P_LoginDCEveryone_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#gpoprivileges"&gt;Privileges&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#gpoprivileges"&gt;Privileges&lt;/a&gt;</value>
   </data>
   <data name="P_RecycleBin_Description" xml:space="preserve">
     <value>The purpose is to ensure that the Recycle Bin feature is enabled</value>
@@ -2046,7 +2046,7 @@ As an alternative, the file GptTmpl.inf can be manually edited.</value>
   </data>
   <data name="P_RecycleBin_Solution" xml:space="preserve">
     <value>First, be sure that the forest level is at least Windows 2008 R2.
-    You can check it with Get-ADForest or in the &lt;a href="#domaininformation"&gt;Domain Information&lt;/a&gt; section.
+    You can check it with Get-ADForest or in the &lt;a class="hyperlink" href="#domaininformation"&gt;Domain Information&lt;/a&gt; section.
   Then you can enable it using the powershell command:
 Enable-ADOptionalFeature -identity 'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=test,DC=mysmartlogon,DC=com' -Scope ForestOrConfigurationSet -Target 'test.mysmartlogon.com'</value>
   </data>
@@ -2057,7 +2057,7 @@ Enable-ADOptionalFeature -identity 'CN=Recycle Bin Feature,CN=Optional Features,
     <value>Ensure that the Recycle Bin feature is enabled</value>
   </data>
   <data name="P_RecycleBin_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaininformation"&gt;Domain Information&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaininformation"&gt;Domain Information&lt;/a&gt;</value>
   </data>
   <data name="P_DsHeuristicsAdminSDExMask_Description" xml:space="preserve">
     <value>The purpose is to ensure that the AdminSDHolder mechanism has not been altered</value>
@@ -2139,7 +2139,7 @@ As an alternative, the file GptTmpl.inf can be manually edited.</value>
     <value>GPO: {0}</value>
   </data>
   <data name="P_RecoveryModeUnprotected_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
   </data>
   <data name="A_LDAPSigningDisabled_Description" xml:space="preserve">
     <value>The purpose is to check that the integrity of the network protocol LDAP as not been explicitly disabled.</value>
@@ -2171,7 +2171,7 @@ In this case, the LDAP signature feature is configured to None (no negotiation),
     <value>GPO: {0}</value>
   </data>
   <data name="A_LDAPSigningDisabled_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
   </data>
   <data name="A_DCRefuseComputerPwdChange_Description" xml:space="preserve">
     <value>The purpose is to check that the computer account password can be changed as usual.</value>
@@ -2201,7 +2201,7 @@ As an alternative, the file GptTmpl.inf can be manually edited.</value>
     <value>GPO: {0}</value>
   </data>
   <data name="A_DCRefuseComputerPwdChange_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
   </data>
   <data name="P_DelegationFileDeployed_Description" xml:space="preserve">
     <value>The purpose is to check that files deployed to computers cannot be changed by everyone.</value>
@@ -2225,7 +2225,7 @@ As an alternative, the file GptTmpl.inf can be manually edited.</value>
     <value>GPO: {0} Type: {1} FileName: {2} Account: {3} Right: {4}</value>
   </data>
   <data name="P_DelegationFileDeployed_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#gpodeployedfiles"&gt;GPO Deployed Files&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#gpodeployedfiles"&gt;GPO Deployed Files&lt;/a&gt;</value>
   </data>
   <data name="T_FileDeployedOutOfDomain_Description" xml:space="preserve">
     <value>The purpose is to ensure that a compromised domain cannot use file deployed by GPO to compromise other domains</value>
@@ -2249,13 +2249,13 @@ As an alternative, the file GptTmpl.inf can be manually edited.</value>
     <value>Check if files deployed may be located in a trusted domain</value>
   </data>
   <data name="T_FileDeployedOutOfDomain_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#gpodeployedfiles"&gt;GPO Deployed Files&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#gpodeployedfiles"&gt;GPO Deployed Files&lt;/a&gt;</value>
   </data>
   <data name="A_NoGPOLLMNR_Description" xml:space="preserve">
     <value>The purpose is to ensure that local name resolution protocol (LLMNR) cannot be used to collect credentials by performing a network attack</value>
   </data>
   <data name="A_NoGPOLLMNR_Solution" xml:space="preserve">
-    <value>Enable the GPO &lt;a href="https://getadmx.com/?Category=Windows_10_2016&amp;Policy=Microsoft.Policies.DNSClient::Turn_Off_Multicast"&gt;Turn off multicast name resolution&lt;/a&gt; and check that no GPO override this setting.
+    <value>Enable the GPO &lt;a class="hyperlink" href="https://getadmx.com/?Category=Windows_10_2016&amp;Policy=Microsoft.Policies.DNSClient::Turn_Off_Multicast"&gt;Turn off multicast name resolution&lt;/a&gt; and check that no GPO override this setting.
     (if it is the case, the policy involved will be displayed below)</value>
   </data>
   <data name="A_NoGPOLLMNR_Rationale" xml:space="preserve">
@@ -2280,7 +2280,7 @@ As an alternative, the file GptTmpl.inf can be manually edited.</value>
     <value>Check if LLMNR can be used to steal credentials</value>
   </data>
   <data name="A_NoGPOLLMNR_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
   </data>
   <data name="InactiveUserOrComputer_Detail" xml:space="preserve">
     <value>By reusing existing objects, whose credentials may be the same among all objects or stored on configuration files or in memory, a third party can take them over.</value>
@@ -2401,7 +2401,7 @@ https://support.microsoft.com/en-us/help/4490425/updates-to-tgt-delegation-acros
     <value>Check if kerberos delegation can be used to take control of the forest from a trusted forest</value>
   </data>
   <data name="T_TGTDelegation_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#discovereddomains"&gt;Trusts section&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#discovereddomains"&gt;Trusts section&lt;/a&gt;</value>
   </data>
   <data name="AccountTakeOver_Detail" xml:space="preserve">
     <value>Members of administrators' groups are a priority target. By misconfiguring their protection, the password of the account can be retrieved by an attacker or it can leverage internal mechanisms of the AD such authentication to act on its behalf.</value>
@@ -2435,7 +2435,7 @@ Please note that this program skips service accounts having their password chang
     <value>Check if admin accounts are vulnerable to the kerberoast attack.</value>
   </data>
   <data name="P_Kerberoasting_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
   </data>
   <data name="P_DNSDelegation_Description" xml:space="preserve">
     <value>The purpose is to ensure that no specific delegation has been setup to manage the Microsoft DNS.</value>
@@ -2469,7 +2469,7 @@ https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dnsp/007efcd2-29
     <value>Check if there is an explicit delegation on DNS servers.</value>
   </data>
   <data name="P_DNSDelegation_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#admindelegation"&gt;Delegations&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#admindelegation"&gt;Delegations&lt;/a&gt;</value>
   </data>
   <data name="P_TrustedCredManAccessPrivilege_Description" xml:space="preserve">
     <value>The purpose is to ensure that there is no assignment of the SeTrustedCredManAccessPrivilege privilege.</value>
@@ -2500,7 +2500,7 @@ https://docs.microsoft.com/en-us/windows/win32/secauthn/authentication-functions
     <value>Check if there is the privilege Access Credential Manager as a trusted caller user right has been explicitly granted.</value>
   </data>
   <data name="P_TrustedCredManAccessPrivilege_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#gpoprivileges"&gt;Privileges&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#gpoprivileges"&gt;Privileges&lt;/a&gt;</value>
   </data>
   <data name="P_LogonDenied_Description" xml:space="preserve">
     <value>The purpose is to ensure that there is a tier isolation.</value>
@@ -2540,7 +2540,7 @@ Then Deny log on locally and Deny logon through Remote Desktop Services.</value>
     <value>Check if there is a policy preventing administrators to connect to unsecured workstations.</value>
   </data>
   <data name="P_LogonDenied_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#gpologin"&gt;GPO Login&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#gpologin"&gt;GPO Login&lt;/a&gt;</value>
   </data>
   <data name="P_ControlPathIndirectEveryone_Description" xml:space="preserve">
     <value>The purpose is to ensure that there is no control path involving everyone.</value>
@@ -2576,7 +2576,7 @@ https://github.com/ANSSI-FR/AD-control-paths</value>
     <value>Check if there is a control path involving everyone-like groups.</value>
   </data>
   <data name="P_ControlPathIndirectEveryone_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#controlpath"&gt;Control Paths Analysis&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#controlpath"&gt;Control Paths Analysis&lt;/a&gt;</value>
   </data>
   <data name="P_ControlPathIndirectMany_Description" xml:space="preserve">
     <value>The purpose is to ensure that there is no control path involving a large number of users.</value>
@@ -2611,7 +2611,7 @@ https://github.com/ANSSI-FR/AD-control-paths</value>
     <value>Check if there is a control path involving too much users or computers.</value>
   </data>
   <data name="P_ControlPathIndirectMany_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#controlpath"&gt;Control Paths Analysis&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#controlpath"&gt;Control Paths Analysis&lt;/a&gt;</value>
   </data>
   <data name="A_AuditDC_Description" xml:space="preserve">
     <value>The purpose is to ensure that the audit policy on domain controllers collect the right set of events.</value>
@@ -2645,7 +2645,7 @@ https://github.com/ANSSI-FR/AD-control-paths</value>
     <value>Check if there is the expected audit policy on domain controllers.</value>
   </data>
   <data name="A_AuditDC_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#auditsettings"&gt;Audit settings&lt;/a&gt;
+    <value>The detail can be found in &lt;a class="hyperlink" href="#auditsettings"&gt;Audit settings&lt;/a&gt;
     &lt;br&gt;
     The table below shows the settings that were not found as configured in GPO for a given domain controller.</value>
   </data>
@@ -2684,7 +2684,7 @@ https://adsecurity.org/?p=376</value>
     <value>Check if LDAPS is used with weak SSL protocol.</value>
   </data>
   <data name="A_DCLdapsProtocol_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="A_AuditPowershell_Description" xml:space="preserve">
     <value>The purpose is to ensure that Powershell logging is enabled.</value>
@@ -2715,7 +2715,7 @@ https://docs.microsoft.com/en-us/powershell/scripting/wmf/whats-new/script-loggi
     <value>Check if there is powershell logging enabled.</value>
   </data>
   <data name="A_AuditPowershell_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
   </data>
   <data name="S_OS_Vista_Description" xml:space="preserve">
     <value>The purpose is to ensure that there is no use of the obsolete and vulnerable OS Windows Vista for the workstations within the domain</value>
@@ -2736,7 +2736,7 @@ https://docs.microsoft.com/en-us/powershell/scripting/wmf/whats-new/script-loggi
     <value />
   </data>
   <data name="S_OS_Vista_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#operatingsystems"&gt;Operating Systems&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#operatingsystems"&gt;Operating Systems&lt;/a&gt;</value>
   </data>
   <data name="S_DC_2008_Description" xml:space="preserve">
     <value>The purpose is to ensure that there is no use of the obsolete and vulnerable OS Windows 2008 as Domain Controller within the domain</value>
@@ -2748,7 +2748,7 @@ https://docs.microsoft.com/en-us/powershell/scripting/wmf/whats-new/script-loggi
     <value>Presence of Windows 2008 as DC = {count}</value>
   </data>
   <data name="S_DC_2008_ReportLocation" xml:space="preserve">
-    <value>The operating system of domain controllers can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The operating system of domain controllers can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="S_DC_2008_Solution" xml:space="preserve">
     <value>To resolve this security risk, the only way is to decommission DC running Windows 2008 OS, in order to use new versions that are more secured and that are still being patched regarding new security threats</value>
@@ -2769,7 +2769,7 @@ https://docs.microsoft.com/en-us/powershell/scripting/wmf/whats-new/script-loggi
     <value>Presence of Windows 2008 = {count}</value>
   </data>
   <data name="S_OS_2008_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#operatingsystems"&gt;Operating Systems&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#operatingsystems"&gt;Operating Systems&lt;/a&gt;</value>
   </data>
   <data name="S_OS_2008_Solution" xml:space="preserve">
     <value>In order to solve this security issue, you should upgrade all the servers to a more recent version of Windows, starting from Windows 2012. Do note that you can get the full details regarding the OS used with the following PowerShell command: &lt;i&gt;Get-ADComputer -Filter * -Property * | Format-Table Name,OperatingSystem,OperatingSystemServicePack,OperatingSystemVersion -Wrap -Auto You can replace [-Filter *] by [-Filter {OperatingSystem -Like "Windows Server*"}&lt;/i&gt;</value>
@@ -2794,7 +2794,7 @@ https://keychest.net/roca</value>
     <value>At least one private key associated to a certificate can be recovered</value>
   </data>
   <data name="A_CertROCA_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#certificates"&gt;Certificates&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#certificates"&gt;Certificates&lt;/a&gt;</value>
   </data>
   <data name="A_CertROCA_Solution" xml:space="preserve">
     <value>If the certificates listed below are still valid, you have to revoke and re-issue them. If other certificates depends on them, they should be revoked and replaced too.
@@ -2824,7 +2824,7 @@ https://keychest.net/roca</value>
     <value>At least one trusted certificate found has a DSA key [{count}]</value>
   </data>
   <data name="A_CertWeakDSA_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#certificates"&gt;Certificates&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#certificates"&gt;Certificates&lt;/a&gt;</value>
   </data>
   <data name="A_CertWeakDSA_Solution" xml:space="preserve">
     <value>To solve the matter, the certificate should be removed from the GPO and if needed, certificates depending on it should be reissued.</value>
@@ -2849,7 +2849,7 @@ https://keychest.net/roca</value>
     <value>At least one trusted certificate found has a weak RSA exponent [{count}]</value>
   </data>
   <data name="A_CertWeakRsaComponent_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#certificates"&gt;Certificates&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#certificates"&gt;Certificates&lt;/a&gt;</value>
   </data>
   <data name="A_CertWeakRsaComponent_Solution" xml:space="preserve">
     <value>To solve the matter, the certificate should be removed from the GPO and if needed, certificates depending on it should be reissued.</value>
@@ -2876,7 +2876,7 @@ https://keychest.net/roca</value>
     <value>At least one trusted certificate found has a relatively weak RSA key [{count}]</value>
   </data>
   <data name="A_WeakRSARootCert2_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#certificates"&gt;Certificates&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#certificates"&gt;Certificates&lt;/a&gt;</value>
   </data>
   <data name="A_WeakRSARootCert2_Solution" xml:space="preserve">
     <value>To solve the matter, the certificate should be removed from the GPO and if needed, certificates depending on it should be reissued.
@@ -3074,7 +3074,7 @@ If there is any entry found, the program consider that NTFRS is in use for SYSVO
     <value>Number of DC inactive: {count}</value>
   </data>
   <data name="S_DC_Inactive_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="S_DC_Inactive_Solution" xml:space="preserve">
     <value>You have to demote the DC object using the procedure referenced in the documentation section.
@@ -3102,7 +3102,7 @@ If there is any entry found, the program consider that NTFRS is in use for SYSVO
     <value>Number of DC without password change: {count}</value>
   </data>
   <data name="S_PwdLastSet_DC_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="S_PwdLastSet_DC_Solution" xml:space="preserve">
     <value>
@@ -3137,7 +3137,7 @@ If there is any entry found, the program consider that NTFRS is in use for SYSVO
     <value>Number of dangerous SID in SIDHistory: {count}</value>
   </data>
   <data name="T_SIDHistoryDangerous_ReportLocation" xml:space="preserve">
-    <value>The SIDHistory detail can be found in &lt;a href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt; and a quick summary in &lt;a href="#sidhistory"&gt;SID History&lt;/a&gt;</value>
+    <value>The SIDHistory detail can be found in &lt;a class="hyperlink" href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt; and a quick summary in &lt;a class="hyperlink" href="#sidhistory"&gt;SID History&lt;/a&gt;</value>
   </data>
   <data name="T_SIDHistoryDangerous_Solution" xml:space="preserve">
     <value>
@@ -3164,7 +3164,7 @@ If there is any entry found, the program consider that NTFRS is in use for SYSVO
     <value>Number of accounts which has never-expiring passwords: {count}</value>
   </data>
   <data name="S_PwdNeverExpires_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#useraccountanalysis"&gt;User information&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#useraccountanalysis"&gt;User information&lt;/a&gt;</value>
   </data>
   <data name="S_PwdNeverExpires_Solution" xml:space="preserve">
     <value>In order to make Active Directory enforce periodic password change, accounts must not have the "Password never expires" flag set in the "Account" tab of the user properties. Their passwords should then be rolled immediately.
@@ -3191,7 +3191,7 @@ https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/8ebf2419-11
     <value>Number of DC with a configuration issue: {count}</value>
   </data>
   <data name="S_DCRegistration_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="S_DCRegistration_Solution" xml:space="preserve">
     <value>This rule result is either the result of a manual or software based misconfiguration. It can also be the sign of a compromise.
@@ -3231,7 +3231,7 @@ PARTIAL_SECRETS_ACCOUNT (0x04000000) | TRUSTED_TO_AUTHENTICATE_FOR_DELEGATION (0
     <value>Number of DC with a contrained delegation: {count}</value>
   </data>
   <data name="P_DelegationDCa2d2_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="P_DelegationDCa2d2_Solution" xml:space="preserve">
     <value>You should edit the msDS-AllowedToDelegateTo attribute of the accounts listed below to remove the SPN of the domain controllers involved.
@@ -3262,7 +3262,7 @@ PARTIAL_SECRETS_ACCOUNT (0x04000000) | TRUSTED_TO_AUTHENTICATE_FOR_DELEGATION (0
     <value>Number of DC with a contrained delegation with protocol transition: {count}</value>
   </data>
   <data name="P_DelegationDCt2a4d_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="P_DelegationDCt2a4d_Solution" xml:space="preserve">
     <value>You should edit the msDS-AllowedToDelegateTo attribute of the accounts listed below to remove the SPN of the domain controllers involved.
@@ -3294,7 +3294,7 @@ PARTIAL_SECRETS_ACCOUNT (0x04000000) | TRUSTED_TO_AUTHENTICATE_FOR_DELEGATION (0
     <value>Number of DC with a resource based constrained delegation: {count}</value>
   </data>
   <data name="P_DelegationDCsourcedeleg_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="P_DelegationDCsourcedeleg_Solution" xml:space="preserve">
     <value>You should edit the msDS-AllowedToDelegateToattribute attribute of the domain controllers and remove the account involved.
@@ -3344,7 +3344,7 @@ https://blog.andreas-schreiner.de/2018/09/07/active-directory-sicherheit-teil-1-
     <value>Number of admins not in Protected Users: {count}</value>
   </data>
   <data name="P_ProtectedUsers_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
   </data>
   <data name="P_ProtectedUsers_Solution" xml:space="preserve">
     <value>After having reviewed the potential impact on adding users to this group, add the missing privileged accounts to this group.</value>
@@ -3377,7 +3377,7 @@ That's why this rule is not triggered if only one account is not protected.</val
     <value>Number of computer without password change: {count}</value>
   </data>
   <data name="S_PwdLastSet_45_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
   </data>
   <data name="S_PwdLastSet_45_Solution" xml:space="preserve">
     <value>
@@ -3413,7 +3413,7 @@ That's why this rule is not triggered if only one account is not protected.</val
     <value>Number of computer without password change for at least 3 months: {count}</value>
   </data>
   <data name="S_PwdLastSet_90_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
   </data>
   <data name="S_PwdLastSet_90_Solution" xml:space="preserve">
     <value>
@@ -3449,7 +3449,7 @@ That's why this rule is not triggered if only one account is not protected.</val
     <value>Number of admin with a password older than 3 years: {count}</value>
   </data>
   <data name="P_AdminPwdTooOld_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
   </data>
   <data name="P_AdminPwdTooOld_Solution" xml:space="preserve">
     <value>We advised to read the ANSSI guidelines about this, which is quoted in the documentation section below.
@@ -3474,7 +3474,7 @@ That's why this rule is not triggered if only one account is not protected.</val
     <value>Number of admin accounts which do not require kerberos pre-authentication: {count}</value>
   </data>
   <data name="S_NoPreAuthAdmin_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#useraccountanalysis"&gt;User information&lt;/a&gt; and &lt;a class="hyperlink" href="#computeraccountanalysis"&gt;Computer information&lt;/a&gt;</value>
   </data>
   <data name="S_NoPreAuthAdmin_Solution" xml:space="preserve">
     <value>Edit the property of the involved accounts and select the Account tab. Uncheck "Do not require Kerberos preauthentication". For computers which doesn't have the Account tab, you have to manually edit the attribute useraccountcontrol. Subtract from the attribute the value 4194304.</value>
@@ -3502,7 +3502,7 @@ https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dnsp/007efcd2-29
     <value>Number of members of the Dns Admins group: {count}</value>
   </data>
   <data name="P_DNSAdmin_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#admingroups"&gt;Admin Groups&lt;/a&gt;</value>
   </data>
   <data name="P_DNSAdmin_Solution" xml:space="preserve">
     <value>You should remove the members of the DNS admin group and do a proper delegation to the specific DNS Zones.
@@ -3538,7 +3538,7 @@ In this case, the DnsAdmins group is not empty and grant to its user, the possib
     <value>At least one privileged group can be revealed on RODC</value>
   </data>
   <data name="P_RODCRevealOnDemand_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="P_RODCRevealOnDemand_Solution" xml:space="preserve">
     <value>Edit the attribute msDS-RevealOnDemandGroup and remove the privileged user or group identified.
@@ -3567,7 +3567,7 @@ All privileged group have a RID lower than 1000, than means that the RODC can ge
     <value>The protection against Privileged Group protection on RODC is not fully enabled</value>
   </data>
   <data name="P_RODCNeverReveal_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="P_RODCNeverReveal_Solution" xml:space="preserve">
     <value>Check the value of the attribute msDS-NeverRevealGroup and the presence of the following expected groups:
@@ -3599,7 +3599,7 @@ All privileged group have a RID lower than 1000, than means that the RODC can ge
     <value>At least one privileged user has been revealed on a RODC</value>
   </data>
   <data name="P_RODCAdminRevealed_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="P_RODCAdminRevealed_Solution" xml:space="preserve">
     <value>The admin account should have its secrets change (a password reset) and be sure that the account will not be revealed anymore.</value>
@@ -3629,7 +3629,7 @@ In addition to that, RODC are placed in general on more riskier environment.</va
     <value>At least one RODC has write access to the SYSVOL volume</value>
   </data>
   <data name="P_RODCSYSVOLWrite_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#domaincontrollersection"&gt;Domain controllers&lt;/a&gt;</value>
   </data>
   <data name="P_RODCSYSVOLWrite_Solution" xml:space="preserve">
     <value>Locate the domain controller object related to the RODC in ADSIEdit.
@@ -3660,7 +3660,7 @@ https://adsecurity.org/?p=3299</value>
     <value>No GPO has been found which implements NetCease</value>
   </data>
   <data name="A_NoNetSessionHardening_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#lsasettings"&gt;Security settings&lt;/a&gt;</value>
   </data>
   <data name="A_NoNetSessionHardening_Solution" xml:space="preserve">
     <value>If this mitigation is not part of the computer image, apply the following recommandations:
@@ -3698,7 +3698,7 @@ https://www.blackhillsinfosec.com/domain-goodness-learned-love-ad-explorer/</val
     <value>At least one user has an attribute set which is known to potentially contains a password</value>
   </data>
   <data name="A_UnixPwd_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#unixpasswordsfound"&gt;Unix Passwords&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#unixpasswordsfound"&gt;Unix Passwords&lt;/a&gt;</value>
   </data>
   <data name="A_UnixPwd_Solution" xml:space="preserve">
     <value>The attribute unixUserPassword and userPassword should be cleared from the mentionned user account, unless the remote system is known to have a strong cryptographic protocol.</value>
@@ -3734,7 +3734,7 @@ https://www.dsinternals.com/en/impersonating-office-365-users-mimikatz/</value>
     <value>The password used in AzureAD SSO has not been changed for at least one year</value>
   </data>
   <data name="T_AzureADSSO_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#azure"&gt;Azure&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#azure"&gt;Azure&lt;/a&gt;</value>
   </data>
   <data name="T_AzureADSSO_Solution" xml:space="preserve">
     <value>Run the script referenced in the documentation below to change the password of the account AZUREADSSOACC.</value>
@@ -3758,7 +3758,7 @@ That means that an extraction of its password (using DCSync for example) can lea
     <value>Presence of Windows 7 = {count}</value>
   </data>
   <data name="S_OS_Win7_ReportLocation" xml:space="preserve">
-    <value>The detail can be found in &lt;a href="#operatingsystems"&gt;Operating Systems&lt;/a&gt;</value>
+    <value>The detail can be found in &lt;a class="hyperlink" href="#operatingsystems"&gt;Operating Systems&lt;/a&gt;</value>
   </data>
   <data name="S_OS_Win7_Solution" xml:space="preserve">
     <value>In order to solve this security issue, you should upgrade all the workstations to a more recent version of Windows, starting from Windows 10. Do note that you can get the full details regarding the OS used with the following PowerShell command: &lt;i&gt;Get-ADComputer -Filter * -Property * | Format-Table Name,OperatingSystem,OperatingSystemServicePack,OperatingSystemVersion -Wrap -Auto You can replace [-Filter *] by [-Filter {OperatingSystem -Like "Windows Server*"}&lt;/i&gt;</value>

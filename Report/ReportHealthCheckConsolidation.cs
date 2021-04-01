@@ -83,13 +83,13 @@ $('table').not('.model_table').DataTable(
             versionString += " Beta";
 #endif
 			GenerateNavigation("Consolidation", null, DateTime.Now);
-			GenerateAbout(@"<p><strong>Generated with <a href=""https://10root.com"">10Root RisX</a> powered by <a href=""https://www.pingcastle.com"">Ping Castle</a> all rights reserved</strong></p>
+			GenerateAbout(@"<p><strong>Generated with <a class=""hyperlink"" href=""https://10root.com"">10Root RisX</a> powered by <a class=""hyperlink"" href=""https://www.pingcastle.com"">Ping Castle</a> all rights reserved</strong></p>
 <p>Open source components:</p>
 <ul>
-<li><a href=""https://getbootstrap.com/"">Bootstrap</a> licensed under the <a href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
-<li><a href=""https://datatables.net/"">DataTables</a> licensed under the <a href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
-<li><a href=""https://popper.js.org/"">Popper.js</a> licensed under the <a href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
-<li><a href=""https://jquery.org"">JQuery</a> licensed under the <a href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
+<li><a class=""hyperlink"" href=""https://getbootstrap.com/"">Bootstrap</a> licensed under the <a class=""hyperlink"" href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
+<li><a class=""hyperlink"" href=""https://datatables.net/"">DataTables</a> licensed under the <a class=""hyperlink"" href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
+<li><a class=""hyperlink"" href=""https://popper.js.org/"">Popper.js</a> licensed under the <a class=""hyperlink"" href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
+<li><a class=""hyperlink"" href=""https://jquery.org"">JQuery</a> licensed under the <a class=""hyperlink"" href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
 </ul>");
             Add(@"
 <div id=""wrapper"" class=""container-fluid well"">

@@ -181,7 +181,7 @@ namespace PingCastle.Rules
         public virtual string GenerateLink()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("<a href=\"");
+            sb.Append("<a class=\"hyperlink\" href=\"");
             sb.Append(URL);
             sb.Append("\">");
             if (!string.IsNullOrEmpty(Country))

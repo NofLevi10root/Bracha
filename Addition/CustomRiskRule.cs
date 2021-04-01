@@ -137,7 +137,7 @@ namespace PingCastle.Addition
         public void SetReportLocation()
         {
             if (ReportLocationHelper != null && ReportLocationHelper.Target != null)
-            ReportLocation =  "The detail can be found in <a href=\"#" + ReportLocationHelper.Target + "\">" + ReportLocationHelper.Text + "</a>";
+            ReportLocation = "The detail can be found in <a class=\"hyperlink\" href=\"#" + ReportLocationHelper.Target + "\">" + ReportLocationHelper.Text + "</a>";
         }
         public void SetDocumentation()
         {
