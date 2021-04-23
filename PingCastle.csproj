@@ -108,6 +108,7 @@
     <Compile Include="Addition\CustomHealthCheckData.cs" />
     <Compile Include="Addition\CustomHealthCheckRiskRule.cs" />
     <Compile Include="Addition\CustomInformationSection.cs" />
+    <Compile Include="Addition\CustomTableKeyLink.cs" />
     <Compile Include="Addition\CustomReportLocation.cs" />
     <Compile Include="Addition\CustomRiskModelCategory.cs" />
     <Compile Include="Addition\CustomRiskRule.cs" />
@@ -368,6 +369,10 @@
     <Compile Include="template\TemplateManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Addition\DataScheme.xsd">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>

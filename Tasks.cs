@@ -192,6 +192,7 @@ namespace PingCastle
         public bool AnalysisTask<T>() where T : IPingCastleReport
         {
             string[] servers = Server.Split(',');
+            Console.WriteLine(Server);
             if(!string.IsNullOrEmpty(CustomConfigFileOrDirectory) && File.Exists(CustomConfigFileOrDirectory))
             {
                 domainsCustomData = new Dictionary<string, CustomHealthCheckData>();
@@ -199,17 +200,25 @@ namespace PingCastle
                 {
                     foreach(var file in Directory.GetFiles(CustomConfigFileOrDirectory, "*.xml"))
                     {
-                        var domainData = CustomHealthCheckData.LoadXML(file);
-                        if(!string.IsNullOrEmpty(domainData.Domain) && !domainsCustomData.ContainsKey(domainData.Domain))
+                        if(CustomHealthCheckData.LoadXML(file, out var domainData))
                         {
-                            domainsCustomData[domainData.Domain] = domainData;
+                            if (!string.IsNullOrEmpty(domainData.Domain) && !domainsCustomData.ContainsKey(domainData.Domain))
+                            {
+                                domainsCustomData[domainData.Domain] = domainData;
+                            }
                         }
                     }
                 }
                 else if(File.Exists(CustomConfigFileOrDirectory))
                 {
-                    var domainData = CustomHealthCheckData.LoadXML(CustomConfigFileOrDirectory);
-                    domainsCustomData[domainData.Domain] = domainData;
+                    if(CustomHealthCheckData.LoadXML(CustomConfigFileOrDirectory, out var domainData))
+                    {
+                        if(servers.Length <= 1 && Server != "*")
+                        {
+                            domainData.Domain = Server;
+                        }
+                        domainsCustomData[domainData.Domain] = domainData;
+                    }
                 }
             }
             foreach (string server in servers)
@@ -552,9 +561,8 @@ namespace PingCastle
                         var fi = new FileInfo(FileOrDirectory);
 						var healthcheckData = DataHelper<HealthcheckData>.LoadXml(FileOrDirectory);
 						var endUserReportGenerator = PingCastleFactory.GetEndUserReportGenerator<HealthcheckData>();
-                        if(AddCustsomData)
+                        if(AddCustsomData && CustomHealthCheckData.LoadXML(CustomConfigFileOrDirectory, out var customHealthCheckData))
                         {
-                            var customHealthCheckData = CustomHealthCheckData.LoadXML(CustomConfigFileOrDirectory);
                             customHealthCheckData.FillData(healthcheckData);
                             customHealthCheckData.MergeData(healthcheckData);
                             endUserReportGenerator.GenerateReportFile(healthcheckData, License, healthcheckData.GetHumanReadableFileName(), customHealthCheckData);

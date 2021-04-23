@@ -13,12 +13,17 @@ namespace PingCastle.Addition
         [XmlArray("Columns")]
         [XmlArrayItem("Column")]
         public List<CustomTableColumn> Columns { get; set; } = new List<CustomTableColumn>();
+
+        [XmlArray("KeyLinks")]
+        [XmlArrayItem("KeyLink")]
+        public List<CustomTableKeyLink> KeyLinks { get; set; } = new List<CustomTableKeyLink>();
         [XmlIgnore]
         public List<string> Keys { get; set; } = new List<string>();
         #endregion
 
         #region Fields
         private readonly Dictionary<string, CustomTableColumn> dictCols = new Dictionary<string, CustomTableColumn>();
+        private readonly Dictionary<string, CustomInformationSection> dictKeyLinks = new Dictionary<string, CustomInformationSection>();
         #endregion
 
 
@@ -28,11 +33,19 @@ namespace PingCastle.Addition
             foreach (var col in Columns)
                 dictCols[col.Header] = col;
         }
+
+        public void SetLinksToSections(Dictionary<string, CustomInformationSection> sections)
+        {
+            foreach(var keyLink in KeyLinks)
+            {
+                if (sections.ContainsKey(keyLink.Target))
+                    dictKeyLinks[keyLink.Value] = sections[keyLink.Target];
+            }
+        }
         public void AddDetail(CustomRuleDetails detail)
         {
             if (!File.Exists(detail.FilePath))
                 return;
-
             var lines = File.ReadAllLines(detail.FilePath);
             if (lines.Length == 0)
                 return;
@@ -44,7 +57,8 @@ namespace PingCastle.Addition
             {
                 data[i] = new string[colsNum];
                 var lineParts = lines[i].Split(',');
-                for (int q = 0; q < lineParts.Length; q++)
+                var maxQ = Math.Min(colsNum, lineParts.Length);
+                for (int q = 0; q < maxQ; q++)
                 {
                     data[i][q] = lineParts[q].Trim();
                 }
@@ -103,6 +117,18 @@ namespace PingCastle.Addition
             }
             return output;
         }
+
+        public bool GetKeyLinkedSection(string target, out CustomInformationSection result)
+        {
+            if(dictKeyLinks.ContainsKey(target))
+            {
+                result = dictKeyLinks[target];
+                return true;
+            }
+            result = null;
+            return false;
+        }
+
         #endregion
     }
 }

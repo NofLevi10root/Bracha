@@ -41,14 +41,15 @@ namespace PingCastle.Addition
         #region Methods
         public bool AddData(string filename)
         {
-            var data = CustomHealthCheckData.LoadXML(filename);
-            if (!string.IsNullOrEmpty(data.Domain))
+            if(CustomHealthCheckData.LoadXML(filename, out var data))
             {
-                DomainsData[data.Domain] = data;
-                return true;
+                if (!string.IsNullOrEmpty(data.Domain))
+                {
+                    DomainsData[data.Domain] = data;
+                    return true;
+                }
             }
-            else
-                return false;
+            return false;
         }
 
         public void MergeDomainData(HealthcheckData domain)

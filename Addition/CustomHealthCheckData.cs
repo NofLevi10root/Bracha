@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Xml;
+using System.Xml.Schema;
 using System.Xml.Serialization;
 
 namespace PingCastle.Addition
@@ -77,43 +78,69 @@ namespace PingCastle.Addition
         #endregion
 
         #region Methods
-        public static CustomHealthCheckData LoadXML(string filename)
+        #region XML
+        public static bool LoadXML(string filename, out CustomHealthCheckData result)
         {
-            var output = new CustomHealthCheckData();
-            using (Stream fs = File.OpenRead(filename))
-            {
-                XmlDocument xmlDoc = LoadXmlDocument(fs, filename);
-                XmlSerializer xs = new XmlSerializer(typeof(CustomHealthCheckData));
-                output = (CustomHealthCheckData)xs.Deserialize(new XmlNodeReader(xmlDoc));
-            }
-            output.dataDirectory = Path.GetDirectoryName(filename);
-            return output;
-        }
-        private static XmlDocument LoadXmlDocument(Stream report, string filenameForDebug)
-        {
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.PreserveWhitespace = true;
+            result = new CustomHealthCheckData();
             try
             {
-                xmlDoc.Load(report);
+                using (Stream fs = File.OpenRead(filename))
+                {
+                    //XmlDocument xmlDoc = LoadXmlDocument(fs, filename);
+                    XmlDocument xmlDoc = LoadXmlDocument(filename);
+                    XmlSerializer xs = new XmlSerializer(typeof(CustomHealthCheckData));
+                    result = (CustomHealthCheckData)xs.Deserialize(new XmlNodeReader(xmlDoc));
+                }
+
             }
-            catch (XmlException ex)
+            catch(Exception e)
             {
-                Trace.WriteLine("Invalid xml " + ex.Message);
-                Trace.WriteLine("Trying to recover");
-                StreamReader reader = new StreamReader(report);
-                string xml = reader.ReadToEnd();
-                try
-                {
-                    xmlDoc.LoadXml(xml);
-                }
-                catch (XmlException ex2)
-                {
-                    throw new PingCastleDataException(filenameForDebug, "Unable to parse the xml (" + ex2.Message + ")");
-                }
+                ShowMessage($"Failed loading data from : {filename}", ConsoleColor.Red);
+                ShowMessage($"{e.Message}", ConsoleColor.Yellow);
+                ShowMessage($"{e.StackTrace}", ConsoleColor.Red);
+                return false;
             }
-            return xmlDoc;
+            result.dataDirectory = Path.GetDirectoryName(filename);
+            return true;
         }
+        
+        private static XmlDocument LoadXmlDocument(string fileName)
+        {
+            try
+            {
+                XmlReaderSettings settings = new XmlReaderSettings();
+                settings.Schemas.Add("", $"{Directory.GetCurrentDirectory()}\\Addition\\DataScheme.xsd");
+                settings.ValidationType = ValidationType.Schema;
+
+                XmlReader reader = XmlReader.Create(fileName, settings);
+                XmlDocument document = new XmlDocument();
+                document.PreserveWhitespace = true;
+                document.Load(reader);
+
+                ValidationEventHandler eventHandler = new ValidationEventHandler(ValidationEventHandler);
+
+                // the following call to Validate succeeds.
+                document.Validate(eventHandler);
+                return document;
+            }
+            catch (Exception e)
+            {
+                throw new PingCastleDataException(fileName, "Unable to parse the xml (" + e.Message + ")");
+            }
+        }
+        static void ValidationEventHandler(object sender, ValidationEventArgs e)
+        {
+            switch (e.Severity)
+            {
+                case XmlSeverityType.Error:
+                    Console.WriteLine("Error: {0}", e.Message);
+                    break;
+                case XmlSeverityType.Warning:
+                    Console.WriteLine("Warning {0}", e.Message);
+                    break;
+            }
+        }
+        #endregion
         public void FillData(HealthcheckData healthData)
         {
             #region Add Sections
@@ -125,6 +152,7 @@ namespace PingCastle.Addition
             {
                 dictTables.Add(table.Id, table);
                 table.SetInitData();
+                table.SetLinksToSections(dictSections);
             }
             #endregion
 
@@ -148,7 +176,7 @@ namespace PingCastle.Addition
                     dictModels.Add(model.Id, model);
             }
             #endregion
-            #region Add Risk Rules To Dictinary
+            #region Add Risk Rules To Dictionary
             foreach (var riskRule in RiskRules)
             {
                 if (!dictRiskRules.ContainsKey(riskRule.Id))
@@ -197,28 +225,31 @@ namespace PingCastle.Addition
                     }
                     #endregion
                     #region Add Point To Category
-                    if (Enum.IsDefined(typeof(RiskRuleCategory), healthRule.Category)) // add points
+                    if(healthRule.Category != null)
                     {
-                        switch (healthRule.Category)
+                        if (Enum.IsDefined(typeof(RiskRuleCategory), healthRule.Category)) // add points
                         {
-                            case "Anomalies":
-                                healthData.AnomalyScore = Math.Min(100, healthData.AnomalyScore + healthRule.Points);
-                                break;
-                            case "PrivilegedAccounts":
-                                healthData.PrivilegiedGroupScore = Math.Min(100, healthData.PrivilegiedGroupScore + healthRule.Points);
-                                break;
-                            case "StaleObjects":
-                                healthData.StaleObjectsScore = Math.Min(100, healthData.StaleObjectsScore + healthRule.Points);
-                                break;
-                            case "Trusts":
-                                healthData.TrustScore = Math.Min(100, healthData.TrustScore + healthRule.Points);
-                                break;
+                            switch (healthRule.Category)
+                            {
+                                case "Anomalies":
+                                    healthData.AnomalyScore = Math.Min(100, healthData.AnomalyScore + healthRule.Points);
+                                    break;
+                                case "PrivilegedAccounts":
+                                    healthData.PrivilegiedGroupScore = Math.Min(100, healthData.PrivilegiedGroupScore + healthRule.Points);
+                                    break;
+                                case "StaleObjects":
+                                    healthData.StaleObjectsScore = Math.Min(100, healthData.StaleObjectsScore + healthRule.Points);
+                                    break;
+                                case "Trusts":
+                                    healthData.TrustScore = Math.Min(100, healthData.TrustScore + healthRule.Points);
+                                    break;
+                            }
                         }
-                    }
-                    else
-                    {
-                        var category = dictCategories[healthRule.Category];
-                        category.Score = Math.Min(100, category.Score + healthRule.Points);
+                        else
+                        {
+                            var category = dictCategories[healthRule.Category];
+                            category.Score = Math.Min(100, category.Score + healthRule.Points);
+                        }
                     }
                     #endregion
                 }
@@ -335,6 +366,13 @@ namespace PingCastle.Addition
             }
             category = null;
             return false;
+        }
+
+        public static void ShowMessage(string message, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine(message);
+            Console.ResetColor();
         }
         #endregion
     }
