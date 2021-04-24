@@ -181,11 +181,14 @@ namespace PingCastle.Addition
             {
                 if (!dictRiskRules.ContainsKey(riskRule.Id))
                     dictRiskRules.Add(riskRule.Id, riskRule);
-                if (dictModels.ContainsKey(riskRule.Model))
+                foreach(string model in riskRule.Models)
                 {
-                    riskRule.Category = dictModels[riskRule.Model].Category;
+                    riskRule.AddModelToDictionary(model);
+                    if (dictModels.ContainsKey(model))
+                    {
+                        riskRule.AddCategory(dictModels[model].Category);
+                    }
                 }
-                    
             }
             #endregion
             #region Fill Health Risk Rules Data
@@ -195,8 +198,14 @@ namespace PingCastle.Addition
                 {
                     rule.SetReportLocation();
                     rule.SetDocumentation();
-                    healthRule.Category = rule.Category;
-                    healthRule.Model = rule.Model;
+                    foreach(var category in rule.Categories)
+                    {
+                        healthRule.AddCategory(category);
+                    }
+                    foreach (var model in rule.Models)
+                    {
+                        healthRule.AddModel(model);
+                    }
                     #region Get Details
                     if (healthRule.RuleDetails != null)
                     {
@@ -225,11 +234,11 @@ namespace PingCastle.Addition
                     }
                     #endregion
                     #region Add Point To Category
-                    if(healthRule.Category != null)
+                    foreach(var categoryName in healthRule.Categories)
                     {
-                        if (Enum.IsDefined(typeof(RiskRuleCategory), healthRule.Category)) // add points
+                        if (Enum.IsDefined(typeof(RiskRuleCategory), categoryName)) // add points
                         {
-                            switch (healthRule.Category)
+                            switch (categoryName)
                             {
                                 case "Anomalies":
                                     healthData.AnomalyScore = Math.Min(100, healthData.AnomalyScore + healthRule.Points);
@@ -247,7 +256,7 @@ namespace PingCastle.Addition
                         }
                         else
                         {
-                            var category = dictCategories[healthRule.Category];
+                            var category = dictCategories[categoryName];
                             category.Score = Math.Min(100, category.Score + healthRule.Points);
                         }
                     }
@@ -276,7 +285,7 @@ namespace PingCastle.Addition
             int output = 0;
             foreach (var rule in HealthRules)
             {
-                if (rule.Category == category)
+                if(rule.CheckIsInCategory(category))
                     output++;
             }
             return output;
@@ -286,7 +295,7 @@ namespace PingCastle.Addition
             int output = 0;
             foreach (var rule in RiskRules)
             {
-                if (rule.Category == category)
+                if(rule.CheckIsInCategory(category))
                     output++;
             }
             return output;

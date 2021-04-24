@@ -320,7 +320,7 @@ namespace PingCastle.Report
 						}
 						foreach(var rule in hcrules)
                         {
-							if(rule.Model == model.Id)
+							if(rule.CheckIsInModel(model.Id))
                             {
 								numrules++;
 								score += rule.Points;
@@ -428,7 +428,7 @@ namespace PingCastle.Report
             {
 				foreach (CustomHealthCheckRiskRule rule in CustomData.HealthRules)
 				{
-					if (rule.Category == category.ToString())
+					if(rule.CheckIsInCategory(category.ToString()))
 					{
 						hasRule = true;
 						break;
@@ -454,8 +454,8 @@ namespace PingCastle.Report
                         {
 							foreach(var rule in CustomData.HealthRules)
                             {
-								if (rule.Category == category.ToString())
-									GenerateAdvancedIndicatorPanelDetail(rule.Category, rule);
+								if(rule.CheckIsInCategory(category.ToString()))
+									GenerateAdvancedIndicatorPanelDetail(category.ToString(), rule);
                             }
                         }
 					});
@@ -490,7 +490,7 @@ namespace PingCastle.Report
 			bool hasRule = false;
 			foreach (CustomHealthCheckRiskRule rule in CustomData.HealthRules)
 			{
-				if (rule.Category == category)
+				if(rule.CheckIsInCategory(category))
 				{
 					hasRule = true;
 					break;
@@ -508,7 +508,7 @@ namespace PingCastle.Report
 					);
 					foreach (CustomHealthCheckRiskRule rule in CustomData.HealthRules)
 					{
-						if (rule.Category == category)
+						if(rule.CheckIsInCategory(category))
 							GenerateAdvancedIndicatorPanelDetail(category, rule);
 					}
 				});

@@ -10,9 +10,11 @@ namespace PingCastle.Addition
     {
         #region Properties
         public string Id { get; set; }
-        public string Model { get; set; }
+        [XmlArray("Models")]
+        [XmlArrayItem("Model")]
+        public List<string> Models { get; set; } = new List<string>();
         [XmlIgnore]
-        public string Category { get; set; }
+        public List<string> Categories { get; set; } = new List<string>();
         [XmlIgnore]
         public int Maturity { get; set; }
         [XmlElement(ElementName = "Maturity")]
@@ -57,6 +59,11 @@ namespace PingCastle.Addition
         public List<CustomRuleComputation> RuleComputations { get; set; } = new List<CustomRuleComputation>();
         #endregion
 
+        #region Fields
+        private readonly Dictionary<string, bool> dictCategories = new Dictionary<string, bool>(); 
+        private readonly Dictionary<string, bool> dictModels = new Dictionary<string, bool>(); 
+        #endregion
+
         #region Methods
         public static CustomRiskRule GetFromRuleBase<T>(RuleBase<T> rule)
         {
@@ -65,8 +72,6 @@ namespace PingCastle.Addition
             CustomRiskRule output = new CustomRiskRule()
             {
                 Id = rule.RiskId,
-                Category = rule.Category.ToString(),
-                Model = rule.Model.ToString(),
                 Description = rule.Description,
                 Details = rule.Details,
                 Documentation = rule.Documentation,
@@ -76,6 +81,9 @@ namespace PingCastle.Addition
                 TechnicalExplanation = rule.TechnicalExplanation,
                 Title = rule.Title
             };
+            output.AddCategory(rule.Category.ToString());
+            output.AddModel(rule.Model.ToString());
+
             foreach(var attr in rule.RuleComputation)
             {
                 output.RuleComputations.Add(new CustomRuleComputation()
@@ -150,6 +158,38 @@ namespace PingCastle.Addition
                 }
                 Documentation =  string.Join("<br>", lines);
             }
+        }
+
+
+        public void AddCategory(string category)
+        {
+            if (dictCategories.ContainsKey(category))
+                return;
+            dictCategories.Add(category, true);
+            Categories.Add(category);
+        }
+
+        public void AddModel(string model)
+        {
+            if (dictModels.ContainsKey(model))
+                return;
+            dictModels.Add(model, true);
+            Models.Add(model);
+        }
+        public void AddModelToDictionary(string model)
+        {
+            if (!dictModels.ContainsKey(model))
+                dictModels.Add(model, true);
+        }
+
+        public bool CheckIsInCategory(string category)
+        {
+            return dictCategories.ContainsKey(category);
+        }
+
+        public bool CheckIsInModel(string model)
+        {
+            return dictModels.ContainsKey(model);
         }
         #endregion
     }

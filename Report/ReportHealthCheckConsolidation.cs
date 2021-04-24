@@ -183,7 +183,7 @@ $('table').not('.model_table').DataTable(
                     {
                         AddBeginRow();
                         AddPrintDomain(data.Domain);
-                        AddCellText(rule.Category);
+                        AddCellText(string.Join(", ", rule.Categories.ToArray()));
                         AddCellText(rule.RiskId);
                         AddCellNum(rule.Points);
                         if (CustomConsoData.GetRiskRule(rule.RiskId, out var riskRule))
