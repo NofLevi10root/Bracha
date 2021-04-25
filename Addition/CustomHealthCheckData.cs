@@ -1,5 +1,6 @@
 ﻿using PingCastle.Data;
 using PingCastle.Healthcheck;
+using PingCastle.Properties;
 using PingCastle.Rules;
 using System;
 using System.Collections.Generic;
@@ -109,10 +110,14 @@ namespace PingCastle.Addition
             try
             {
                 XmlReaderSettings settings = new XmlReaderSettings();
-                settings.Schemas.Add("", $"{Directory.GetCurrentDirectory()}\\Addition\\DataScheme.xsd");
+
+                settings.Schemas.Add("", XmlReader.Create(new StringReader(Resources.DataScheme)));
                 settings.ValidationType = ValidationType.Schema;
+                settings.CheckCharacters = false;
+                
 
                 XmlReader reader = XmlReader.Create(fileName, settings);
+                
                 XmlDocument document = new XmlDocument();
                 document.PreserveWhitespace = true;
                 document.Load(reader);
@@ -123,9 +128,17 @@ namespace PingCastle.Addition
                 document.Validate(eventHandler);
                 return document;
             }
+            catch (XmlSchemaValidationException e)
+            {
+                throw new PingCastleDataException(fileName, $"Unable to parse the xml ({e.Message})\nPosition [Line: {e.LineNumber} | Char: {e.LinePosition}]");
+            }
+            catch (XmlException e)
+            {
+                throw new PingCastleDataException(fileName, $"Unable to parse the xml ({e.Message})\nPosition [Line: {e.LineNumber} | Char: {e.LinePosition}]");
+            }
             catch (Exception e)
             {
-                throw new PingCastleDataException(fileName, "Unable to parse the xml (" + e.Message + ")");
+                throw new PingCastleDataException(fileName, $"Unable to parse the xml ({e.Message})");
             }
         }
         static void ValidationEventHandler(object sender, ValidationEventArgs e)

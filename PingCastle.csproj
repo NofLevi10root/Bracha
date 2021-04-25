@@ -221,6 +221,11 @@
     <Compile Include="misc\Subnet.cs" />
     <Compile Include="PingCastleException.cs" />
     <Compile Include="PingCastleFactory.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Report\IPingCastleReportUser.cs" />
     <Compile Include="Report\ReportBase.cs" />
     <Compile Include="Report\ReportHealthCheckConsolidation.cs" />
@@ -369,10 +374,9 @@
     <Compile Include="template\TemplateManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Addition\DataScheme.xsd">
+    <None Include="Addition\DataScheme.xsd">
       <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </None>
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
@@ -415,6 +419,10 @@
     </None>
     <EmbeddedResource Include="Healthcheck\Rules\RuleDescription.resx">
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="template\responsivetemplate.html.gz" />
     <EmbeddedResource Include="template\vis.min.css.gz" />
