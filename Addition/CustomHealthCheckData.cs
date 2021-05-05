@@ -164,7 +164,7 @@ namespace PingCastle.Addition
             foreach (var table in Tables)
             {
                 dictTables.Add(table.Id, table);
-                table.SetInitData();
+                table.SetInitData(dataDirectory);
                 table.SetLinksToSections(dictSections);
             }
             #endregion

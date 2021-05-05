@@ -462,20 +462,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             }
             AddBeginTableData();
             AddBeginRow();
-            if(custTable != null && custTable.GetKeyLinkedSection(Report.DomainFQDN, out var targetSection))
-            {
-                Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                Add(@""">");
-                AddEncoded(Report.DomainFQDN);
-                Add("</a></td>");
-
-                AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), targetSection.Name, ShowModalType.XL);
-                GenerateAdvancedCustomSection(targetSection);
-                AddEndModal();
-            }
-            else
-                AddCellText(Report.DomainFQDN);
+            AddTableKeyCell(custTable, Report.DomainFQDN);
             AddCellText(Report.NetBIOSName);
             AddCellText(ReportHelper.DecodeDomainFunctionalLevel(Report.DomainFunctionalLevel));
             AddCellText(ReportHelper.DecodeForestFunctionalLevel(Report.ForestFunctionalLevel));
@@ -505,7 +492,8 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             }
             AddEndRow();
             AddEndTable();
-            if(CustomData != null)
+            AddTableKeyModal(custTable, Report.DomainFQDN);
+            if (CustomData != null)
             {
                 if(CustomData.GetSection("DomainInformation", out var section))
                 {
@@ -571,20 +559,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             }
             AddBeginTableData();
             AddBeginRow();
-            if (custTable != null && custTable.GetKeyLinkedSection(Report.UserAccountData.Number.ToString(), out var targetSection))
-            {
-                Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                Add(@""">");
-                AddEncoded(Report.UserAccountData.Number.ToString());
-                Add("</a></td>");
-
-                AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), targetSection.Name, ShowModalType.XL);
-                GenerateAdvancedCustomSection(targetSection);
-                AddEndModal();
-            }
-            else
-                AddCellNum(Report.UserAccountData.Number);
+            AddTableKeyCell(custTable, Report.UserAccountData.Number, "number");
             AddCellNum(Report.UserAccountData.NumberEnabled);
             AddCellNum(Report.UserAccountData.NumberDisabled);
             AddCellNum(Report.UserAccountData.NumberActive);
@@ -609,6 +584,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             }
             AddEndRow();
             AddEndTable();
+            AddTableKeyModal(custTable, Report.UserAccountData.Number);
             GenerateListAccount(Report.UserAccountData, "user", "usersaccordion");
             if (Report.PasswordDistribution != null && Report.PasswordDistribution.Count > 0)
             {
@@ -935,20 +911,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             foreach (HealthcheckSIDHistoryData domainSidHistory in data.ListDomainSidHistory)
             {
                 AddBeginRow();
-                if (custTable != null && custTable.GetKeyLinkedSection(domainSidHistory.FriendlyName, out var targetSection))
-                {
-                    Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                    Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                    Add(@""">");
-                    AddEncoded(domainSidHistory.FriendlyName);
-                    Add("</a></td>");
-
-                    AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), targetSection.Name, ShowModalType.XL);
-                    GenerateAdvancedCustomSection(targetSection);
-                    AddEndModal();
-                }
-                else
-                    AddCellText(domainSidHistory.FriendlyName);
+                AddTableKeyCell(custTable, domainSidHistory.FriendlyName);
                 AddCellDate(domainSidHistory.FirstDate);
                 AddCellDate(domainSidHistory.LastDate);
                 AddCellNum(domainSidHistory.Count);
@@ -970,6 +933,11 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 AddEndRow();
             }
             AddEndTable();
+
+            foreach (HealthcheckSIDHistoryData domainSidHistory in data.ListDomainSidHistory)
+            {
+                AddTableKeyModal(custTable, domainSidHistory.FriendlyName);
+            }
         }
 
         #endregion user info
@@ -999,20 +967,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             AddBeginTableData();
 
             AddBeginRow();
-            if (custTable != null && custTable.GetKeyLinkedSection(Report.ComputerAccountData.Number.ToString(), out var targetSection))
-            {
-                Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                Add(@""">");
-                AddEncoded(Report.ComputerAccountData.Number.ToString());
-                Add("</a></td>");
-
-                AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), targetSection.Name, ShowModalType.XL);
-                GenerateAdvancedCustomSection(targetSection);
-                AddEndModal();
-            }
-            else
-                AddCellNum(Report.ComputerAccountData.Number);
+            AddTableKeyCell(custTable, Report.ComputerAccountData.Number, "number");
             AddCellNum(Report.ComputerAccountData.NumberEnabled);
             AddCellNum(Report.ComputerAccountData.NumberDisabled);
             AddCellNum(Report.ComputerAccountData.NumberActive);
@@ -1033,7 +988,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             }
             AddEndRow();
             AddEndTable();
-
+            AddTableKeyModal(custTable, Report.ComputerAccountData.Number);
             GenerateListAccount(Report.ComputerAccountData, "computer", "computersaccordion");
             GenerateOperatingSystemList();
             GenerateDomainSIDHistoryList(Report.ComputerAccountData);
@@ -1082,20 +1037,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 					foreach (HealthcheckOSData os in Report.OperatingSystem)
 					{
 						AddBeginRow();
-                        if (custTable != null && custTable.GetKeyLinkedSection(os.OperatingSystem, out var targetSection))
-                        {
-                            Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                            Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                            Add(@""">");
-                            AddEncoded(os.OperatingSystem);
-                            Add("</a></td>");
-
-                            AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), targetSection.Name, ShowModalType.XL);
-                            GenerateAdvancedCustomSection(targetSection);
-                            AddEndModal();
-                        }
-                        else
-                            AddCellText(os.OperatingSystem);
+                        AddTableKeyCell(custTable, os.OperatingSystem);
 						AddCellNum(os.NumberOfOccurence);
                         if (custTable != null)
                         {
@@ -1112,7 +1054,11 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 					}
 				}
 				AddEndTable();
-			}
+                foreach (HealthcheckOSData os in Report.OperatingSystem)
+                {
+                    AddTableKeyModal(custTable, os.OperatingSystem);
+                }
+            }
 			else
 			{
 				AddBeginTable("Operating System list");
@@ -1145,20 +1091,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 					foreach (HealthcheckOSData os in Report.OperatingSystem)
 					{
 						AddBeginRow();
-                        if (custTable != null && custTable.GetKeyLinkedSection(os.OperatingSystem, out var targetSection))
-                        {
-                            Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                            Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                            Add(@""">");
-                            AddEncoded(os.OperatingSystem);
-                            Add("</a></td>");
-
-                            AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), targetSection.Name, ShowModalType.XL);
-                            GenerateAdvancedCustomSection(targetSection);
-                            AddEndModal();
-                        }
-                        else
-                            AddCellText(os.OperatingSystem);
+                        AddTableKeyCell(custTable, os.OperatingSystem);
 						AddCellNum(os.data.Number);
 						AddCellNum(os.data.NumberEnabled);
 						AddCellNum(os.data.NumberDisabled);
@@ -1183,7 +1116,11 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 					}
 				}
 				AddEndTable();
-			}
+                foreach (HealthcheckOSData os in Report.OperatingSystem)
+                {
+                    AddTableKeyModal(custTable, os.OperatingSystem);
+                }
+            }
 		}
 		private void GenerateAdvancedCustomSection(CustomInformationSection section)
         {
@@ -1209,17 +1146,9 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                                 AddBeginRow();
                                 for(int i = 0; i < table.Columns.Count; i++)
                                 {
-                                    if(i == 0 && table.GetKeyLinkedSection(key, out var targetSection))
+                                    if(i == 0)
                                     {
-                                        Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                                        Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                                        Add(@""">");
-                                        AddEncoded(key);
-                                        Add("</a></td>");
-
-                                        AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), targetSection.Name, ShowModalType.XL);
-                                        GenerateAdvancedCustomSection(targetSection);
-                                        AddEndModal();
+                                        AddTableKeyCell(table, key);
                                     }
                                     else
                                     {
@@ -1232,6 +1161,10 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                                 AddEndRow();
                             }
                             AddEndTable();
+                            foreach (var key in table.Keys)
+                            {
+                                AddTableKeyModal(table, key);
+                            }
                         }
                         break;
                     case CustomSectionChildType.Chart:
@@ -1320,20 +1253,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                             {
                                 count++;
                                 AddBeginRow();
-                                if (custTable != null && custTable.GetKeyLinkedSection(dc.DCName, out var targetSection))
-                                {
-                                    Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                                    Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                                    Add(@""">");
-                                    AddEncoded(dc.DCName);
-                                    Add("</a></td>");
-
-                                    AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), targetSection.Name, ShowModalType.XL);
-                                    GenerateAdvancedCustomSection(targetSection);
-                                    AddEndModal();
-                                }
-                                else
-                                    AddCellText(dc.DCName);
+                                AddTableKeyCell(custTable, dc.DCName);
                                 AddCellText(dc.OperatingSystem);
                                 AddCellText((dc.CreationDate == DateTime.MinValue ? "Unknown" : dc.CreationDate.ToString("u")));
                                 AddCellText((dc.StartupTime == DateTime.MinValue ? (dc.LastComputerLogonDate.AddDays(60) < DateTime.Now ? "Inactive?" : "Unknown") : (dc.StartupTime.AddMonths(6) < DateTime.Now ? /*"<span class='unticked'>" + */dc.StartupTime.ToString("u")/* + "</span>"*/ : dc.StartupTime.ToString("u"))));
@@ -1369,6 +1289,8 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                                 AddEndRow();
                             }
                             AddEndTable();
+                            foreach (var dc in Report.DomainControllers)
+                                AddTableKeyModal(custTable, dc.DCName);
                         }
                     );
                 }
@@ -1432,17 +1354,9 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 foreach (HealthCheckGroupData group in Report.PrivilegedGroups)
                 {
                     AddBeginRow();
-                    if (custTable != null && custTable.GetKeyLinkedSection(group.GroupName, out var targetSection))
+                    if (custTable != null && (custTable.GetKeyLinkedSection(group.GroupName, out var targetSection) || custTable.GetNestedTable(group.GroupName, out var targetTable)))
                     {
-                        Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                        Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                        Add(@""">");
-                        AddEncoded(group.GroupName);
-                        Add("</a></td>");
-
-                        AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), targetSection.Name, ShowModalType.XL);
-                        GenerateAdvancedCustomSection(targetSection);
-                        AddEndModal();
+                        AddTableKeyCell(custTable, group.GroupName);
                     }
                     else if (group.Members != null && group.Members.Count > 0)
                     {
@@ -1491,13 +1405,17 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 AddEndTable();
                 foreach (HealthCheckGroupData group in Report.PrivilegedGroups)
                 {
-                    if (group.Members != null && group.Members.Count > 0)
+                    if (custTable != null && (custTable.GetKeyLinkedSection(group.GroupName, out var targetSection) || custTable.GetNestedTable(group.GroupName, out var targetTable)))
+                        AddTableKeyModal(custTable, group.GroupName);
+                    else if (group.Members != null && group.Members.Count > 0)
                     {
                         AddBeginModal(GenerateModalAdminGroupIdFromGroupName(group.GroupName), group.GroupName, ShowModalType.XL);
                         GenerateAdminGroupsDetail(group.Members);
                         AddEndModal();
                     }
+
                 }
+                
             }
 
             if (Report.AllPrivilegedMembers != null && Report.AllPrivilegedMembers.Count > 0)
@@ -1676,20 +1594,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 if (dcPathPos > 0)
                     path = delegation.DistinguishedName.Substring(0, dcPathPos);
                 AddBeginRow();
-                if (custTable != null && custTable.GetKeyLinkedSection(path, out var targetSection))
-                {
-                    Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                    Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                    Add(@""">");
-                    AddEncoded(path);
-                    Add("</a></td>");
-
-                    AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), targetSection.Name, ShowModalType.XL);
-                    GenerateAdvancedCustomSection(targetSection);
-                    AddEndModal();
-                }
-                else
-                    AddCellText(path);
+                AddTableKeyCell(custTable, path);
                 AddCellText(delegation.Account);
                 AddCellText(delegation.Right);
                 if (custTable != null)
@@ -1706,6 +1611,14 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 AddEndRow();
             }
             AddEndTable();
+            foreach (HealthcheckDelegationData delegation in Report.Delegations)
+            {
+                int dcPathPos = delegation.DistinguishedName.IndexOf(",DC=");
+                string path = delegation.DistinguishedName;
+                if (dcPathPos > 0)
+                    path = delegation.DistinguishedName.Substring(0, dcPathPos);
+                AddTableKeyModal(custTable, path);
+            }
         }
 
         private void GenerateAdminGroupsDetail(List<HealthCheckGroupMemberData> members)
@@ -1907,46 +1820,12 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 //Add("<td class='text'>");
                 if (GetUrlCallback == null)
                 {
-                    if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(header.FQDN), out var targetSection))
-                    {
-                        Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                        Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                        Add(@""">");
-                        AddEncoded(header.FQDN);
-                        Add("</a></td>");
-
-                        AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), ReportHelper.Encode(header.FQDN), ShowModalType.XL);
-                        GenerateAdvancedCustomSection(targetSection);
-                        AddEndModal();
-                    }
-                    else
-                    {
-                        Add("<td class='text'>");
-                        AddEncoded(header.FQDN);
-                        Add("</td>");
-                    }
+                    AddTableKeyCell(custTable, ReportHelper.Encode(header.FQDN));
                 }
                 else
                 {
                     var urlCallBack = GetUrlCallback(header.Domain, !string.IsNullOrEmpty(header.FQDN) ? header.FQDN : header.Netbios);
-                    if (custTable != null && custTable.GetKeyLinkedSection(urlCallBack, out var targetSection))
-                    {
-                        Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                        Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                        Add(@""">");
-                        AddEncoded(urlCallBack);
-                        Add("</a></td>");
-
-                        AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), urlCallBack, ShowModalType.XL);
-                        GenerateAdvancedCustomSection(targetSection);
-                        AddEndModal();
-                    }
-                    else
-                    {
-                        Add("<td class='text'>");
-                        Add(GetUrlCallback(header.Domain, !string.IsNullOrEmpty(header.FQDN) ? header.FQDN : header.Netbios));
-                        Add("</td>");
-                    }
+                    AddTableKeyCell(custTable, urlCallBack);
                 }
                 //Add("</td>");
                 AddCellText(header.Netbios);
@@ -1985,6 +1864,18 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 AddEndRow();
             }
             AddEndTable();
+            foreach (var header in Report.ControlPaths.Dependancies)
+            {
+                if (GetUrlCallback == null)
+                {
+                    AddTableKeyModal(custTable, ReportHelper.Encode(header.FQDN));
+                }
+                else
+                {
+                    var urlCallBack = GetUrlCallback(header.Domain, !string.IsNullOrEmpty(header.FQDN) ? header.FQDN : header.Netbios);
+                    AddTableKeyModal(custTable, urlCallBack);
+                }
+            }
         }
 
         protected void GenerateCompromissionGraphIndirectLinksInformation()
@@ -2021,22 +1912,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             foreach (var objectRisk in (CompromiseGraphDataObjectRisk[])Enum.GetValues(typeof(CompromiseGraphDataObjectRisk)))
             {
                 AddBeginRow();
-                if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.GetEnumDescription(objectRisk), out var targetSection))
-                {
-                    Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                    Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                    Add(@""">");
-                    AddEncoded(ReportHelper.GetEnumDescription(objectRisk));
-                    Add("</a></td>");
-
-                    AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), ReportHelper.GetEnumDescription(objectRisk), ShowModalType.XL);
-                    GenerateAdvancedCustomSection(targetSection);
-                    AddEndModal();
-                }
-                else
-                {
-                    AddHeaderText(ReportHelper.GetEnumDescription(objectRisk));
-                }
+                AddTableKeyCell(custTable, ReportHelper.GetEnumDescription(objectRisk), "header");
                 bool found = false;
                 foreach (var analysis in Report.ControlPaths.AnomalyAnalysis)
                 {
@@ -2069,6 +1945,8 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 AddEndRow();
             }
             AddEndTable();
+            foreach (var objectRisk in (CompromiseGraphDataObjectRisk[])Enum.GetValues(typeof(CompromiseGraphDataObjectRisk)))
+                AddTableKeyModal(custTable, ReportHelper.GetEnumDescription(objectRisk));
         }
 
         private void GenerateCompromissionGraphDetailedAnalysis()
@@ -2103,14 +1981,14 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 AddHeaderText("Detail");
                 if (CustomData != null)
                 {
-                    if (CustomData.GetTable("Summary of group", out var custTable))
+                    if (CustomData.GetTable("Summary of group", out var custTable3))
                     {
-                        for (int i = 1; i < custTable.Columns.Count; i++)
+                        for (int i = 1; i < custTable3.Columns.Count; i++)
                         {
-                            if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                                AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
+                            if (!string.IsNullOrEmpty(custTable3.Columns[i].Tooltip))
+                                AddHeaderText(custTable3.Columns[i].Header, custTable3.Columns[i].Tooltip);
                             else
-                                AddHeaderText(custTable.Columns[i].Header);
+                                AddHeaderText(custTable3.Columns[i].Header);
                         }
                     }
                 }
@@ -2120,6 +1998,15 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     GenerateSummary(i, line[i]);
                 }
                 AddEndTable();
+                if(CustomData.GetTable("Summary of group", out var custTable))
+                {
+                    foreach (var i in line.Keys)
+                    {
+                        AddTableKeyCell(custTable, line[i].Description);
+                    }
+                }
+
+                
             }
 
             for (int i = 0; i < Report.ControlPaths.Data.Count; i++)
@@ -2138,22 +2025,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             CustomData.GetTable("Summary of group", out var custTable);
 
             AddBeginRow();
-            if (custTable != null && custTable.GetKeyLinkedSection(data.Description, out var targetSection))
-            {
-                Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                Add(@""">");
-                AddEncoded(data.Description);
-                Add("</a></td>");
-
-                AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), data.Description, ShowModalType.XL);
-                GenerateAdvancedCustomSection(targetSection);
-                AddEndModal();
-            }
-            else
-            {
-                AddCellText(data.Description);
-            }
+            AddTableKeyCell(custTable, data.Description);
             AddCellText(ReportHelper.GetEnumDescription(data.ObjectRisk));
             bool isAGroup = true;
             foreach (var node in data.Nodes)
@@ -2685,60 +2557,11 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 //Add(@"<td class='text'>");
                 if (GetUrlCallback == null)
                 {
-                    if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(trust.TrustPartner), out var targetSection))
-                    {
-                        Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                        Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                        Add(@""">");
-                        AddEncoded(trust.TrustPartner);
-                        Add("</a>");
-                        AddBeginTooltip();
-                        Add("SID: ");
-                        Add(sid);
-                        Add("<br>Netbios: ");
-                        Add(netbios);
-                        AddEndTooltip();
-                        Add("</td>");
-                        AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), ReportHelper.Encode(trust.TrustPartner), ShowModalType.XL);
-                        GenerateAdvancedCustomSection(targetSection);
-                        AddEndModal();
-                    }
-                    else
-                    {
-                        Add(@"<td class='text'>");
-                        AddEncoded(trust.TrustPartner);
-                        AddBeginTooltip();
-                        Add("SID: ");
-                        Add(sid);
-                        Add("<br>Netbios: ");
-                        Add(netbios);
-                        AddEndTooltip();
-                        Add(@"</td>");
-
-                    }
-                    
+                    AddTableKeyCell(custTable, ReportHelper.Encode(trust.TrustPartner), tooltip: $"SID: {sid}<br>Netbios: {netbios}");
                 }
                 else
                 {
-                    if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(GetUrlCallback(trust.Domain, trust.TrustPartner)), out var targetSection))
-                    {
-                        Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                        Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                        Add(@""">");
-                        AddEncoded(GetUrlCallback(trust.Domain, trust.TrustPartner));
-                        Add("</a></td>");
-
-                        AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), ReportHelper.Encode(GetUrlCallback(trust.Domain, trust.TrustPartner)), ShowModalType.XL);
-                        GenerateAdvancedCustomSection(targetSection);
-                        AddEndModal();
-                    }
-                    else
-                    {
-                        Add(@"<td class='text'>");
-                        Add(GetUrlCallback(trust.Domain, trust.TrustPartner));
-                        Add(@"</td>");
-                    }
-                    
+                    AddTableKeyCell(custTable, ReportHelper.Encode(GetUrlCallback(trust.Domain, trust.TrustPartner)));
                 }
                 //Add(@"</td>");
                 AddCellText(TrustAnalyzer.GetTrustType(trust.TrustType));
@@ -2764,8 +2587,18 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 AddEndRow();
             }
             AddEndTable();
-
-			GenerateSubSection("Reachable Domains");
+            foreach (HealthCheckTrustData trust in Report.Trusts)
+            {
+                if (GetUrlCallback == null)
+                {
+                    AddTableKeyModal(custTable, ReportHelper.Encode(trust.TrustPartner));
+                }
+                else
+                {
+                    AddTableKeyModal(custTable, ReportHelper.Encode(GetUrlCallback(trust.Domain, trust.TrustPartner)));
+                }
+            }
+            GenerateSubSection("Reachable Domains");
 			AddParagraph("These are the domains that RisX was able to detect but which is not releated to direct trusts. It may be children of a forest or bastions.");
 			AddBeginTable("Reachable domains list");
 			AddHeaderText("Reachable domain");
@@ -2804,33 +2637,11 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     //Add(@"<td class='text'>");
                     if (GetUrlCallback == null)
                     {
-                        if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(di.DnsName), out var targetSection))
-                        {
-                            Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                            Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                            Add(@""">");
-                            AddEncoded(di.DnsName);
-                            Add("</a></td>");
-
-                            AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), ReportHelper.Encode(di.DnsName), ShowModalType.XL);
-                            GenerateAdvancedCustomSection(targetSection);
-                            AddEndModal();
-                        }
-                        else
-                        {
-                            Add(@"<td class='text'>");
-                            AddEncoded(di.DnsName);
-                            Add(@"</td>");
-                        }
-
+                        AddTableKeyCell(custTable, ReportHelper.Encode(di.DnsName));
                     }
                     else
                     {
-                        Add(@"<td class='text'>");
-
-                        Add(GetUrlCallback(di.Domain, di.DnsName));
-                        Add(@"</td>");
-
+                        AddTableKeyCell(custTable, GetUrlCallback(di.Domain, di.DnsName));
                     }
                     //Add(@"</td><td class='text'>");
                     Add(@"<td class='text'>");
@@ -2875,42 +2686,11 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     //Add(@"<td class='text'>");
                     if (GetUrlCallback == null)
                     {
-                        if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(di.DnsName), out var targetSection))
-                        {
-                            Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                            Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                            Add(@""">");
-                            AddEncoded(di.DnsName);
-                            Add("</a></td>");
-
-                            AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), ReportHelper.Encode(di.DnsName), ShowModalType.XL);
-                            GenerateAdvancedCustomSection(targetSection);
-                            AddEndModal();
-                        }
-                        else
-                        {
-                            Add(@"<td class='text'>");
-                            AddEncoded(di.DnsName);
-                            Add(@"</td>");
-                        }
+                        AddTableKeyCell(custTable, ReportHelper.Encode(di.DnsName));
                     }
                     else
                     {
-                        if (custTable != null && custTable.GetKeyLinkedSection(GetUrlCallback(di.Domain, di.DnsName), out var targetSection))
-                        {
-                            Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                            Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                            Add(@""">");
-                            AddEncoded(GetUrlCallback(di.Domain, di.DnsName));
-                            Add("</a></td>");
-
-                            AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), GetUrlCallback(di.Domain, di.DnsName), ShowModalType.XL);
-                            GenerateAdvancedCustomSection(targetSection);
-                            AddEndModal();
-                        }
-                        Add(@"<td class='text'>");
-                        Add(GetUrlCallback(di.Domain, di.DnsName));
-                        Add(@"</td>");
+                        AddTableKeyCell(custTable, GetUrlCallback(di.Domain, di.DnsName));
                     }
                     //Add(@"</td>");
                     AddCellText("Unknown");
@@ -2931,6 +2711,42 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             }
 
             AddEndTable();
+            foreach (HealthCheckTrustData trust in Report.Trusts)
+            {
+                if (trust.KnownDomains == null)
+                    continue;
+                trust.KnownDomains.Sort((HealthCheckTrustDomainInfoData a, HealthCheckTrustDomainInfoData b)
+                    =>
+                {
+                    return String.Compare(a.DnsName, b.DnsName);
+                }
+                );
+                foreach (HealthCheckTrustDomainInfoData di in trust.KnownDomains)
+                {
+                    if (GetUrlCallback == null)
+                    {
+                        AddTableKeyModal(custTable, ReportHelper.Encode(di.DnsName));
+                    }
+                    else
+                    {
+                        AddTableKeyModal(custTable, GetUrlCallback(di.Domain, di.DnsName));
+                    }
+                }
+            }
+            if (Report.ReachableDomains != null)
+            {
+                foreach (HealthCheckTrustDomainInfoData di in Report.ReachableDomains)
+                {
+                    if (GetUrlCallback == null)
+                    {
+                        AddTableKeyModal(custTable, ReportHelper.Encode(di.DnsName));
+                    }
+                    else
+                    {
+                        AddTableKeyModal(custTable, GetUrlCallback(di.Domain, di.DnsName));
+                    }
+                }
+            }
 
             if (Report.AzureADSSOLastPwdChange != DateTime.MinValue)
             {
@@ -3078,20 +2894,7 @@ Here is the list of servers configured for WEF found in GPO</p>
                                 foreach (var info in Report.GPOEventForwarding)
                                 {
                                     AddBeginRow();
-                                    if (custTable != null && custTable.GetKeyLinkedSection(info.GPOName, out var targetSection))
-                                    {
-                                        Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                                        Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                                        Add(@""">");
-                                        AddEncoded(info.GPOName);
-                                        Add("</a></td>");
-
-                                        AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), info.GPOName, ShowModalType.XL);
-                                        GenerateAdvancedCustomSection(targetSection);
-                                        AddEndModal();
-                                    }
-                                    else
-                                        AddCellText(info.GPOName);
+                                    AddTableKeyCell(custTable, info.GPOName);
                                     AddCellNum(info.Order);
                                     AddCellText(info.Server);
                                     if (custTable != null)
@@ -3108,6 +2911,8 @@ Here is the list of servers configured for WEF found in GPO</p>
                                     AddEndRow();
                                 }
                                 AddEndTable();
+                                foreach (var info in Report.GPOEventForwarding)
+                                    AddTableKeyModal(custTable, info.GPOName);
                             });
                     });
                 Add(@"
@@ -3211,20 +3016,7 @@ Hackers can then perform a reconnaissance of the environement with only a networ
                                         if (DC.HasNullSession)
                                         {
                                             AddBeginRow();
-                                            if (custTable2 != null && custTable2.GetKeyLinkedSection(DC.DCName, out var targetSection))
-                                            {
-                                                Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                                                Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                                                Add(@""">");
-                                                AddEncoded(DC.DCName);
-                                                Add("</a></td>");
-
-                                                AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), DC.DCName, ShowModalType.XL);
-                                                GenerateAdvancedCustomSection(targetSection);
-                                                AddEndModal();
-                                            }
-                                            else
-                                                AddCellText(DC.DCName);
+                                            AddTableKeyCell(custTable2, DC.DCName);
                                             if (custTable2 != null)
                                             {
                                                 for (int i = 1; i < custTable2.Columns.Count; i++)
@@ -3240,6 +3032,13 @@ Hackers can then perform a reconnaissance of the environement with only a networ
                                         }
                                     }
                                     AddEndTable();
+                                    foreach (var DC in Report.DomainControllers)
+                                    {
+                                        if (DC.HasNullSession)
+                                        {
+                                            AddTableKeyModal(custTable2, DC.DCName);
+                                        }
+                                    }
                                 }
                             );
                         }
@@ -3303,20 +3102,10 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 foreach (HealthcheckLoginScriptData script in Report.LoginScript)
                 {
                     AddBeginRow();
-                    if (custTable != null && custTable.GetKeyLinkedSection(script.LoginScript, out var targetSection))
-                    {
-                        Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                        Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                        Add(@""">");
-                        AddEncoded(script.LoginScript);
-                        Add("</a></td>");
-
-                        AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), script.LoginScript, ShowModalType.XL);
-                        GenerateAdvancedCustomSection(targetSection);
-                        AddEndModal();
-                    }
+                    if (!string.IsNullOrEmpty(script.LoginScript.Trim()))
+                        AddTableKeyCell(custTable, script.LoginScript);
                     else
-                        AddCellText(String.IsNullOrEmpty(script.LoginScript.Trim()) ? "<spaces>" : script.LoginScript);
+                        AddCellText("<spaces>");
                     AddCellNum(script.NumberOfOccurence);
                     if (custTable != null)
                     {
@@ -3349,6 +3138,12 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
 		</div>
 	</div>
 ");
+
+                foreach (HealthcheckLoginScriptData script in Report.LoginScript)
+                {
+                    if (!string.IsNullOrEmpty(script.LoginScript.Trim()))
+                        AddTableKeyModal(custTable, script.LoginScript);
+                }
                 // certificate
                 GenerateSubSection("Certificates", "certificates");
                 Add(@"
@@ -3420,49 +3215,11 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                                     AddBeginRow();
                                     if (data.Source == "NTLMStore")
                                     {
-                                        if (custTable != null && custTable.GetKeyLinkedSection("Enterprise NTAuth", out var targetSection))
-                                        {
-                                            Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                                            Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                                            Add(@""">");
-                                            AddEncoded("Enterprise NTAuth");
-                                            Add("</a>");
-                                            AddBeginTooltip();
-                                            Add("This store is used by the Windows PKI. You can view it with the command 'certutil -viewstore -enterprise NTAuth' or edit it with the command 'Manage AD Container' of the 'Enterprise PKI' snapin of mmc.");
-                                            AddEndTooltip();
-                                            Add("</td>");
-
-                                            AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), "Enterprise NTAuth", ShowModalType.XL);
-                                            GenerateAdvancedCustomSection(targetSection);
-                                            AddEndModal();
-                                        }
-                                        else
-                                        {
-                                            Add("<td class='text'>");
-                                            Add(@"Enterprise NTAuth");
-                                            AddBeginTooltip();
-                                            Add("This store is used by the Windows PKI. You can view it with the command 'certutil -viewstore -enterprise NTAuth' or edit it with the command 'Manage AD Container' of the 'Enterprise PKI' snapin of mmc.");
-                                            AddEndTooltip();
-                                            Add(@"</td>");
-                                        }
+                                        AddTableKeyCell(custTable, "Enterprise NTAuth", "This store is used by the Windows PKI. You can view it with the command 'certutil -viewstore -enterprise NTAuth' or edit it with the command 'Manage AD Container' of the 'Enterprise PKI' snapin of mmc.");
                                     }
                                     else
                                     {
-                                        if (custTable != null && custTable.GetKeyLinkedSection(data.Source, out var targetSection))
-                                        {
-                                            Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                                            Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                                            Add(@""">");
-                                            AddEncoded(data.Source);
-                                            Add("</a>");
-                                            Add("</td>");
-
-                                            AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), data.Source, ShowModalType.XL);
-                                            GenerateAdvancedCustomSection(targetSection);
-                                            AddEndModal();
-                                        }
-                                        else
-                                            AddCellText(data.Source);
+                                        AddTableKeyCell(custTable, data.Source);
                                     }
                                     AddCellText(data.Store);
                                     AddCellTextNoWrap(cert.Subject);
@@ -3485,6 +3242,17 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                                     AddEndRow();
                                 }
                                 AddEndTable();
+                                foreach (HealthcheckCertificateData data in Report.TrustedCertificates)
+                                {
+                                    if (data.Source == "NTLMStore")
+                                    {
+                                        AddTableKeyModal(custTable, "Enterprise NTAuth");
+                                    }
+                                    else
+                                    {
+                                        AddTableKeyModal(custTable, data.Source);
+                                    }
+                                }
                             }
                         );
                     }
@@ -3524,21 +3292,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     foreach (var e in Report.lDAPIPDenyList)
                     {
                         AddBeginRow();
-                        if (custTable != null && custTable.GetKeyLinkedSection(e, out var targetSection))
-                        {
-                            Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                            Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                            Add(@""">");
-                            AddEncoded(e);
-                            Add("</a>");
-                            Add("</td>");
-
-                            AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), e, ShowModalType.XL);
-                            GenerateAdvancedCustomSection(targetSection);
-                            AddEndModal();
-                        }
-                        else
-                            AddCellText(e);
+                        AddTableKeyCell(custTable, e);
                         if (custTable != null)
                         {
                             for (int i = 1; i < custTable.Columns.Count; i++)
@@ -3552,6 +3306,8 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                         AddEndRow();
                     }
                     AddEndTable();
+                    foreach (var e in Report.lDAPIPDenyList)
+                        AddTableKeyModal(custTable, e);
                 }
 
             }
@@ -3604,58 +3360,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 foreach (GPPSecurityPolicy policy in Report.GPPPasswordPolicy)
                 {
                     AddBeginRow();
-                    if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(policy.GPOName), out var targetSection))
-                    {
-                        Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                        Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                        Add(@""">");
-                        AddEncoded(policy.GPOName);
-                        Add("</a>");
-                        if (!string.IsNullOrEmpty(policy.GPOId))
-                        {
-                            if (!Report.GPOInfoDic.ContainsKey(policy.GPOId))
-                            {
-                                Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                                return;
-                            }
-                            var refGPO = Report.GPOInfoDic[policy.GPOId];
-                            if (refGPO.IsDisabled)
-                            {
-                                Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                            }
-                            if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
-                            {
-                                AddBeginTooltip(true);
-                                Add("<div class='text-left'>Linked to:<br><ul>");
-                                foreach (var i in refGPO.AppliedTo)
-                                {
-                                    Add("<li>");
-                                    AddEncoded(i);
-                                    Add("</li>");
-                                }
-                                Add("</ul></div>");
-                                Add("<div class='text-left'>Technical id:<br>");
-                                AddEncoded(policy.GPOId);
-                                Add("</div>");
-                                AddEndTooltip();
-                            }
-                            else
-                            {
-                                Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
-                                AddBeginTooltip();
-                                Add("<div class='text-left'>Technical id:<br>");
-                                AddEncoded(policy.GPOId);
-                                Add("</div>");
-                                AddEndTooltip();
-                            }
-                        }
-                        Add("</td>");
-                        AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), ReportHelper.Encode(policy.GPOName), ShowModalType.XL);
-                        GenerateAdvancedCustomSection(targetSection);
-                        AddEndModal();
-                    }
-                    else
-                        AddGPOName(policy);
+                    AddGPOTableKeyCell(custTable, policy);
                     AddPSOStringValue(policy, "PasswordComplexity");
                     AddPSOStringValue(policy, "MaximumPasswordAge");
                     AddPSOStringValue(policy, "MinimumPasswordAge");
@@ -3679,6 +3384,11 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 }
             }
             AddEndTable();
+            if (Report.GPPPasswordPolicy != null)
+            {
+                foreach (GPPSecurityPolicy policy in Report.GPPPasswordPolicy)
+                    AddTableKeyModal(custTable, ReportHelper.Encode(policy.GPOName));
+            }
 
             GenerateSubSection("Screensaver policies");
             AddParagraph("This is the settings related to screensavers stored in Group Policies. Each non compliant setting is written in red.");
@@ -3708,58 +3418,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 foreach (GPPSecurityPolicy policy in Report.GPOScreenSaverPolicy)
                 {
                     AddBeginRow();
-                    if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(policy.GPOName), out var targetSection))
-                    {
-                        Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                        Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                        Add(@""">");
-                        AddEncoded(policy.GPOName);
-                        Add("</a>");
-                        if (!string.IsNullOrEmpty(policy.GPOId))
-                        {
-                            if (!Report.GPOInfoDic.ContainsKey(policy.GPOId))
-                            {
-                                Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                                return;
-                            }
-                            var refGPO = Report.GPOInfoDic[policy.GPOId];
-                            if (refGPO.IsDisabled)
-                            {
-                                Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                            }
-                            if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
-                            {
-                                AddBeginTooltip(true);
-                                Add("<div class='text-left'>Linked to:<br><ul>");
-                                foreach (var i in refGPO.AppliedTo)
-                                {
-                                    Add("<li>");
-                                    AddEncoded(i);
-                                    Add("</li>");
-                                }
-                                Add("</ul></div>");
-                                Add("<div class='text-left'>Technical id:<br>");
-                                AddEncoded(policy.GPOId);
-                                Add("</div>");
-                                AddEndTooltip();
-                            }
-                            else
-                            {
-                                Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
-                                AddBeginTooltip();
-                                Add("<div class='text-left'>Technical id:<br>");
-                                AddEncoded(policy.GPOId);
-                                Add("</div>");
-                                AddEndTooltip();
-                            }
-                        }
-                        Add("</td>");
-                        AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), ReportHelper.Encode(policy.GPOName), ShowModalType.XL);
-                        GenerateAdvancedCustomSection(targetSection);
-                        AddEndModal();
-                    }
-                    else
-                        AddGPOName(policy);
+                    AddGPOTableKeyCell(custTable, policy);
                     AddPSOStringValue(policy, "ScreenSaveActive");
                     AddPSOStringValue(policy, "ScreenSaverIsSecure");
                     AddPSOStringValue(policy, "ScreenSaveTimeOut");
@@ -3778,6 +3437,11 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 }
             }
             AddEndTable();
+            if (Report.GPOScreenSaverPolicy != null)
+            {
+                foreach (GPPSecurityPolicy policy in Report.GPOScreenSaverPolicy)
+                    AddTableKeyModal(custTable, ReportHelper.Encode(policy.GPOName));
+            }
             if (CustomData != null)
             {
                 if (CustomData.GetSection("PasswordPolicies", out var section))
@@ -3823,58 +3487,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 foreach (GPPPassword password in Report.GPPPassword)
                 {
                     AddBeginRow();
-                    if (custTable2 != null && custTable2.GetKeyLinkedSection(ReportHelper.Encode(password.GPOName), out var targetSection))
-                    {
-                        Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                        Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                        Add(@""">");
-                        AddEncoded(password.GPOName);
-                        Add("</a>");
-                        if (!string.IsNullOrEmpty(password.GPOId))
-                        {
-                            if (!Report.GPOInfoDic.ContainsKey(password.GPOId))
-                            {
-                                Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                                return;
-                            }
-                            var refGPO = Report.GPOInfoDic[password.GPOId];
-                            if (refGPO.IsDisabled)
-                            {
-                                Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                            }
-                            if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
-                            {
-                                AddBeginTooltip(true);
-                                Add("<div class='text-left'>Linked to:<br><ul>");
-                                foreach (var i in refGPO.AppliedTo)
-                                {
-                                    Add("<li>");
-                                    AddEncoded(i);
-                                    Add("</li>");
-                                }
-                                Add("</ul></div>");
-                                Add("<div class='text-left'>Technical id:<br>");
-                                AddEncoded(password.GPOId);
-                                Add("</div>");
-                                AddEndTooltip();
-                            }
-                            else
-                            {
-                                Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
-                                AddBeginTooltip();
-                                Add("<div class='text-left'>Technical id:<br>");
-                                AddEncoded(password.GPOId);
-                                Add("</div>");
-                                AddEndTooltip();
-                            }
-                        }
-                        Add("</td>");
-                        AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), ReportHelper.Encode(password.GPOName), ShowModalType.XL);
-                        GenerateAdvancedCustomSection(targetSection);
-                        AddEndModal();
-                    }
-                    else
-                        AddGPOName(password);
+                    AddGPOTableKeyCell(custTable2, password);
                     AddCellText(password.Type);
                     AddCellText(password.UserName);
                     AddCellText(password.Password, true);
@@ -3893,6 +3506,8 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddEndRow();
                 }
                 AddEndTable();
+                foreach (GPPPassword password in Report.GPPPassword)
+                    AddTableKeyModal(custTable2, ReportHelper.Encode(password.GPOName));
             }
 
             GenerateSubSection("Restricted Groups");
@@ -3932,21 +3547,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 foreach (GPOMembership membership in Report.GPOLocalMembership)
                 {
                     AddBeginRow();
-                    if (custTable2 != null && custTable2.GetKeyLinkedSection(membership.GPOName, out var targetSection))
-                    {
-                        Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                        Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                        Add(@""">");
-                        AddEncoded(membership.GPOName);
-                        Add("</a>");
-                        Add("</td>");
-
-                        AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), membership.GPOName, ShowModalType.XL);
-                        GenerateAdvancedCustomSection(targetSection);
-                        AddEndModal();
-                    }
-                    else
-                        AddCellText(membership.GPOName);
+                    AddGPOTableKeyCell(custTable2, membership);
                     AddCellText(membership.User);
                     AddCellText(membership.MemberOf);
                     if (custTable2 != null)
@@ -3963,6 +3564,8 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddEndRow();
                 }
                 AddEndTable();
+                foreach (GPOMembership membership in Report.GPOLocalMembership)
+                    AddTableKeyModal(custTable2, ReportHelper.Encode(membership.GPOName));
             }
 
             GenerateSubSection("Security settings", "lsasettings");
@@ -3993,58 +3596,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     foreach (GPPSecurityPolicyProperty property in policy.Properties)
                     {
                         AddBeginRow();
-                        if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(policy.GPOName), out var targetSection))
-                        {
-                            Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                            Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                            Add(@""">");
-                            AddEncoded(policy.GPOName);
-                            Add("</a>");
-                            if (!string.IsNullOrEmpty(policy.GPOId))
-                            {
-                                if (!Report.GPOInfoDic.ContainsKey(policy.GPOId))
-                                {
-                                    Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                                    return;
-                                }
-                                var refGPO = Report.GPOInfoDic[policy.GPOId];
-                                if (refGPO.IsDisabled)
-                                {
-                                    Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                                }
-                                if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
-                                {
-                                    AddBeginTooltip(true);
-                                    Add("<div class='text-left'>Linked to:<br><ul>");
-                                    foreach (var i in refGPO.AppliedTo)
-                                    {
-                                        Add("<li>");
-                                        AddEncoded(i);
-                                        Add("</li>");
-                                    }
-                                    Add("</ul></div>");
-                                    Add("<div class='text-left'>Technical id:<br>");
-                                    AddEncoded(policy.GPOId);
-                                    Add("</div>");
-                                    AddEndTooltip();
-                                }
-                                else
-                                {
-                                    Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
-                                    AddBeginTooltip();
-                                    Add("<div class='text-left'>Technical id:<br>");
-                                    AddEncoded(policy.GPOId);
-                                    Add("</div>");
-                                    AddEndTooltip();
-                                }
-                            }
-                            Add("</td>");
-                            AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), ReportHelper.Encode(policy.GPOName), ShowModalType.XL);
-                            GenerateAdvancedCustomSection(targetSection);
-                            AddEndModal();
-                        }
-                        else
-                            AddGPOName(policy);
+                        AddGPOTableKeyCell(custTable, policy);
                         Add(@"<td class='text'>");
                         Add(GetLinkForLsaSetting(property.Property));
                         Add(@"</td>");
@@ -4065,6 +3617,9 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 }
             }
             AddEndTable();
+            foreach (GPPSecurityPolicy policy in Report.GPOLsaPolicy)
+                AddTableKeyModal(custTable, ReportHelper.Encode(policy.GPOName));
+
 
             if (Report.version >= new Version(2, 8))
             {
@@ -4099,58 +3654,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     foreach (var a in Report.GPOAuditSimple)
                     {
                         AddBeginRow();
-                        if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(a.GPOName), out var targetSection))
-                        {
-                            Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                            Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                            Add(@""">");
-                            AddEncoded(a.GPOName);
-                            Add("</a>");
-                            if (!string.IsNullOrEmpty(a.GPOId))
-                            {
-                                if (!Report.GPOInfoDic.ContainsKey(a.GPOId))
-                                {
-                                    Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                                    return;
-                                }
-                                var refGPO = Report.GPOInfoDic[a.GPOId];
-                                if (refGPO.IsDisabled)
-                                {
-                                    Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                                }
-                                if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
-                                {
-                                    AddBeginTooltip(true);
-                                    Add("<div class='text-left'>Linked to:<br><ul>");
-                                    foreach (var i in refGPO.AppliedTo)
-                                    {
-                                        Add("<li>");
-                                        AddEncoded(i);
-                                        Add("</li>");
-                                    }
-                                    Add("</ul></div>");
-                                    Add("<div class='text-left'>Technical id:<br>");
-                                    AddEncoded(a.GPOId);
-                                    Add("</div>");
-                                    AddEndTooltip();
-                                }
-                                else
-                                {
-                                    Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
-                                    AddBeginTooltip();
-                                    Add("<div class='text-left'>Technical id:<br>");
-                                    AddEncoded(a.GPOId);
-                                    Add("</div>");
-                                    AddEndTooltip();
-                                }
-                            }
-                            Add("</td>");
-                            AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), ReportHelper.Encode(a.GPOName), ShowModalType.XL);
-                            GenerateAdvancedCustomSection(targetSection);
-                            AddEndModal();
-                        }
-                        else
-                            AddGPOName(a);
+                        AddTableKeyCell(custTable, a);
                         AddCellText("[Simple Audit]");
                         AddCellText(GetAuditSimpleDescription(a.Category));
                         AddCellText(GetAuditSimpleValue(a.Value));
@@ -4168,63 +3672,12 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                         AddEndRow();
                     }
                 }
-                if (Report.GPOAuditSimple != null)
+                if (Report.GPOAuditAdvanced != null)
                 {
                     foreach (var a in Report.GPOAuditAdvanced)
                     {
                         AddBeginRow();
-                        if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(a.GPOName), out var targetSection))
-                        {
-                            Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                            Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                            Add(@""">");
-                            AddEncoded(a.GPOName);
-                            Add("</a>");
-                            if (!string.IsNullOrEmpty(a.GPOId))
-                            {
-                                if (!Report.GPOInfoDic.ContainsKey(a.GPOId))
-                                {
-                                    Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                                    return;
-                                }
-                                var refGPO = Report.GPOInfoDic[a.GPOId];
-                                if (refGPO.IsDisabled)
-                                {
-                                    Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                                }
-                                if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
-                                {
-                                    AddBeginTooltip(true);
-                                    Add("<div class='text-left'>Linked to:<br><ul>");
-                                    foreach (var i in refGPO.AppliedTo)
-                                    {
-                                        Add("<li>");
-                                        AddEncoded(i);
-                                        Add("</li>");
-                                    }
-                                    Add("</ul></div>");
-                                    Add("<div class='text-left'>Technical id:<br>");
-                                    AddEncoded(a.GPOId);
-                                    Add("</div>");
-                                    AddEndTooltip();
-                                }
-                                else
-                                {
-                                    Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
-                                    AddBeginTooltip();
-                                    Add("<div class='text-left'>Technical id:<br>");
-                                    AddEncoded(a.GPOId);
-                                    Add("</div>");
-                                    AddEndTooltip();
-                                }
-                            }
-                            Add("</td>");
-                            AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), ReportHelper.Encode(a.GPOName), ShowModalType.XL);
-                            GenerateAdvancedCustomSection(targetSection);
-                            AddEndModal();
-                        }
-                        else
-                            AddGPOName(a);
+                        AddGPOTableKeyCell(custTable, a);
                         AddCellText(GetAuditAdvancedCategory(a.SubCategory));
                         AddCellText(GetAuditAdvancedDescription(a.SubCategory));
                         AddCellText(GetAuditSimpleValue(a.Value));
@@ -4243,6 +3696,20 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     }
                 }
                 AddEndTable();
+                if (Report.GPOAuditSimple != null)
+                {
+                    foreach (var a in Report.GPOAuditSimple)
+                    {
+                        AddTableKeyModal(custTable, ReportHelper.Encode(a.GPOName));
+                    }
+                }
+                if (Report.GPOAuditAdvanced != null)
+                {
+                    foreach (var a in Report.GPOAuditAdvanced)
+                    {
+                        AddTableKeyModal(custTable, ReportHelper.Encode(a.GPOName));
+                    }
+                }
             }
 
             GenerateSubSection("Privileges", "gpoprivileges");
@@ -4272,58 +3739,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 foreach (GPPRightAssignment right in Report.GPPRightAssignment)
                 {
                     AddBeginRow();
-                    if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(right.GPOName), out var targetSection))
-                    {
-                        Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                        Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                        Add(@""">");
-                        AddEncoded(right.GPOName);
-                        Add("</a>");
-                        if (!string.IsNullOrEmpty(right.GPOId))
-                        {
-                            if (!Report.GPOInfoDic.ContainsKey(right.GPOId))
-                            {
-                                Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                                return;
-                            }
-                            var refGPO = Report.GPOInfoDic[right.GPOId];
-                            if (refGPO.IsDisabled)
-                            {
-                                Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                            }
-                            if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
-                            {
-                                AddBeginTooltip(true);
-                                Add("<div class='text-left'>Linked to:<br><ul>");
-                                foreach (var i in refGPO.AppliedTo)
-                                {
-                                    Add("<li>");
-                                    AddEncoded(i);
-                                    Add("</li>");
-                                }
-                                Add("</ul></div>");
-                                Add("<div class='text-left'>Technical id:<br>");
-                                AddEncoded(right.GPOId);
-                                Add("</div>");
-                                AddEndTooltip();
-                            }
-                            else
-                            {
-                                Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
-                                AddBeginTooltip();
-                                Add("<div class='text-left'>Technical id:<br>");
-                                AddEncoded(right.GPOId);
-                                Add("</div>");
-                                AddEndTooltip();
-                            }
-                        }
-                        Add("</td>");
-                        AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), ReportHelper.Encode(right.GPOName), ShowModalType.XL);
-                        GenerateAdvancedCustomSection(targetSection);
-                        AddEndModal();
-                    }
-                    else
-                        AddGPOName(right);
+                    AddGPOTableKeyCell(custTable, right);
                     AddCellText(right.Privilege);
                     AddCellText(right.User);
                     if (custTable != null)
@@ -4340,6 +3756,8 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddEndRow();
                 }
                 AddEndTable();
+                foreach (GPPRightAssignment right in Report.GPPRightAssignment)
+                    AddTableKeyModal(custTable, ReportHelper.Encode(right.GPOName));
             }
 
             if (Report.version >= new Version(2, 8))
@@ -4371,58 +3789,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     foreach (GPPRightAssignment right in Report.GPPLoginAllowedOrDeny)
                     {
                         AddBeginRow();
-                        if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(right.GPOName), out var targetSection))
-                        {
-                            Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                            Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                            Add(@""">");
-                            AddEncoded(right.GPOName);
-                            Add("</a>");
-                            if (!string.IsNullOrEmpty(right.GPOId))
-                            {
-                                if (!Report.GPOInfoDic.ContainsKey(right.GPOId))
-                                {
-                                    Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                                    return;
-                                }
-                                var refGPO = Report.GPOInfoDic[right.GPOId];
-                                if (refGPO.IsDisabled)
-                                {
-                                    Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                                }
-                                if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
-                                {
-                                    AddBeginTooltip(true);
-                                    Add("<div class='text-left'>Linked to:<br><ul>");
-                                    foreach (var i in refGPO.AppliedTo)
-                                    {
-                                        Add("<li>");
-                                        AddEncoded(i);
-                                        Add("</li>");
-                                    }
-                                    Add("</ul></div>");
-                                    Add("<div class='text-left'>Technical id:<br>");
-                                    AddEncoded(right.GPOId);
-                                    Add("</div>");
-                                    AddEndTooltip();
-                                }
-                                else
-                                {
-                                    Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
-                                    AddBeginTooltip();
-                                    Add("<div class='text-left'>Technical id:<br>");
-                                    AddEncoded(right.GPOId);
-                                    Add("</div>");
-                                    AddEndTooltip();
-                                }
-                            }
-                            Add("</td>");
-                            AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), ReportHelper.Encode(right.GPOName), ShowModalType.XL);
-                            GenerateAdvancedCustomSection(targetSection);
-                            AddEndModal();
-                        }
-                        else
-                            AddGPOName(right);
+                        AddGPOTableKeyCell(custTable, right);
                         Add(@"<td class='text'>");
                         AddPrivilegeToGPO(right.Privilege);
                         Add(@"</td>");
@@ -4441,6 +3808,8 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                         AddEndRow();
                     }
                     AddEndTable();
+                    foreach (GPPRightAssignment right in Report.GPPLoginAllowedOrDeny)
+                        AddTableKeyModal(custTable, ReportHelper.Encode(right.GPOName));
                 }
             }
 
@@ -4473,58 +3842,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 foreach (HealthcheckGPOLoginScriptData loginscript in Report.GPOLoginScript)
                 {
                     AddBeginRow();
-                    if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(loginscript.GPOName), out var targetSection))
-                    {
-                        Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                        Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                        Add(@""">");
-                        AddEncoded(loginscript.GPOName);
-                        Add("</a>");
-                        if (!string.IsNullOrEmpty(loginscript.GPOId))
-                        {
-                            if (!Report.GPOInfoDic.ContainsKey(loginscript.GPOId))
-                            {
-                                Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                                return;
-                            }
-                            var refGPO = Report.GPOInfoDic[loginscript.GPOId];
-                            if (refGPO.IsDisabled)
-                            {
-                                Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                            }
-                            if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
-                            {
-                                AddBeginTooltip(true);
-                                Add("<div class='text-left'>Linked to:<br><ul>");
-                                foreach (var i in refGPO.AppliedTo)
-                                {
-                                    Add("<li>");
-                                    AddEncoded(i);
-                                    Add("</li>");
-                                }
-                                Add("</ul></div>");
-                                Add("<div class='text-left'>Technical id:<br>");
-                                AddEncoded(loginscript.GPOId);
-                                Add("</div>");
-                                AddEndTooltip();
-                            }
-                            else
-                            {
-                                Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
-                                AddBeginTooltip();
-                                Add("<div class='text-left'>Technical id:<br>");
-                                AddEncoded(loginscript.GPOId);
-                                Add("</div>");
-                                AddEndTooltip();
-                            }
-                        }
-                        Add("</td>");
-                        AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), ReportHelper.Encode(loginscript.GPOName), ShowModalType.XL);
-                        GenerateAdvancedCustomSection(targetSection);
-                        AddEndModal();
-                    }
-                    else
-                        AddGPOName(loginscript);
+                    AddGPOTableKeyCell(custTable, loginscript);
                     AddCellText(loginscript.Action);
                     AddCellText(loginscript.Source);
                     AddCellText(loginscript.CommandLine);
@@ -4543,6 +3861,8 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddEndRow();
                 }
                 AddEndTable();
+                foreach (HealthcheckGPOLoginScriptData loginscript in Report.GPOLoginScript)
+                    AddTableKeyModal(custTable, ReportHelper.Encode(loginscript.GPOName));
             }
             if (Report.version >= new Version(2, 7, 0, 0))
             {
@@ -4573,58 +3893,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     foreach (var file in Report.GPPFileDeployed)
                     {
                         AddBeginRow();
-                        if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(file.GPOName), out var targetSection))
-                        {
-                            Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                            Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                            Add(@""">");
-                            AddEncoded(file.GPOName);
-                            Add("</a>");
-                            if (!string.IsNullOrEmpty(file.GPOId))
-                            {
-                                if (!Report.GPOInfoDic.ContainsKey(file.GPOId))
-                                {
-                                    Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                                    return;
-                                }
-                                var refGPO = Report.GPOInfoDic[file.GPOId];
-                                if (refGPO.IsDisabled)
-                                {
-                                    Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                                }
-                                if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
-                                {
-                                    AddBeginTooltip(true);
-                                    Add("<div class='text-left'>Linked to:<br><ul>");
-                                    foreach (var i in refGPO.AppliedTo)
-                                    {
-                                        Add("<li>");
-                                        AddEncoded(i);
-                                        Add("</li>");
-                                    }
-                                    Add("</ul></div>");
-                                    Add("<div class='text-left'>Technical id:<br>");
-                                    AddEncoded(file.GPOId);
-                                    Add("</div>");
-                                    AddEndTooltip();
-                                }
-                                else
-                                {
-                                    Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
-                                    AddBeginTooltip();
-                                    Add("<div class='text-left'>Technical id:<br>");
-                                    AddEncoded(file.GPOId);
-                                    Add("</div>");
-                                    AddEndTooltip();
-                                }
-                            }
-                            Add("</td>");
-                            AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), ReportHelper.Encode(file.GPOName), ShowModalType.XL);
-                            GenerateAdvancedCustomSection(targetSection);
-                            AddEndModal();
-                        }
-                        else
-                            AddGPOName(file);
+                        AddGPOTableKeyCell(custTable, file);
                         AddCellText(file.Type);
                         AddCellText(file.FileName);
                         if (custTable != null)
@@ -4641,6 +3910,11 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                         AddEndRow();
                     }
                     AddEndTable();
+
+                    foreach(var file in Report.GPPFileDeployed)
+                    {
+                        AddTableKeyModal(custTable, ReportHelper.Encode(file.GPOName));
+                    }
                 }
             }
 
@@ -4934,5 +4208,246 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
 
         }
         #endregion GPO
+
+        #region Custom Methods
+
+        private void AddTableKeyModal(CustomTable custTable, object cellValue)
+        {
+            if (cellValue == null)
+                return;
+            string value = cellValue.ToString();
+            if (custTable != null && custTable.GetKeyLinkedSection(value, out var targetSection))
+            {
+                AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), targetSection.Name, ShowModalType.XL);
+                GenerateAdvancedCustomSection(targetSection);
+                AddEndModal();
+            }
+            else if (custTable != null && custTable.GetNestedTable(value, out var targetTable))
+            {
+                AddBeginModal(GenerateModalAdminGroupIdFromGroupName($"table_{value}"), value, ShowModalType.XL);
+                AddCustomTableHtml(targetTable);
+                AddEndModal();
+            }
+        }
+
+        private void AddTableKeyCell(CustomTable custTable, object cellValue, string valueType = "string", string tooltip = null)
+        {
+            if (cellValue == null)
+            {
+                AddCellText("");
+                return;
+            }
+            string value = cellValue.ToString();
+            if (custTable != null && custTable.GetKeyLinkedSection(value, out var targetSection))
+            {
+                Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
+                Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
+                Add(@""">");
+                AddEncoded(value);
+                Add("</a>");
+                AddCustomTooltip(tooltip);
+                Add("</td>");
+            }
+            else if (custTable != null && custTable.GetNestedTable(value, out var targetTable))
+            {
+                Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
+                Add(GenerateModalAdminGroupIdFromGroupName($"table_{value}"));
+                Add(@""">");
+                AddEncoded(value);
+                Add("</a>");
+                AddCustomTooltip(tooltip);
+                Add("</td>");
+            }
+            else
+            {
+                switch(valueType)
+                {
+                    case "string":
+                        AddCellText(value, tooltip: tooltip);
+                        break;
+                    case "number":
+                        AddCellNum((int)cellValue);
+                        break;
+                    case "header":
+                        AddHeaderText(value);
+                        break;
+                }
+                
+            }
+        }
+
+        private void AddGPOTableKeyCell(CustomTable custTable, IGPOReference cellValue)
+        {
+            if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(cellValue.GPOName), out var targetSection))
+            {
+                Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
+                Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
+                Add(@""">");
+                AddEncoded(cellValue.GPOName);
+                Add("</a>");
+                if (!string.IsNullOrEmpty(cellValue.GPOId))
+                {
+                    if (!Report.GPOInfoDic.ContainsKey(cellValue.GPOId))
+                    {
+                        Add(@" <span class=""font-weight-light"">[Disabled]</span>");
+                        return;
+                    }
+                    var refGPO = Report.GPOInfoDic[cellValue.GPOId];
+                    if (refGPO.IsDisabled)
+                    {
+                        Add(@" <span class=""font-weight-light"">[Disabled]</span>");
+                    }
+                    if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
+                    {
+                        AddBeginTooltip(true);
+                        Add("<div class='text-left'>Linked to:<br><ul>");
+                        foreach (var i in refGPO.AppliedTo)
+                        {
+                            Add("<li>");
+                            AddEncoded(i);
+                            Add("</li>");
+                        }
+                        Add("</ul></div>");
+                        Add("<div class='text-left'>Technical id:<br>");
+                        AddEncoded(cellValue.GPOId);
+                        Add("</div>");
+                        AddEndTooltip();
+                    }
+                    else
+                    {
+                        Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
+                        AddBeginTooltip();
+                        Add("<div class='text-left'>Technical id:<br>");
+                        AddEncoded(cellValue.GPOId);
+                        Add("</div>");
+                        AddEndTooltip();
+                    }
+                }
+                Add("</td>");
+            }
+            else if (custTable != null && custTable.GetNestedTable(ReportHelper.Encode(cellValue.GPOName), out var targetTable))
+            {
+                Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
+                Add(GenerateModalAdminGroupIdFromGroupName($"table_{ReportHelper.Encode(cellValue.GPOName)}"));
+                Add(@""">");
+                AddEncoded(cellValue.GPOName);
+                Add("</a>");
+                if (!string.IsNullOrEmpty(cellValue.GPOId))
+                {
+                    if (!Report.GPOInfoDic.ContainsKey(cellValue.GPOId))
+                    {
+                        Add(@" <span class=""font-weight-light"">[Disabled]</span>");
+                        return;
+                    }
+                    var refGPO = Report.GPOInfoDic[cellValue.GPOId];
+                    if (refGPO.IsDisabled)
+                    {
+                        Add(@" <span class=""font-weight-light"">[Disabled]</span>");
+                    }
+                    if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
+                    {
+                        AddBeginTooltip(true);
+                        Add("<div class='text-left'>Linked to:<br><ul>");
+                        foreach (var i in refGPO.AppliedTo)
+                        {
+                            Add("<li>");
+                            AddEncoded(i);
+                            Add("</li>");
+                        }
+                        Add("</ul></div>");
+                        Add("<div class='text-left'>Technical id:<br>");
+                        AddEncoded(cellValue.GPOId);
+                        Add("</div>");
+                        AddEndTooltip();
+                    }
+                    else
+                    {
+                        Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
+                        AddBeginTooltip();
+                        Add("<div class='text-left'>Technical id:<br>");
+                        AddEncoded(cellValue.GPOId);
+                        Add("</div>");
+                        AddEndTooltip();
+                    }
+                }
+                Add("</td>");
+            }
+            else
+            {
+                AddGPOName(cellValue);
+            }
+        }
+
+        private void AddCustomTableHtml(List<string> data)
+        {
+            var firstLineParts = data[0].Split(' ');
+            if (firstLineParts.Length > 1 && firstLineParts[0].EndsWith(":"))
+            {
+                var tokens = new List<string>();
+                for (int i = 0; i < firstLineParts.Length; i++)
+                {
+                    if (!string.IsNullOrEmpty(firstLineParts[i]) && firstLineParts[i].EndsWith(":"))
+                    {
+                        tokens.Add(firstLineParts[i]);
+                    }
+                }
+                Add(@"<div class=""row"">
+			<div class=""col-md-12 table-responsive"">
+				<table class=""table table-striped table-bordered"">
+					<thead><tr>");
+                foreach (var token in tokens)
+                {
+                    Add("<th>");
+                    string parsedToken = token.Replace("#$%%$#", " ");
+                    AddEncoded(parsedToken.Substring(0, parsedToken.Length - 1));
+                    Add("</th>");
+                }
+                Add("</tr></thead><tbody>");
+                foreach (var d in data)
+                {
+                    if (string.IsNullOrEmpty(d))
+                        continue;
+                    Add("<tr>");
+                    var t = d.Split(' ');
+                    for (int i = 0, j = 0; i < t.Length && j <= tokens.Count; i++)
+                    {
+                        if (j < tokens.Count && t[i] == tokens[j])
+                        {
+                            if (j != 0)
+                            {
+                                Add("</td>");
+                            }
+                            j++;
+                            Add("<td>");
+                        }
+                        else
+                        {
+                            Add(t[i]);
+                            Add(" ");
+                        }
+                    }
+                    Add("</td>");
+                    Add("</tr>");
+                }
+                Add("</tbody></table></div></div>");
+
+            }
+            else
+            {
+                Add("<p>");
+                Add(String.Join("<br>\r\n", data.ToArray()));
+                Add("</p>");
+            }
+        }
+        private void AddCustomTooltip(string tooltip)
+        {
+            if (!string.IsNullOrEmpty(tooltip))
+            {
+                AddBeginTooltip();
+                Add(tooltip);
+                AddEndTooltip();
+            }
+        }
     }
+    #endregion
 }

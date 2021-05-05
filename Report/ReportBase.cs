@@ -316,7 +316,7 @@ namespace PingCastle.Report
             Add("</th>");
         }
 
-        protected void AddCellText(string text, bool highlight = false, bool IsGood = false)
+        protected void AddCellText(string text, bool highlight = false, bool IsGood = false, string tooltip = null)
         {
             Add("<td class='text'>");
             if (footerMode)
@@ -333,6 +333,12 @@ namespace PingCastle.Report
                 Add("</span>");
             if (footerMode)
                 Add("</b>");
+            if(!string.IsNullOrEmpty(tooltip))
+            {
+                AddBeginTooltip();
+                Add(tooltip);
+                AddEndTooltip();
+            }
             Add(@"</td>");
         }
 

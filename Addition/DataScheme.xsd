@@ -174,6 +174,7 @@
                 <xsd:complexType>
                   <xsd:sequence>
                     <xsd:element name="Id" type="xsd:string" />
+                    <xsd:element minOccurs="0" name="NestedTablesDirectory" type="xsd:string" />
                     <xsd:element minOccurs="0" name="KeyLinks">
                       <xsd:complexType>
                         <xsd:sequence>

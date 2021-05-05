@@ -10,6 +10,7 @@ namespace PingCastle.Addition
     {
         #region Properties
         public string Id { get; set; }
+        public string NestedTablesDirectory { get; set; }
         [XmlArray("Columns")]
         [XmlArrayItem("Column")]
         public List<CustomTableColumn> Columns { get; set; } = new List<CustomTableColumn>();
@@ -24,14 +25,28 @@ namespace PingCastle.Addition
         #region Fields
         private readonly Dictionary<string, CustomTableColumn> dictCols = new Dictionary<string, CustomTableColumn>();
         private readonly Dictionary<string, CustomInformationSection> dictKeyLinks = new Dictionary<string, CustomInformationSection>();
+        private readonly Dictionary<string, bool> dictNestedTables = new Dictionary<string, bool>();
         #endregion
 
 
         #region Methods
-        public void SetInitData()
+        public void SetInitData(string baseDataDirectory)
         {
             foreach (var col in Columns)
                 dictCols[col.Header] = col;
+            if(!string.IsNullOrEmpty(NestedTablesDirectory))
+            {
+                if (NestedTablesDirectory.StartsWith(@".\"))
+                    NestedTablesDirectory = baseDataDirectory + "\\" + NestedTablesDirectory.Substring(2);
+                if(Directory.Exists(NestedTablesDirectory))
+                {
+                    foreach(var file in Directory.GetFiles(NestedTablesDirectory))
+                    {
+                        string fileName = Path.GetFileNameWithoutExtension(file);
+                        dictNestedTables[fileName] = true;
+                    }
+                }
+            }
         }
 
         public void SetLinksToSections(Dictionary<string, CustomInformationSection> sections)
@@ -109,7 +124,7 @@ namespace PingCastle.Addition
             {
                 var lineParts = lines[i].Split(',');
                 StringBuilder builder = new StringBuilder();
-                for (int q = 0; q < lineParts.Length; q++)
+                for (int q = 0; q < lineParts.Length && q < headers.Count; q++)
                 {
                     builder.Append(headers[q] + lineParts[q] + " ");
                 }
@@ -129,6 +144,16 @@ namespace PingCastle.Addition
             return false;
         }
 
+        public bool GetNestedTable(string name, out List<string> result)
+        {
+            if(!dictNestedTables.ContainsKey(name))
+            {
+                result = null;
+                return false;
+            }
+            result = GetTable($"{NestedTablesDirectory}\\{name}.csv");
+            return true;
+        }
         #endregion
     }
 }
