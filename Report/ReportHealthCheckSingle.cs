@@ -219,7 +219,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             {
 				foreach (var category in CustomData.Categories)
 				{
-					GenerateSection(category.Name, () =>
+					GenerateSection(category.Id, category.Name, () =>
 					{
 						GenerateSubIndicator(category.Name, Report.GlobalScore, category.Score, category.Explanation);
 						GenerateAdvancedIndicatorPanel("Detail" + category.Id, category.Name + "rule details", category.Id);
