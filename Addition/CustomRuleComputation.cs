@@ -9,8 +9,10 @@ namespace PingCastle.Addition
     {
         #region Properties
         public string Type { get; set; }
+
         [XmlIgnore]
         public int Score { get; set; }
+
         [XmlElement(ElementName = "Score")]
         public string ScoreString
         {
@@ -30,8 +32,10 @@ namespace PingCastle.Addition
                 }
             }
         }
+
         [XmlIgnore]
         public int Threshold { get; set; }
+
         [XmlElement(ElementName = "Threshold")]
         public string ThresholdString
         {
@@ -51,8 +55,10 @@ namespace PingCastle.Addition
                 }
             }
         }
+
         [XmlIgnore]
         public int Order { get; set; }
+
         [XmlElement(ElementName = "Order")]
         public string OrderString
         {

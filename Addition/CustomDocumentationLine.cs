@@ -16,26 +16,35 @@ namespace PingCastle.Addition
         #region Methods
         public static string ParseToDocumentationLine(CustomDocumentationLine line)
         {
-            StringBuilder builder = new StringBuilder();
-            if(!string.IsNullOrEmpty(line.Target))
+            try
             {
-                builder.Append("<a class=\"hyperlink\" href=\"" + line.Target + "\">");
-            }
-            if(!string.IsNullOrEmpty(line.Text))
-            {
-                builder.Append(line.Text);
-            }
-            builder.Append("</a>");
-            if (!string.IsNullOrEmpty(line.SpanClass))
-            {
-                builder.Append("<span class=\"" + line.SpanClass + "\">");
-                if(!string.IsNullOrEmpty(line.SpanText))
+                StringBuilder builder = new StringBuilder();
+                if (!string.IsNullOrEmpty(line.Target))
                 {
-                    builder.Append(line.SpanText);
+                    builder.Append("<a class=\"hyperlink\" href=\"" + line.Target + "\">");
                 }
-                builder.Append("</span>");
+                if (!string.IsNullOrEmpty(line.Text))
+                {
+                    builder.Append(line.Text);
+                }
+                builder.Append("</a>");
+                if (!string.IsNullOrEmpty(line.SpanClass))
+                {
+                    builder.Append("<span class=\"" + line.SpanClass + "\">");
+                    if (!string.IsNullOrEmpty(line.SpanText))
+                    {
+                        builder.Append(line.SpanText);
+                    }
+                    builder.Append("</span>");
+                }
+                return builder.ToString();
             }
-            return builder.ToString();
+            catch (Exception e)
+            {
+                Console.WriteLine("Problem on 'ParseToDocumentationLine' method on 'CustomDocumentationLine':");
+                Console.WriteLine(e);
+                return "";
+            }
         }
         #endregion
     }

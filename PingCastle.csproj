@@ -103,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Addition\CustomChart.cs" />
+    <Compile Include="Addition\CustomComparers.cs" />
     <Compile Include="Addition\CustomConsolidationData.cs" />
     <Compile Include="Addition\CustomDocumentationLine.cs" />
     <Compile Include="Addition\CustomHealthCheckData.cs" />

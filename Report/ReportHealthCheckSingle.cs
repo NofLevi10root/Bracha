@@ -347,7 +347,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 Add("</span> you need to fix the following rules:</p>");
                 GenerateAccordion("rulesmaturity", () =>
                 {
-                    SortedDictionary<int, List<object>> levelRules = new SortedDictionary<int, List<object>>(); // need to oppose the sorting
+                    SortedDictionary<int, List<object>> levelRules = new SortedDictionary<int, List<object>>(new MaturityComparer());
 					foreach(var rule in Report.RiskRules)
                     {
                         if (l.Contains(rule.RiskId))
@@ -369,11 +369,6 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                             }
                         }
                     }
-                    //levelRules.Sort((HealthcheckRiskRule a, HealthcheckRiskRule b)
-                    //    =>
-                    //{
-                    //    return -a.Points.CompareTo(b.Points);
-                    //});
 
                     foreach (var listRule in levelRules)
                     {

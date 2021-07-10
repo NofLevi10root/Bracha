@@ -13,7 +13,9 @@ namespace PingCastle.Addition
     {
         #region Properties
         public CustomDetailsType Type { get; set; }
+
         public string FilePath { get; set; }
+
         public string Id { get; set; }
         #endregion
     }

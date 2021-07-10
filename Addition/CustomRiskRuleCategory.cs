@@ -9,8 +9,11 @@ namespace PingCastle.Addition
     {
         #region Properties
         public string Id { get; set; }
+
         public string Name { get; set; }
+
         public string Explanation { get; set; }
+
         [XmlIgnore]
         public int Score { get; set; } = 0;
         #endregion
@@ -18,12 +21,21 @@ namespace PingCastle.Addition
         #region Methods
         public static string ParseCategoriesToTableHeaders(List<CustomRiskRuleCategory> categories)
         {
-            StringBuilder builder = new StringBuilder();
-            foreach (var category in categories) // transfer to static method in customdata
+            try
             {
-                builder.Append(@"<th>" + category.Name + @"</th>");
+                StringBuilder builder = new StringBuilder();
+                foreach (var category in categories) // transfer to static method in customdata
+                {
+                    builder.Append(@"<th>" + category.Name + @"</th>");
+                }
+                return builder.ToString();
             }
-            return builder.ToString();
+            catch (Exception e)
+            {
+                Console.WriteLine("Problem on 'ParseCategoriesToTableHeaders' method on 'CustomRiskRuleCategory':");
+                Console.WriteLine(e);
+                return null;
+            }
         }
         #endregion
     }
