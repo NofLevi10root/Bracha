@@ -4208,239 +4208,279 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
 
         private void AddTableKeyModal(CustomTable custTable, object cellValue)
         {
-            if (cellValue == null)
-                return;
-            string value = cellValue.ToString();
-            if (custTable != null && custTable.GetKeyLinkedSection(value, out var targetSection))
+            try
             {
-                AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), targetSection.Name, ShowModalType.XL);
-                GenerateAdvancedCustomSection(targetSection);
-                AddEndModal();
+                if (cellValue == null)
+                    return;
+                string value = cellValue.ToString();
+                if (custTable != null && custTable.GetKeyLinkedSection(value, out var targetSection))
+                {
+                    AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), targetSection.Name, ShowModalType.XL);
+                    GenerateAdvancedCustomSection(targetSection);
+                    AddEndModal();
+                }
+                else if (custTable != null && custTable.GetNestedTable(value, out var targetTable))
+                {
+                    AddBeginModal(GenerateModalAdminGroupIdFromGroupName($"table_{value}"), value, ShowModalType.XL);
+                    AddCustomTableHtml(targetTable);
+                    AddEndModal();
+                }
             }
-            else if (custTable != null && custTable.GetNestedTable(value, out var targetTable))
+            catch (Exception e)
             {
-                AddBeginModal(GenerateModalAdminGroupIdFromGroupName($"table_{value}"), value, ShowModalType.XL);
-                AddCustomTableHtml(targetTable);
-                AddEndModal();
+                Console.WriteLine("Problem on 'AddTableKeyModal' method on 'ReportHealthCheckSingle':");
+                Console.WriteLine(e);
             }
         }
 
         private void AddTableKeyCell(CustomTable custTable, object cellValue, string valueType = "string", string tooltip = null)
         {
-            if (cellValue == null)
+            try
             {
-                AddCellText("");
-                return;
-            }
-            string value = cellValue.ToString();
-            if (custTable != null && custTable.GetKeyLinkedSection(value, out var targetSection))
-            {
-                Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                Add(@""">");
-                AddEncoded(value);
-                Add("</a>");
-                AddCustomTooltip(tooltip);
-                Add("</td>");
-            }
-            else if (custTable != null && custTable.GetNestedTable(value, out var targetTable))
-            {
-                Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                Add(GenerateModalAdminGroupIdFromGroupName($"table_{value}"));
-                Add(@""">");
-                AddEncoded(value);
-                Add("</a>");
-                AddCustomTooltip(tooltip);
-                Add("</td>");
-            }
-            else
-            {
-                switch(valueType)
+                if (cellValue == null)
                 {
-                    case "string":
-                        AddCellText(value, tooltip: tooltip);
-                        break;
-                    case "number":
-                        AddCellNum((int)cellValue);
-                        break;
-                    case "header":
-                        AddHeaderText(value);
-                        break;
+                    AddCellText("");
+                    return;
                 }
-                
+                string value = cellValue.ToString();
+                if (custTable != null && custTable.GetKeyLinkedSection(value, out var targetSection))
+                {
+                    Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
+                    Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
+                    Add(@""">");
+                    AddEncoded(value);
+                    Add("</a>");
+                    AddCustomTooltip(tooltip);
+                    Add("</td>");
+                }
+                else if (custTable != null && custTable.GetNestedTable(value, out var targetTable))
+                {
+                    Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
+                    Add(GenerateModalAdminGroupIdFromGroupName($"table_{value}"));
+                    Add(@""">");
+                    AddEncoded(value);
+                    Add("</a>");
+                    AddCustomTooltip(tooltip);
+                    Add("</td>");
+                }
+                else
+                {
+                    switch (valueType)
+                    {
+                        case "string":
+                            AddCellText(value, tooltip: tooltip);
+                            break;
+                        case "number":
+                            AddCellNum((int)cellValue);
+                            break;
+                        case "header":
+                            AddHeaderText(value);
+                            break;
+                    }
+
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Problem on 'AddTableKeyCell' method on 'ReportHealthCheckSingle':");
+                Console.WriteLine(e);
             }
         }
 
         private void AddGPOTableKeyCell(CustomTable custTable, IGPOReference cellValue)
         {
-            if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(cellValue.GPOName), out var targetSection))
+            try
             {
-                Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                Add(@""">");
-                AddEncoded(cellValue.GPOName);
-                Add("</a>");
-                if (!string.IsNullOrEmpty(cellValue.GPOId))
+                if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(cellValue.GPOName), out var targetSection))
                 {
-                    if (!Report.GPOInfoDic.ContainsKey(cellValue.GPOId))
+                    Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
+                    Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
+                    Add(@""">");
+                    AddEncoded(cellValue.GPOName);
+                    Add("</a>");
+                    if (!string.IsNullOrEmpty(cellValue.GPOId))
                     {
-                        Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                        return;
-                    }
-                    var refGPO = Report.GPOInfoDic[cellValue.GPOId];
-                    if (refGPO.IsDisabled)
-                    {
-                        Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                    }
-                    if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
-                    {
-                        AddBeginTooltip(true);
-                        Add("<div class='text-left'>Linked to:<br><ul>");
-                        foreach (var i in refGPO.AppliedTo)
+                        if (!Report.GPOInfoDic.ContainsKey(cellValue.GPOId))
                         {
-                            Add("<li>");
-                            AddEncoded(i);
-                            Add("</li>");
+                            Add(@" <span class=""font-weight-light"">[Disabled]</span>");
+                            return;
                         }
-                        Add("</ul></div>");
-                        Add("<div class='text-left'>Technical id:<br>");
-                        AddEncoded(cellValue.GPOId);
-                        Add("</div>");
-                        AddEndTooltip();
+                        var refGPO = Report.GPOInfoDic[cellValue.GPOId];
+                        if (refGPO.IsDisabled)
+                        {
+                            Add(@" <span class=""font-weight-light"">[Disabled]</span>");
+                        }
+                        if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
+                        {
+                            AddBeginTooltip(true);
+                            Add("<div class='text-left'>Linked to:<br><ul>");
+                            foreach (var i in refGPO.AppliedTo)
+                            {
+                                Add("<li>");
+                                AddEncoded(i);
+                                Add("</li>");
+                            }
+                            Add("</ul></div>");
+                            Add("<div class='text-left'>Technical id:<br>");
+                            AddEncoded(cellValue.GPOId);
+                            Add("</div>");
+                            AddEndTooltip();
+                        }
+                        else
+                        {
+                            Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
+                            AddBeginTooltip();
+                            Add("<div class='text-left'>Technical id:<br>");
+                            AddEncoded(cellValue.GPOId);
+                            Add("</div>");
+                            AddEndTooltip();
+                        }
                     }
-                    else
-                    {
-                        Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
-                        AddBeginTooltip();
-                        Add("<div class='text-left'>Technical id:<br>");
-                        AddEncoded(cellValue.GPOId);
-                        Add("</div>");
-                        AddEndTooltip();
-                    }
+                    Add("</td>");
                 }
-                Add("</td>");
-            }
-            else if (custTable != null && custTable.GetNestedTable(ReportHelper.Encode(cellValue.GPOName), out var targetTable))
-            {
-                Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                Add(GenerateModalAdminGroupIdFromGroupName($"table_{ReportHelper.Encode(cellValue.GPOName)}"));
-                Add(@""">");
-                AddEncoded(cellValue.GPOName);
-                Add("</a>");
-                if (!string.IsNullOrEmpty(cellValue.GPOId))
+                else if (custTable != null && custTable.GetNestedTable(ReportHelper.Encode(cellValue.GPOName), out var targetTable))
                 {
-                    if (!Report.GPOInfoDic.ContainsKey(cellValue.GPOId))
+                    Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
+                    Add(GenerateModalAdminGroupIdFromGroupName($"table_{ReportHelper.Encode(cellValue.GPOName)}"));
+                    Add(@""">");
+                    AddEncoded(cellValue.GPOName);
+                    Add("</a>");
+                    if (!string.IsNullOrEmpty(cellValue.GPOId))
                     {
-                        Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                        return;
-                    }
-                    var refGPO = Report.GPOInfoDic[cellValue.GPOId];
-                    if (refGPO.IsDisabled)
-                    {
-                        Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                    }
-                    if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
-                    {
-                        AddBeginTooltip(true);
-                        Add("<div class='text-left'>Linked to:<br><ul>");
-                        foreach (var i in refGPO.AppliedTo)
+                        if (!Report.GPOInfoDic.ContainsKey(cellValue.GPOId))
                         {
-                            Add("<li>");
-                            AddEncoded(i);
-                            Add("</li>");
+                            Add(@" <span class=""font-weight-light"">[Disabled]</span>");
+                            return;
                         }
-                        Add("</ul></div>");
-                        Add("<div class='text-left'>Technical id:<br>");
-                        AddEncoded(cellValue.GPOId);
-                        Add("</div>");
-                        AddEndTooltip();
+                        var refGPO = Report.GPOInfoDic[cellValue.GPOId];
+                        if (refGPO.IsDisabled)
+                        {
+                            Add(@" <span class=""font-weight-light"">[Disabled]</span>");
+                        }
+                        if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
+                        {
+                            AddBeginTooltip(true);
+                            Add("<div class='text-left'>Linked to:<br><ul>");
+                            foreach (var i in refGPO.AppliedTo)
+                            {
+                                Add("<li>");
+                                AddEncoded(i);
+                                Add("</li>");
+                            }
+                            Add("</ul></div>");
+                            Add("<div class='text-left'>Technical id:<br>");
+                            AddEncoded(cellValue.GPOId);
+                            Add("</div>");
+                            AddEndTooltip();
+                        }
+                        else
+                        {
+                            Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
+                            AddBeginTooltip();
+                            Add("<div class='text-left'>Technical id:<br>");
+                            AddEncoded(cellValue.GPOId);
+                            Add("</div>");
+                            AddEndTooltip();
+                        }
                     }
-                    else
-                    {
-                        Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
-                        AddBeginTooltip();
-                        Add("<div class='text-left'>Technical id:<br>");
-                        AddEncoded(cellValue.GPOId);
-                        Add("</div>");
-                        AddEndTooltip();
-                    }
+                    Add("</td>");
                 }
-                Add("</td>");
+                else
+                {
+                    AddGPOName(cellValue);
+                }
             }
-            else
+            catch (Exception e)
             {
-                AddGPOName(cellValue);
+                Console.WriteLine("Problem on 'AddGPOTableKeyCell' method on 'ReportHealthCheckSingle':");
+                Console.WriteLine(e);
             }
         }
 
         private void AddCustomTableHtml(List<string> data)
         {
-            var firstLineParts = data[0].Split(' ');
-            if (firstLineParts.Length > 1 && firstLineParts[0].EndsWith(":"))
+            try
             {
-                var tokens = new List<string>();
-                for (int i = 0; i < firstLineParts.Length; i++)
+                var firstLineParts = data[0].Split(' ');
+                if (firstLineParts.Length > 1 && firstLineParts[0].EndsWith(":"))
                 {
-                    if (!string.IsNullOrEmpty(firstLineParts[i]) && firstLineParts[i].EndsWith(":"))
+                    var tokens = new List<string>();
+                    for (int i = 0; i < firstLineParts.Length; i++)
                     {
-                        tokens.Add(firstLineParts[i]);
+                        if (!string.IsNullOrEmpty(firstLineParts[i]) && firstLineParts[i].EndsWith(":"))
+                        {
+                            tokens.Add(firstLineParts[i]);
+                        }
                     }
-                }
-                Add(@"<div class=""row"">
+                    Add(@"<div class=""row"">
 			<div class=""col-md-12 table-responsive"">
 				<table class=""table table-striped table-bordered"">
 					<thead><tr>");
-                foreach (var token in tokens)
-                {
-                    Add("<th>");
-                    string parsedToken = token.Replace("#$%%$#", " ");
-                    AddEncoded(parsedToken.Substring(0, parsedToken.Length - 1));
-                    Add("</th>");
-                }
-                Add("</tr></thead><tbody>");
-                foreach (var d in data)
-                {
-                    if (string.IsNullOrEmpty(d))
-                        continue;
-                    Add("<tr>");
-                    var t = d.Split(' ');
-                    for (int i = 0, j = 0; i < t.Length && j <= tokens.Count; i++)
+                    foreach (var token in tokens)
                     {
-                        if (j < tokens.Count && t[i] == tokens[j])
-                        {
-                            if (j != 0)
-                            {
-                                Add("</td>");
-                            }
-                            j++;
-                            Add("<td>");
-                        }
-                        else
-                        {
-                            Add(t[i]);
-                            Add(" ");
-                        }
+                        Add("<th>");
+                        string parsedToken = token.Replace("#$%%$#", " ");
+                        AddEncoded(parsedToken.Substring(0, parsedToken.Length - 1));
+                        Add("</th>");
                     }
-                    Add("</td>");
-                    Add("</tr>");
-                }
-                Add("</tbody></table></div></div>");
+                    Add("</tr></thead><tbody>");
+                    foreach (var d in data)
+                    {
+                        if (string.IsNullOrEmpty(d))
+                            continue;
+                        Add("<tr>");
+                        var t = d.Split(' ');
+                        for (int i = 0, j = 0; i < t.Length && j <= tokens.Count; i++)
+                        {
+                            if (j < tokens.Count && t[i] == tokens[j])
+                            {
+                                if (j != 0)
+                                {
+                                    Add("</td>");
+                                }
+                                j++;
+                                Add("<td>");
+                            }
+                            else
+                            {
+                                Add(t[i]);
+                                Add(" ");
+                            }
+                        }
+                        Add("</td>");
+                        Add("</tr>");
+                    }
+                    Add("</tbody></table></div></div>");
 
+                }
+                else
+                {
+                    Add("<p>");
+                    Add(String.Join("<br>\r\n", data.ToArray()));
+                    Add("</p>");
+                }
             }
-            else
+            catch (Exception e)
             {
-                Add("<p>");
-                Add(String.Join("<br>\r\n", data.ToArray()));
-                Add("</p>");
+                Console.WriteLine("Problem on 'AddCustomTableHtml' method on 'ReportHealthCheckSingle':");
+                Console.WriteLine(e);
             }
         }
         private void AddCustomTooltip(string tooltip)
         {
-            if (!string.IsNullOrEmpty(tooltip))
+            try
             {
-                AddBeginTooltip();
-                Add(tooltip);
-                AddEndTooltip();
+                if (!string.IsNullOrEmpty(tooltip))
+                {
+                    AddBeginTooltip();
+                    Add(tooltip);
+                    AddEndTooltip();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Problem on 'AddCustomTooltip' method on 'ReportHealthCheckSingle':");
+                Console.WriteLine(e);
             }
         }
     }

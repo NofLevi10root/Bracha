@@ -318,28 +318,36 @@ namespace PingCastle.Report
 
         protected void AddCellText(string text, bool highlight = false, bool IsGood = false, string tooltip = null)
         {
-            Add("<td class='text'>");
-            if (footerMode)
-                Add("<b>");
-            if (highlight)
+            try
             {
-                if (IsGood)
-                    Add("<span class=\"ticked\">");
-                else
-                    Add("<span class=\"unticked\">");
+                Add("<td class='text'>");
+                if (footerMode)
+                    Add("<b>");
+                if (highlight)
+                {
+                    if (IsGood)
+                        Add("<span class=\"ticked\">");
+                    else
+                        Add("<span class=\"unticked\">");
+                }
+                AddEncoded(text);
+                if (highlight)
+                    Add("</span>");
+                if (footerMode)
+                    Add("</b>");
+                if (!string.IsNullOrEmpty(tooltip))
+                {
+                    AddBeginTooltip();
+                    Add(tooltip);
+                    AddEndTooltip();
+                }
+                Add(@"</td>");
             }
-            AddEncoded(text);
-            if (highlight)
-                Add("</span>");
-            if (footerMode)
-                Add("</b>");
-            if(!string.IsNullOrEmpty(tooltip))
+            catch (Exception e)
             {
-                AddBeginTooltip();
-                Add(tooltip);
-                AddEndTooltip();
+                Console.WriteLine("Problem on 'AddCellText' method on 'ReportHealthCheckSingle':");
+                Console.WriteLine(e);
             }
-            Add(@"</td>");
         }
 
         protected void AddCellTextNoWrap(string text)
