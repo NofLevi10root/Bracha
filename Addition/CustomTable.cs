@@ -149,9 +149,14 @@ namespace PingCastle.Addition
 
                 List<string> headers = new List<string>();
 
+                for(int i = 0; i < lines.Length; i++)
+                {
+                    lines[i] = lines[i].Replace(": ", "#$%: %$#");
+                }
+
                 foreach (var part in lines[0].Split(',')) // Headers
                 {
-                    headers.Add(part.Trim().Replace(" ", "#$%%$#") + ": ");
+                    headers.Add(part.Trim().Replace(" ", "#$% %$#") + ": ");
                 }
                 for (int i = 1; i < lines.Length; i++) // Rows
                 {

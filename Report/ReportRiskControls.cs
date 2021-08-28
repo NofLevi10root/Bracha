@@ -630,7 +630,7 @@ namespace PingCastle.Report
 										AddEncoded(token.Replace("Domain_controller:", "Domain controller:").Substring(0, token.Length - 1));
 									else
                                     {
-										string parsedToken = token.Replace("#$%%$#", " ");
+										string parsedToken = token.Replace("#$% %$#", " ").Replace("#$%: %$#", ": ");
 										AddEncoded(parsedToken.Substring(0, parsedToken.Length - 1));
 									}
 									Add("</th>");
@@ -653,7 +653,7 @@ namespace PingCastle.Report
                                         }
                                         else
                                         {
-                                            Add(t[i]);
+                                            Add(t[i].Replace("#$%: %$#", ": "));
                                             Add(" ");
                                         }
                                     }
@@ -743,7 +743,7 @@ namespace PingCastle.Report
 										foreach (var token in tokens)
 										{
 											Add("<th>");
-											string parsedToken = token.Replace("#$%%$#", " ");
+											string parsedToken = token.Replace("#$% %$#", " ").Replace("#$%: %$#", ": ");
 											AddEncoded(parsedToken.Substring(0, parsedToken.Length - 1));
 											Add("</th>");
 										}
@@ -765,7 +765,7 @@ namespace PingCastle.Report
 												}
 												else
 												{
-													Add(t[i]);
+													Add(t[i].Replace("#$%: %$#", ": "));
 													Add(" ");
 												}
 											}

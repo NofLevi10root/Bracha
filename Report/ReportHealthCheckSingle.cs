@@ -4419,7 +4419,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     foreach (var token in tokens)
                     {
                         Add("<th>");
-                        string parsedToken = token.Replace("#$%%$#", " ");
+                        string parsedToken = token.Replace("#$% %$#", " ").Replace("#$%: %$#", ": ");
                         AddEncoded(parsedToken.Substring(0, parsedToken.Length - 1));
                         Add("</th>");
                     }
@@ -4443,7 +4443,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                             }
                             else
                             {
-                                Add(t[i]);
+                                Add(t[i].Replace("#$%: %$#", ": "));
                                 Add(" ");
                             }
                         }
