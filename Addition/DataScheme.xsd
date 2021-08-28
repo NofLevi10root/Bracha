@@ -4,6 +4,7 @@
     <xsd:complexType>
       <xsd:sequence minOccurs="1">
         <xsd:element name="Domain" type="xsd:string"/>
+        <xsd:element name="CustomDelimiter" type="xsd:string" minOccurs="0"/>
         <xsd:element name="Categories" minOccurs="0">
           <xsd:complexType>
             <xsd:sequence>

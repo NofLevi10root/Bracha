@@ -630,7 +630,7 @@ namespace PingCastle.Report
 										AddEncoded(token.Replace("Domain_controller:", "Domain controller:").Substring(0, token.Length - 1));
 									else
                                     {
-										string parsedToken = token.Replace("#$% %$#", " ").Replace("#$%: %$#", ": ");
+										string parsedToken = token.Replace("#$%%$#", " ").Replace("#$%:%$#", ": ");
 										AddEncoded(parsedToken.Substring(0, parsedToken.Length - 1));
 									}
 									Add("</th>");
@@ -653,7 +653,7 @@ namespace PingCastle.Report
                                         }
                                         else
                                         {
-                                            Add(t[i].Replace("#$%: %$#", ": "));
+                                            Add(t[i].Replace("#$%:%$#", ": "));
                                             Add(" ");
                                         }
                                     }
@@ -722,7 +722,7 @@ namespace PingCastle.Report
                             {
 								if(detail.Type == CustomDetailsType.Table)
                                 {
-									var tableLines = CustomTable.GetTable(detail.FilePath);
+									var tableLines = CustomTable.GetTable(CustomData.CustomDelimiter, detail.FilePath);
 									if (tableLines == null)
 										continue;
 									var firstLineParts = tableLines[0].Split(' ');
@@ -743,7 +743,7 @@ namespace PingCastle.Report
 										foreach (var token in tokens)
 										{
 											Add("<th>");
-											string parsedToken = token.Replace("#$% %$#", " ").Replace("#$%: %$#", ": ");
+											string parsedToken = token.Replace("#$%%$#", " ").Replace("#$%:%$#", ": ");
 											AddEncoded(parsedToken.Substring(0, parsedToken.Length - 1));
 											Add("</th>");
 										}
@@ -765,7 +765,7 @@ namespace PingCastle.Report
 												}
 												else
 												{
-													Add(t[i].Replace("#$%: %$#", ": "));
+													Add(t[i].Replace("#$%:%$#", ": "));
 													Add(" ");
 												}
 											}

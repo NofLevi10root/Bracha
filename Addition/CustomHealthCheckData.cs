@@ -20,6 +20,9 @@ namespace PingCastle.Addition
         [XmlElement("Domain")]
         public string Domain { get; set; }
 
+        [XmlElement("CustomDelimiter")]
+        public string CustomDelimiter { get; set; } = ",";
+
         [XmlArray("Categories")]
         [XmlArrayItem(ElementName = "Category")]
         public List<CustomRiskRuleCategory> Categories { get; set; } = new List<CustomRiskRuleCategory>();
@@ -228,7 +231,7 @@ namespace PingCastle.Addition
                                     if (string.IsNullOrEmpty(detail.Id))
                                         continue;
                                     if (dictTables.ContainsKey(detail.Id))
-                                        dictTables[detail.Id].AddDetail(detail);
+                                        dictTables[detail.Id].AddDetail(detail, CustomDelimiter);
 
                                 }
                             }

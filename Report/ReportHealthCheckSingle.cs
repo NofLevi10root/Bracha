@@ -1349,7 +1349,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 foreach (HealthCheckGroupData group in Report.PrivilegedGroups)
                 {
                     AddBeginRow();
-                    if (custTable != null && (custTable.GetKeyLinkedSection(group.GroupName, out var targetSection) || custTable.GetNestedTable(group.GroupName, out var targetTable)))
+                    if (custTable != null && (custTable.GetKeyLinkedSection(group.GroupName, out var targetSection) || custTable.GetNestedTable(group.GroupName, CustomData.CustomDelimiter, out var targetTable)))
                     {
                         AddTableKeyCell(custTable, group.GroupName);
                     }
@@ -1400,7 +1400,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 AddEndTable();
                 foreach (HealthCheckGroupData group in Report.PrivilegedGroups)
                 {
-                    if (custTable != null && (custTable.GetKeyLinkedSection(group.GroupName, out var targetSection) || custTable.GetNestedTable(group.GroupName, out var targetTable)))
+                    if (custTable != null && (custTable.GetKeyLinkedSection(group.GroupName, out var targetSection) || custTable.GetNestedTable(group.GroupName, CustomData.CustomDelimiter, out var targetTable)))
                         AddTableKeyModal(custTable, group.GroupName);
                     else if (group.Members != null && group.Members.Count > 0)
                     {
@@ -4219,7 +4219,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     GenerateAdvancedCustomSection(targetSection);
                     AddEndModal();
                 }
-                else if (custTable != null && custTable.GetNestedTable(value, out var targetTable))
+                else if (custTable != null && custTable.GetNestedTable(value, CustomData.CustomDelimiter, out var targetTable))
                 {
                     AddBeginModal(GenerateModalAdminGroupIdFromGroupName($"table_{value}"), value, ShowModalType.XL);
                     AddCustomTableHtml(targetTable);
@@ -4253,7 +4253,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddCustomTooltip(tooltip);
                     Add("</td>");
                 }
-                else if (custTable != null && custTable.GetNestedTable(value, out var targetTable))
+                else if (custTable != null && custTable.GetNestedTable(value, CustomData.CustomDelimiter, out var targetTable))
                 {
                     Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
                     Add(GenerateModalAdminGroupIdFromGroupName($"table_{value}"));
@@ -4338,7 +4338,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     }
                     Add("</td>");
                 }
-                else if (custTable != null && custTable.GetNestedTable(ReportHelper.Encode(cellValue.GPOName), out var targetTable))
+                else if (custTable != null && custTable.GetNestedTable(ReportHelper.Encode(cellValue.GPOName), CustomData.CustomDelimiter, out var targetTable))
                 {
                     Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
                     Add(GenerateModalAdminGroupIdFromGroupName($"table_{ReportHelper.Encode(cellValue.GPOName)}"));
@@ -4419,7 +4419,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     foreach (var token in tokens)
                     {
                         Add("<th>");
-                        string parsedToken = token.Replace("#$% %$#", " ").Replace("#$%: %$#", ": ");
+                        string parsedToken = token.Replace("#$%%$#", " ").Replace("#$%:%$#", ": ");
                         AddEncoded(parsedToken.Substring(0, parsedToken.Length - 1));
                         Add("</th>");
                     }
@@ -4443,7 +4443,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                             }
                             else
                             {
-                                Add(t[i].Replace("#$%: %$#", ": "));
+                                Add(t[i].Replace("#$%:%$#", ": "));
                                 Add(" ");
                             }
                         }

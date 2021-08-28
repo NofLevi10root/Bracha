@@ -79,7 +79,7 @@ namespace PingCastle.Addition
                 Console.WriteLine(e);
             }
         }
-        public void AddDetail(CustomRuleDetails detail)
+        public void AddDetail(CustomRuleDetails detail, string delimiter)
         {
             try
             {
@@ -89,13 +89,13 @@ namespace PingCastle.Addition
                 if (lines.Length == 0)
                     return;
 
-                var headers = lines[0].Split(',');
+                var headers = lines[0].Split(new string[] { delimiter }, StringSplitOptions.None);
                 var colsNum = headers.Length;
                 string[][] data = new string[lines.Length][];
                 for (int i = 0; i < lines.Length; i++) // build table 
                 {
                     data[i] = new string[colsNum];
-                    var lineParts = lines[i].Split(',');
+                    var lineParts = lines[i].Split(new string[] { delimiter }, StringSplitOptions.None);
                     var maxQ = Math.Min(colsNum, lineParts.Length);
                     for (int q = 0; q < maxQ; q++)
                     {
@@ -135,7 +135,7 @@ namespace PingCastle.Addition
             }
             
         }
-        public static List<string> GetTable(string filePath)
+        public static List<string> GetTable(string filePath, string delimiter)
         {
             try
             {
@@ -151,16 +151,16 @@ namespace PingCastle.Addition
 
                 for(int i = 0; i < lines.Length; i++)
                 {
-                    lines[i] = lines[i].Replace(": ", "#$%: %$#");
+                    lines[i] = lines[i].Replace(": ", "#$%:%$#");
                 }
 
-                foreach (var part in lines[0].Split(',')) // Headers
+                foreach (var part in lines[0].Split(new string[] { delimiter }, StringSplitOptions.None)) // Headers
                 {
-                    headers.Add(part.Trim().Replace(" ", "#$% %$#") + ": ");
+                    headers.Add(part.Trim().Replace(" ", "#$%%$#") + ": ");
                 }
                 for (int i = 1; i < lines.Length; i++) // Rows
                 {
-                    var lineParts = lines[i].Split(',');
+                    var lineParts = lines[i].Split(new string[] { delimiter }, StringSplitOptions.None);
                     StringBuilder builder = new StringBuilder();
                     for (int q = 0; q < lineParts.Length && q < headers.Count; q++)
                     {
@@ -190,14 +190,14 @@ namespace PingCastle.Addition
             }
             catch (Exception e)
             {
-                Console.WriteLine("Problem on 'GetTable' method on 'CustomTable':");
+                Console.WriteLine("Problem on 'GetKeyLinkedSection' method on 'CustomTable':");
                 Console.WriteLine(e);
             }
             result = null;
             return false;
         }
 
-        public bool GetNestedTable(string name, out List<string> result)
+        public bool GetNestedTable(string name, string delimiter, out List<string> result)
         {
             try
             {
@@ -209,10 +209,10 @@ namespace PingCastle.Addition
             }
             catch (Exception e)
             {
-                Console.WriteLine("Problem on 'GetTable' method on 'CustomTable':");
+                Console.WriteLine("Problem on 'GetNestedTable' method on 'CustomTable':");
                 Console.WriteLine(e);
             }
-            result = GetTable($"{NestedTablesDirectory}\\{name}.csv");
+            result = GetTable($"{NestedTablesDirectory}\\{name}.csv", delimiter);
             return true;
         }
         #endregion
