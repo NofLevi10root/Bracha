@@ -16,6 +16,9 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using PingCastle.Addition;
+using PingCastle.Addition.LogicEnteties;
+using PingCastle.Addition.StructureEnteties;
+using PingCastle.Addition.ReportEnteties;
 
 namespace PingCastle.Report
 {
@@ -29,24 +32,12 @@ namespace PingCastle.Report
 		public string GenerateReportFile(HealthcheckData report, ADHealthCheckingLicense license, string filename)
 		{
 			Report = report;
-			CustomData = null;
-			_license = license;
+            _license = license;
 			report.InitializeReportingData();
             ReportID = GenerateUniqueID(report);
             Brand(license);
             return GenerateReportFile(filename);
         }
-
-		public string GenerateReportFile(HealthcheckData report, ADHealthCheckingLicense license, string filename, CustomHealthCheckData customData)
-		{
-			Report = report;
-			CustomData = customData;
-			_license = license;
-			report.InitializeReportingData();
-			ReportID = GenerateUniqueID(report);
-			Brand(license);
-			return GenerateReportFile(filename);
-		}
 
 		private string GenerateUniqueID(IPingCastleReport report)
         {
@@ -57,8 +48,7 @@ namespace PingCastle.Report
 		public string GenerateRawContent(HealthcheckData report, ADHealthCheckingLicense aDHealthCheckingLicense)
 		{
 			Report = report;
-			CustomData = null;
-			_license = aDHealthCheckingLicense;
+            _license = aDHealthCheckingLicense;
 			report.InitializeReportingData();
 			sb.Length = 0;
 			GenerateContent();
@@ -189,10 +179,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 			{
 				AddParagraph("This section focuses on the core security indicators.<br>Locate the sub-process determining the score and fix some rules in that area to get a score improvement.");
 				GenerateIndicators(Report, Report.AllRiskRules);
-				if (CustomData != null)
-					GenerateAdvancedRiskModelPanel(Report.RiskRules);
-				else
-					GenerateRiskModelPanel(Report.RiskRules);
+				GenerateRiskModelPanel(Report.RiskRules);
 			});
             GenerateSection("Maturity Level", GenerateMaturityInformation);
 			GenerateSection("Stale Objects", () =>
@@ -207,7 +194,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 			});
 			GenerateSection("Trusts", () =>
 			{
-				GenerateSubIndicator("Trusts", Report.GlobalScore, Report.TrustScore, "It is about operations related to user or computer objects");
+				GenerateSubIndicator("Trusts", Report.GlobalScore, Report.TrustScore, "It is about links between two Active Directories");
 				GenerateIndicatorPanel("DetailTrusts", "Trusts rule details", RiskRuleCategory.Trusts, Report.RiskRules, Report.applicableRules);
 			});
 			GenerateSection("Anomalies analysis", () =>
@@ -215,17 +202,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 				GenerateSubIndicator("Anomalies", Report.GlobalScore, Report.AnomalyScore, "It is about specific security control points");
 				GenerateIndicatorPanel("DetailAnomalies", "Anomalies rule details", RiskRuleCategory.Anomalies, Report.RiskRules, Report.applicableRules);
 			});
-			if(CustomData != null)
-            {
-				foreach (var category in CustomData.Categories)
-				{
-					GenerateSection(category.Id, category.Name, () =>
-					{
-						GenerateSubIndicator(category.Name, Report.GlobalScore, category.Score, category.Explanation);
-						GenerateAdvancedIndicatorPanel("Detail" + category.Id, category.Name + "rule details", category.Id);
-					});
-				}
-			}
+            CustomData.GenerateCustomCategoriesSections(Report.GlobalScore);
 			GenerateSection("Domain Information", GenerateDomainInformation);
 			GenerateSection("User Information", GenerateUserInformation);
 			GenerateSection("Computer Information", GenerateComputerInformation);
@@ -235,14 +212,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 			GenerateSection("Anomalies", GenerateAnomalyDetail);
 			GenerateSection("Password Policies", GeneratePasswordPoliciesDetail);
 			GenerateSection("GPO", GenerateGPODetail);
-			if(CustomData != null)
-            {
-				foreach(var section in CustomData.InformationSections)
-                {
-                    if(section.Show)
-					    GenerateSection(section.Id, section.Name, () =>  GenerateAdvancedCustomSection(section));
-                }
-            }
+            CustomData.GenerateCustomInformationSections();
 		}
 
         protected override void GenerateFooterInformation()
@@ -357,18 +327,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                             levelRules[rule.Points].Add(rule);
                         }
                     }
-					if(CustomData != null)
-                    {
-						foreach(var rule in CustomData.HealthRules)
-                        {
-							if (l.Contains(rule.RiskId))
-                            {
-                                if (!levelRules.ContainsKey(rule.Points))
-                                    levelRules.Add(rule.Points, new List<object>());
-                                levelRules[rule.Points].Add(rule);
-                            }
-                        }
-                    }
+                    CustomData.AddHealthRulesToCurrentMaturityLevel(l, levelRules);
 
                     foreach (var listRule in levelRules)
                     {
@@ -403,18 +362,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     output[level] = new List<string>();
                 output[level].Add(hcrule.RiskId);
             }
-			if(CustomData != null)
-            {
-				foreach(var rule in CustomData.HealthRules)
-                {
-                    if(!CustomData.GetRiskRule(rule.RiskId, out var hcrule))
-						continue;
-					int level = hcrule.Maturity;
-					if(!output.ContainsKey(level))
-						output[level] = new List<string>();
-					output[level].Add(hcrule.Id);
-				}
-            }
+            CustomData.AddToMaturityLevelsDict(output);
             return output;
         }
         #endregion
@@ -441,23 +389,10 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             {
                 AddHeaderText(@"Recycle Bin enabled");
             }
-            CustomTable custTable = null;
-            if (CustomData != null)
-            {
-                if(CustomData.GetTable("Domain information", out custTable))
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                            AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                        else
-                            AddHeaderText(custTable.Columns[i].Header);
-                    }
-                }
-            }
+            CustomData.GenerateTableHeaders("Domain information");
             AddBeginTableData();
             AddBeginRow();
-            AddTableKeyCell(custTable, Report.DomainFQDN);
+            CustomData.AddTableKeyCell("Domain information", Report.DomainFQDN);
             AddCellText(Report.NetBIOSName);
             AddCellText(ReportHelper.DecodeDomainFunctionalLevel(Report.DomainFunctionalLevel));
             AddCellText(ReportHelper.DecodeForestFunctionalLevel(Report.ForestFunctionalLevel));
@@ -475,27 +410,11 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     AddCellText("FALSE", true);
                 }
             }
-            if(custTable != null)
-            {
-                for (int i = 1; i < custTable.Columns.Count; i++)
-                {
-                    if (custTable.Columns[i].Values.ContainsKey(Report.DomainFQDN))
-                        AddCellText(custTable.Columns[i].Values[Report.DomainFQDN]);
-                    else
-                        AddCellText("");
-                }
-            }
+            CustomData.GenerateTableRowCells("Domain information", Report.DomainFQDN);
             AddEndRow();
             AddEndTable();
-            AddTableKeyModal(custTable, Report.DomainFQDN);
-            if (CustomData != null)
-            {
-                if(CustomData.GetSection("DomainInformation", out var section))
-                {
-                    GenerateAdvancedCustomSection(section);
-                    CustomData.InformationSections.Remove(section);
-                }
-            }
+            CustomData.AddTableKeyModal("Domain information", Report.DomainFQDN);
+            CustomData.GenerateAdvancedSection("DomainInformation");
         }
 
         #endregion domain info
@@ -538,23 +457,10 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             AddHeaderText("Nb User Accounts");
             AddAccountCheckHeader(false);
 
-            CustomTable custTable = null;
-            if (CustomData != null)
-            {
-                if (CustomData.GetTable("Account analysis list", out custTable))
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                            AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                        else
-                            AddHeaderText(custTable.Columns[i].Header);
-                    }
-                }
-            }
+            CustomData.GenerateTableHeaders("Account analysis list");
             AddBeginTableData();
             AddBeginRow();
-            AddTableKeyCell(custTable, Report.UserAccountData.Number, "number");
+            CustomData.AddTableKeyCell("Account analysis list", Report.UserAccountData.Number, "number");
             AddCellNum(Report.UserAccountData.NumberEnabled);
             AddCellNum(Report.UserAccountData.NumberDisabled);
             AddCellNum(Report.UserAccountData.NumberActive);
@@ -567,19 +473,10 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             SectionList("usersaccordion", "sectiondesenableduser", Report.UserAccountData.NumberDesEnabled, Report.UserAccountData.ListDesEnabled);
             SectionList("usersaccordion", "sectiontrusteddelegationuser", Report.UserAccountData.NumberTrustedToAuthenticateForDelegation, Report.UserAccountData.ListTrustedToAuthenticateForDelegation);
             SectionList("usersaccordion", "sectionreversiblenuser", Report.UserAccountData.NumberReversibleEncryption, Report.UserAccountData.ListReversibleEncryption);
-            if (custTable != null)
-            {
-                for (int i = 1; i < custTable.Columns.Count; i++)
-                {
-                    if (custTable.Columns[i].Values.ContainsKey(Report.UserAccountData.Number.ToString()))
-                        AddCellText(custTable.Columns[i].Values[Report.UserAccountData.Number.ToString()]);
-                    else
-                        AddCellText("");
-                }
-            }
+            CustomData.GenerateTableRowCells("Account analysis list", Report.UserAccountData.Number.ToString());
             AddEndRow();
             AddEndTable();
-            AddTableKeyModal(custTable, Report.UserAccountData.Number);
+            CustomData.AddTableKeyModal("Account analysis list", Report.UserAccountData.Number);
             GenerateListAccount(Report.UserAccountData, "user", "usersaccordion");
             if (Report.PasswordDistribution != null && Report.PasswordDistribution.Count > 0)
             {
@@ -595,14 +492,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 }
             }
             GenerateDomainSIDHistoryList(Report.UserAccountData);
-            if (CustomData != null)
-            {
-                if (CustomData.GetSection("UserInformation", out var section))
-                {
-                    GenerateAdvancedCustomSection(section);
-                    CustomData.InformationSections.Remove(section);
-                }
-            }
+            CustomData.GenerateAdvancedSection("UserInformation");
         }
 
         private void AddPasswordDistributionChart(List<HealthcheckPwdDistributionData> input, string id, Dictionary<int, string> tooltips = null)
@@ -881,20 +771,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             {
                 AddHeaderText("Dangerous SID Found");
             }
-            CustomTable custTable = null;
-            if (CustomData != null)
-            {
-                if (CustomData.GetTable("SID History list", out custTable))
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                            AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                        else
-                            AddHeaderText(custTable.Columns[i].Header);
-                    }
-                }
-            }
+            CustomData.GenerateTableHeaders("SID History list");
             AddBeginTableData();
 
             data.ListDomainSidHistory.Sort(
@@ -906,7 +783,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             foreach (HealthcheckSIDHistoryData domainSidHistory in data.ListDomainSidHistory)
             {
                 AddBeginRow();
-                AddTableKeyCell(custTable, domainSidHistory.FriendlyName);
+                CustomData.AddTableKeyCell("SID History list", domainSidHistory.FriendlyName);
                 AddCellDate(domainSidHistory.FirstDate);
                 AddCellDate(domainSidHistory.LastDate);
                 AddCellNum(domainSidHistory.Count);
@@ -914,25 +791,12 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 {
                     AddCellText(domainSidHistory.DangerousSID.ToString());
                 }
-                if (custTable != null)
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (custTable.Columns[i].Values.ContainsKey(domainSidHistory.FriendlyName))
-                            AddCellText(custTable.Columns[i].Values[domainSidHistory.FriendlyName]);
-                        else
-                            AddCellText("");
-                    }
-                    
-                }
+                CustomData.GenerateTableRowCells("SID History list", domainSidHistory.FriendlyName);
                 AddEndRow();
             }
             AddEndTable();
 
-            foreach (HealthcheckSIDHistoryData domainSidHistory in data.ListDomainSidHistory)
-            {
-                AddTableKeyModal(custTable, domainSidHistory.FriendlyName);
-            }
+            CustomData.GenerateTableKeyModals("SID History list", data.ListDomainSidHistory, item => item.FriendlyName);
         }
 
         #endregion user info
@@ -945,24 +809,11 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             AddHeaderText("Nb Computer Accounts");
             AddAccountCheckHeader(true);
 
-            CustomTable custTable = null;
-            if (CustomData != null)
-            {
-                if (CustomData.GetTable("Computer information list", out custTable))
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                            AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                        else
-                            AddHeaderText(custTable.Columns[i].Header);
-                    }
-                }
-            }
+            CustomData.GenerateTableHeaders("Computer information list");
             AddBeginTableData();
 
             AddBeginRow();
-            AddTableKeyCell(custTable, Report.ComputerAccountData.Number, "number");
+            CustomData.AddTableKeyCell("Computer information list", Report.ComputerAccountData.Number, "number");
             AddCellNum(Report.ComputerAccountData.NumberEnabled);
             AddCellNum(Report.ComputerAccountData.NumberDisabled);
             AddCellNum(Report.ComputerAccountData.NumberActive);
@@ -971,31 +822,15 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             SectionList("computersaccordion", "sectionbadprimarygroupcomputer", Report.ComputerAccountData.NumberBadPrimaryGroup, Report.ComputerAccountData.ListBadPrimaryGroup);
             SectionList("computersaccordion", "sectiontrusteddelegationcomputer", Report.ComputerAccountData.NumberTrustedToAuthenticateForDelegation, Report.ComputerAccountData.ListTrustedToAuthenticateForDelegation);
             SectionList("computersaccordion", "sectionreversiblencomputer", Report.ComputerAccountData.NumberReversibleEncryption, Report.ComputerAccountData.ListReversibleEncryption);
-            if (custTable != null)
-            {
-                for (int i = 1; i < custTable.Columns.Count; i++)
-                {
-                    if (custTable.Columns[i].Values.ContainsKey(Report.ComputerAccountData.Number.ToString()))
-                        AddCellText(custTable.Columns[i].Values[Report.ComputerAccountData.Number.ToString()]);
-                    else
-                        AddCellText("");
-                }
-            }
+            CustomData.GenerateTableRowCells("Computer information list", Report.ComputerAccountData.Number.ToString());
             AddEndRow();
             AddEndTable();
-            AddTableKeyModal(custTable, Report.ComputerAccountData.Number);
+            CustomData.AddTableKeyModal("Computer information list", Report.ComputerAccountData.Number);
             GenerateListAccount(Report.ComputerAccountData, "computer", "computersaccordion");
             GenerateOperatingSystemList();
             GenerateDomainSIDHistoryList(Report.ComputerAccountData);
             GenerateDCInformation();
-            if (CustomData != null)
-            {
-                if (CustomData.GetSection("ComputerInformation", out var section))
-                {
-                    GenerateAdvancedCustomSection(section);
-                    CustomData.InformationSections.Remove(section);
-                }
-            }
+            CustomData.GenerateAdvancedSection("ComputerInformation");
         }
 
 		private void GenerateOperatingSystemList()
@@ -1007,20 +842,8 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 				AddBeginTable("Operating System list");
 				AddHeaderText("Operating System");
 				AddHeaderText("Count");
-                CustomTable custTable = null;
-                if (CustomData != null)
-                {
-                    if (CustomData.GetTable("Operating System list", out custTable))
-                    {
-                        for (int i = 1; i < custTable.Columns.Count; i++)
-                        {
-                            if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                                AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                            else
-                                AddHeaderText(custTable.Columns[i].Header);
-                        }
-                    }
-                }
+
+                CustomData.GenerateTableHeaders("Operating System list");
                 AddBeginTableData();
 				Report.OperatingSystem.Sort(
 					(HealthcheckOSData x, HealthcheckOSData y) =>
@@ -1032,27 +855,14 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 					foreach (HealthcheckOSData os in Report.OperatingSystem)
 					{
 						AddBeginRow();
-                        AddTableKeyCell(custTable, os.OperatingSystem);
+                        CustomData.AddTableKeyCell("Operating System list", os.OperatingSystem);
 						AddCellNum(os.NumberOfOccurence);
-                        if (custTable != null)
-                        {
-                            for (int i = 1; i < custTable.Columns.Count; i++)
-                            {
-                                if (custTable.Columns[i].Values.ContainsKey(os.OperatingSystem))
-                                    AddCellText(custTable.Columns[i].Values[os.OperatingSystem]);
-                                else
-                                    AddCellText("");
-                            }
-                            
-                        }
+                        CustomData.GenerateTableRowCells("Operating System list", os.OperatingSystem);
                         AddEndRow();
 					}
 				}
 				AddEndTable();
-                foreach (HealthcheckOSData os in Report.OperatingSystem)
-                {
-                    AddTableKeyModal(custTable, os.OperatingSystem);
-                }
+                CustomData.GenerateTableKeyModals("Operating System list", Report.OperatingSystem, item => item.OperatingSystem);
             }
 			else
 			{
@@ -1062,20 +872,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 				AddAccountCheckHeader(true);
 
 				AddBeginTableData();
-                CustomTable custTable = null;
-                if (CustomData != null)
-                {
-                    if (CustomData.GetTable("Operating System list", out custTable))
-                    {
-                        for (int i = 1; i < custTable.Columns.Count; i++)
-                        {
-                            if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                                AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                            else
-                                AddHeaderText(custTable.Columns[i].Header);
-                        }
-                    }
-                }
+                CustomData.GenerateTableHeaders("Operating System list");
                 Report.OperatingSystem.Sort(
 					(HealthcheckOSData x, HealthcheckOSData y) =>
 					{
@@ -1086,7 +883,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 					foreach (HealthcheckOSData os in Report.OperatingSystem)
 					{
 						AddBeginRow();
-                        AddTableKeyCell(custTable, os.OperatingSystem);
+                        CustomData.AddTableKeyCell("Operating System list", os.OperatingSystem);
 						AddCellNum(os.data.Number);
 						AddCellNum(os.data.NumberEnabled);
 						AddCellNum(os.data.NumberDisabled);
@@ -1096,106 +893,15 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 						AddCellNum(os.data.NumberBadPrimaryGroup);
 						AddCellNum(os.data.NumberTrustedToAuthenticateForDelegation);
 						AddCellNum(os.data.NumberReversibleEncryption);
-                        if (custTable != null)
-                        {
-                            for (int i = 1; i < custTable.Columns.Count; i++)
-                            {
-                                if (custTable.Columns[i].Values.ContainsKey(os.OperatingSystem))
-                                    AddCellText(custTable.Columns[i].Values[os.OperatingSystem]);
-                                else
-                                    AddCellText("");
-                            }
-                            
-                        }
+                        CustomData.GenerateTableRowCells("Operating System list", os.OperatingSystem);
                         AddEndRow();
 					}
 				}
 				AddEndTable();
-                foreach (HealthcheckOSData os in Report.OperatingSystem)
-                {
-                    AddTableKeyModal(custTable, os.OperatingSystem);
-                }
+                CustomData.GenerateTableKeyModals("Operating System list", Report.OperatingSystem, item => item.OperatingSystem);
             }
 		}
-		private void GenerateAdvancedCustomSection(CustomInformationSection section)
-        {
-			foreach(var child in section.Children)
-            {
-                switch(child.Type)
-                {
-                    case CustomSectionChildType.Table:
-                        if(CustomData.GetTable(child.Id, out var table))
-                        {
-                            AddBeginTable(table.Id);
-
-                            foreach (var col in table.Columns)
-                            {
-                                if(!string.IsNullOrEmpty(col.Tooltip))
-                                    AddHeaderText(col.Header, col.Tooltip);
-                                else
-                                AddHeaderText(col.Header);
-                            }
-                            AddBeginTableData();
-                            foreach(var key in table.Keys)
-                            {
-                                AddBeginRow();
-                                for(int i = 0; i < table.Columns.Count; i++)
-                                {
-                                    if(i == 0)
-                                    {
-                                        AddTableKeyCell(table, key);
-                                    }
-                                    else
-                                    {
-                                        if (table.Columns[i].Values.ContainsKey(key))
-                                            AddCellText(table.Columns[i].Values[key]);
-                                        else
-                                            AddCellText("");
-                                    }
-                                }
-                                AddEndRow();
-                            }
-                            AddEndTable();
-                            foreach (var key in table.Keys)
-                            {
-                                AddTableKeyModal(table, key);
-                            }
-                        }
-                        break;
-                    case CustomSectionChildType.Chart:
-                        if (CustomData.GetChart(child.Id, out var chart))
-                            Add(chart.GetChartString());
-                        break;
-                    case CustomSectionChildType.Paragraph:
-                        if(!string.IsNullOrEmpty(child.Value))
-                            AddParagraph(child.Value);
-                        break;
-                    case CustomSectionChildType.SubSectionTitle:
-                        if (!string.IsNullOrEmpty(child.Value))
-                        {
-                            GenerateSubSection(child.Value);
-                        }
-                        break;
-                    case CustomSectionChildType.Modal:
-                        if (!string.IsNullOrEmpty(child.Id) && !string.IsNullOrEmpty(child.Value) && child.Id != section.Id)
-                        {
-                            Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                            Add(GenerateModalAdminGroupIdFromGroupName(child.Id));
-                            Add(@""">");
-                            AddEncoded(child.Value);
-                            Add("</a></td>");
-
-                            AddBeginModal(GenerateModalAdminGroupIdFromGroupName(child.Id), child.Value, ShowModalType.XL);
-                            if(CustomData.GetSection(child.Id, out var modalSection))
-                            {
-                                GenerateAdvancedCustomSection(modalSection);
-                            }
-                            AddEndModal();
-                        }
-                        break;
-                }
-            }
-		}
+		
 
         private void GenerateDCInformation()
         {
@@ -1227,20 +933,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                             {
                                 AddHeaderText("FSMO role", "Flexible Single Master Operation. Indicates the server responsible for each role.");
                             }
-                            CustomTable custTable = null;
-                            if (CustomData != null)
-                            {
-                                if (CustomData.GetTable("Domain Controllers list", out custTable))
-                                {
-                                    for (int i = 1; i < custTable.Columns.Count; i++)
-                                    {
-                                        if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                                            AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                                        else
-                                            AddHeaderText(custTable.Columns[i].Header);
-                                    }
-                                }
-                            }
+                            CustomData.GenerateTableHeaders("Domain Controllers list");
                             AddBeginTableData();
 
                             int count = 0;
@@ -1248,7 +941,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                             {
                                 count++;
                                 AddBeginRow();
-                                AddTableKeyCell(custTable, dc.DCName);
+                                CustomData.AddTableKeyCell("Domain Controllers list", dc.DCName);
                                 AddCellText(dc.OperatingSystem);
                                 AddCellText((dc.CreationDate == DateTime.MinValue ? "Unknown" : dc.CreationDate.ToString("u")));
                                 AddCellText((dc.StartupTime == DateTime.MinValue ? (dc.LastComputerLogonDate.AddDays(60) < DateTime.Now ? "Inactive?" : "Unknown") : (dc.StartupTime.AddMonths(6) < DateTime.Now ? /*"<span class='unticked'>" + */dc.StartupTime.ToString("u")/* + "</span>"*/ : dc.StartupTime.ToString("u"))));
@@ -1270,22 +963,11 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                                     }
                                     Add("</Td>");
                                 }
-                                if (custTable != null)
-                                {
-                                    for (int i = 1; i < custTable.Columns.Count; i++)
-                                    {
-                                        if (custTable.Columns[i].Values.ContainsKey(dc.DCName))
-                                            AddCellText(custTable.Columns[i].Values[dc.DCName]);
-                                        else
-                                            AddCellText("");
-                                    }
-                                    
-                                }
+                                CustomData.GenerateTableRowCells("Domain Controllers list", dc.DCName);
                                 AddEndRow();
                             }
                             AddEndTable();
-                            foreach (var dc in Report.DomainControllers)
-                                AddTableKeyModal(custTable, dc.DCName);
+                            CustomData.GenerateTableKeyModals("Domain Controllers list", Report.DomainControllers, item => item.DCName);
                         }
                     );
                 }
@@ -1324,20 +1006,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 {
                     AddHeaderText("Nb protected users", "This is the number of users in the Protected Users group");
                 }
-                CustomTable custTable = null;
-                if (CustomData != null)
-                {
-                    if (CustomData.GetTable("Admin groups list", out custTable))
-                    {
-                        for (int i = 1; i < custTable.Columns.Count; i++)
-                        {
-                            if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                                AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                            else
-                                AddHeaderText(custTable.Columns[i].Header);
-                        }
-                    }
-                }
+                CustomTable custTable = CustomData.GenerateTableHeaders("Admin groups list");
                 AddBeginTableData();
 
                 Report.PrivilegedGroups.Sort((HealthCheckGroupData a, HealthCheckGroupData b)
@@ -1351,7 +1020,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     AddBeginRow();
                     if (custTable != null && (custTable.GetKeyLinkedSection(group.GroupName, out var targetSection) || custTable.GetNestedTable(group.GroupName, CustomData.CustomDelimiter, out var targetTable)))
                     {
-                        AddTableKeyCell(custTable, group.GroupName);
+                        CustomData.AddTableKeyCell("Admin groups list", group.GroupName);
                     }
                     else if (group.Members != null && group.Members.Count > 0)
                     {
@@ -1384,24 +1053,14 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     {
                         AddCellNum(group.NumberOfMemberInProtectedUsers);
                     }
-                    if (custTable != null)
-                    {
-                        for (int i = 1; i < custTable.Columns.Count; i++)
-                        {
-                            if (custTable.Columns[i].Values.ContainsKey(group.GroupName))
-                                AddCellText(custTable.Columns[i].Values[group.GroupName]);
-                            else
-                                AddCellText("");
-                        }
-                        
-                    }
+                    CustomData.GenerateTableRowCells("Admin groups list", group.GroupName);
                     AddEndRow();
                 }
                 AddEndTable();
                 foreach (HealthCheckGroupData group in Report.PrivilegedGroups)
                 {
                     if (custTable != null && (custTable.GetKeyLinkedSection(group.GroupName, out var targetSection) || custTable.GetNestedTable(group.GroupName, CustomData.CustomDelimiter, out var targetTable)))
-                        AddTableKeyModal(custTable, group.GroupName);
+                        CustomData.AddTableKeyModal("Admin groups list", group.GroupName);
                     else if (group.Members != null && group.Members.Count > 0)
                     {
                         AddBeginModal(GenerateModalAdminGroupIdFromGroupName(group.GroupName), group.GroupName, ShowModalType.XL);
@@ -1485,14 +1144,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     });
                 Add("</div></div>");
             }
-            if (CustomData != null)
-            {
-                if (CustomData.GetSection("AdminGroups", out var section))
-                {
-                    GenerateAdvancedCustomSection(section);
-                    CustomData.InformationSections.Remove(section);
-                }
-            }
+            CustomData.GenerateAdvancedSection("AdminGroups");
         }
 
         private void ComputePrivilegedDistribution(List<HealthcheckPwdDistributionData> lastLogon, Dictionary<int, string> tooltips, List<HealthcheckPwdDistributionData> pwdLastSet, Dictionary<int, string> tooltips2)
@@ -1564,20 +1216,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             AddHeaderText("DistinguishedName");
             AddHeaderText("Account");
             AddHeaderText("Right");
-            CustomTable custTable = null;
-            if (CustomData != null)
-            {
-                if (CustomData.GetTable("Delegations list", out custTable))
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                            AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                        else
-                            AddHeaderText(custTable.Columns[i].Header);
-                    }
-                }
-            }
+            CustomData.GenerateTableHeaders("Delegations list");
             AddBeginTableData();
 
             Report.Delegations.Sort(OrderDelegationData);
@@ -1589,31 +1228,17 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 if (dcPathPos > 0)
                     path = delegation.DistinguishedName.Substring(0, dcPathPos);
                 AddBeginRow();
-                AddTableKeyCell(custTable, path);
+                CustomData.AddTableKeyCell("Delegations list", path);
                 AddCellText(delegation.Account);
                 AddCellText(delegation.Right);
-                if (custTable != null)
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (custTable.Columns[i].Values.ContainsKey(path))
-                            AddCellText(custTable.Columns[i].Values[path]);
-                        else
-                            AddCellText("");
-                    }
-
-                }
+                CustomData.GenerateTableRowCells("Delegations list", path);
                 AddEndRow();
             }
             AddEndTable();
-            foreach (HealthcheckDelegationData delegation in Report.Delegations)
-            {
-                int dcPathPos = delegation.DistinguishedName.IndexOf(",DC=");
-                string path = delegation.DistinguishedName;
-                if (dcPathPos > 0)
-                    path = delegation.DistinguishedName.Substring(0, dcPathPos);
-                AddTableKeyModal(custTable, path);
-            }
+            CustomData.GenerateTableKeyModals("Delegations list", Report.Delegations,
+                item => item.DistinguishedName.IndexOf(",DC=") > 0 ?
+                item.DistinguishedName.Substring(0, item.DistinguishedName.IndexOf(",DC=")) :
+                item.DistinguishedName);
         }
 
         private void GenerateAdminGroupsDetail(List<HealthCheckGroupMemberData> members)
@@ -1751,14 +1376,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             GenerateCompromissionGraphIndirectLinksInformation();
             GenerateCompromissionGraphDetailedAnalysis();
             GenerateCompromissionGraphJasonOutput();
-            if (CustomData != null)
-            {
-                if (CustomData.GetSection("ControlPathsAnalysis", out var section))
-                {
-                    GenerateAdvancedCustomSection(section);
-                    CustomData.InformationSections.Remove(section);
-                }
-            }
+            CustomData.GenerateAdvancedSection("ControlPathsAnalysis");
         }
 
         protected void GenerateCompromissionGraphDependanciesInformation()
@@ -1768,7 +1386,6 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             AddParagraph("This analysis focuses on accounts found in control path and located in other domains.");
             if (Report.ControlPaths.Dependancies == null || Report.ControlPaths.Dependancies.Count == 0)
             {
-                AddParagraph("No operative link with other domains has been found.");
                 AddParagraph("No operative link with other domains has been found.");
                 return;
             }
@@ -1786,20 +1403,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 numTypology++;
             }
 
-            CustomTable custTable = null;
-            if (CustomData != null)
-            {
-                if (CustomData.GetTable("Compromission graph dependancies list", out custTable))
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                            AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip, rowspan: 2);
-                        else
-                            AddHeaderText(custTable.Columns[i].Header, rowspan: 2);
-                    }
-                }
-            }
+            CustomData.GenerateTableHeaders("Compromission graph dependancies list");
             AddEndRow();
             AddBeginRow();
             for (int i = 0; i < numTypology; i++)
@@ -1813,15 +1417,8 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             {
                 AddBeginRow();
                 //Add("<td class='text'>");
-                if (GetUrlCallback == null)
-                {
-                    AddTableKeyCell(custTable, ReportHelper.Encode(header.FQDN));
-                }
-                else
-                {
-                    var urlCallBack = GetUrlCallback(header.Domain, !string.IsNullOrEmpty(header.FQDN) ? header.FQDN : header.Netbios);
-                    AddTableKeyCell(custTable, urlCallBack);
-                }
+                CustomData.AddTableKeyCell("Compromission graph dependancies list", GetUrlCallback == null ?
+                    ReportHelper.Encode(header.FQDN) : GetUrlCallback(header.Domain, !string.IsNullOrEmpty(header.FQDN) ? header.FQDN : header.Netbios));
                 //Add("</td>");
                 AddCellText(header.Netbios);
                 AddCellText(header.Sid);
@@ -1845,32 +1442,17 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                         AddCellNum(0, true);
                     }
                 }
-                if (custTable != null)
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (custTable.Columns[i].Values.ContainsKey(header.FQDN))
-                            AddCellText(custTable.Columns[i].Values[header.FQDN]);
-                        else
-                            AddCellText("");
-                    }
-                    
-                }
+                CustomData.GenerateTableRowCells("Compromission graph dependancies list", header.FQDN);
                 AddEndRow();
             }
             AddEndTable();
-            foreach (var header in Report.ControlPaths.Dependancies)
-            {
-                if (GetUrlCallback == null)
-                {
-                    AddTableKeyModal(custTable, ReportHelper.Encode(header.FQDN));
-                }
-                else
-                {
-                    var urlCallBack = GetUrlCallback(header.Domain, !string.IsNullOrEmpty(header.FQDN) ? header.FQDN : header.Netbios);
-                    AddTableKeyModal(custTable, urlCallBack);
-                }
-            }
+            CustomData.GenerateTableKeyModals("Compromission graph dependancies list", Report.ControlPaths.Dependancies, 
+                item => ReportHelper.Encode(item.FQDN),
+                item => GetUrlCallback == null);
+
+            CustomData.GenerateTableKeyModals("Compromission graph dependancies list", Report.ControlPaths.Dependancies, 
+                item => GetUrlCallback(item.Domain, !string.IsNullOrEmpty(item.FQDN) ? item.FQDN : item.Netbios),
+                item => GetUrlCallback != null);
         }
 
         protected void GenerateCompromissionGraphIndirectLinksInformation()
@@ -1889,25 +1471,12 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             AddHeaderText("Max number of indirect numbers", "Indicates the maximum on all objects of the number of users having indirect access to the object.");
             AddHeaderText("Max ratio", "Indicates in percentage the value of (number of indirect users / number of direct users) if at least one direct users exists. Else the value is zero.");
 
-            CustomTable custTable = null;
-            if (CustomData != null)
-            {
-                if (CustomData.GetTable("Compromission Grapth Indirect links list", out custTable))
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                            AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                        else
-                            AddHeaderText(custTable.Columns[i].Header);
-                    }
-                }
-            }
+            CustomData.GenerateTableHeaders("Compromission Grapth Indirect links list");
             AddBeginTableData();
             foreach (var objectRisk in (CompromiseGraphDataObjectRisk[])Enum.GetValues(typeof(CompromiseGraphDataObjectRisk)))
             {
                 AddBeginRow();
-                AddTableKeyCell(custTable, ReportHelper.GetEnumDescription(objectRisk), "header");
+                CustomData.AddTableKeyCell("Compromission Grapth Indirect links list", ReportHelper.GetEnumDescription(objectRisk), "header");
                 bool found = false;
                 foreach (var analysis in Report.ControlPaths.AnomalyAnalysis)
                 {
@@ -1927,21 +1496,13 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     AddCellNum(0, true);
                     AddCellNum(0, true);
                 }
-                if (custTable != null)
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (custTable.Columns[i].Values.ContainsKey(ReportHelper.GetEnumDescription(objectRisk).ToString()))
-                            AddCellText(custTable.Columns[i].Values[ReportHelper.GetEnumDescription(objectRisk).ToString()]);
-                        else
-                            AddCellText("");
-                    }
-                }
+                CustomData.GenerateTableRowCells("Compromission Grapth Indirect links list", ReportHelper.GetEnumDescription(objectRisk).ToString());
                 AddEndRow();
             }
             AddEndTable();
-            foreach (var objectRisk in (CompromiseGraphDataObjectRisk[])Enum.GetValues(typeof(CompromiseGraphDataObjectRisk)))
-                AddTableKeyModal(custTable, ReportHelper.GetEnumDescription(objectRisk));
+            CustomData.GenerateTableKeyModals("Compromission Grapth Indirect links list",
+                (CompromiseGraphDataObjectRisk[])Enum.GetValues(typeof(CompromiseGraphDataObjectRisk))
+                , item => ReportHelper.GetEnumDescription(item));
         }
 
         private void GenerateCompromissionGraphDetailedAnalysis()
@@ -1974,34 +1535,14 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 AddHeaderText("Number of unresolved members (removed?)", "Indicates the number of local user accounts. Foreign users or groups are excluded.");
                 AddHeaderText("Link with other domains");
                 AddHeaderText("Detail");
-                if (CustomData != null)
-                {
-                    if (CustomData.GetTable("Summary of group", out var custTable3))
-                    {
-                        for (int i = 1; i < custTable3.Columns.Count; i++)
-                        {
-                            if (!string.IsNullOrEmpty(custTable3.Columns[i].Tooltip))
-                                AddHeaderText(custTable3.Columns[i].Header, custTable3.Columns[i].Tooltip);
-                            else
-                                AddHeaderText(custTable3.Columns[i].Header);
-                        }
-                    }
-                }
+                CustomData.GenerateTableHeaders("Summary of group");
                 AddBeginTableData();
                 foreach (var i in line.Keys)
                 {
                     GenerateSummary(i, line[i]);
                 }
                 AddEndTable();
-                if(CustomData.GetTable("Summary of group", out var custTable))
-                {
-                    foreach (var i in line.Keys)
-                    {
-                        AddTableKeyCell(custTable, line[i].Description);
-                    }
-                }
-
-                
+                CustomData.AddTableKeyCellIteration("Summary of group", line.Keys, item => line[item].Description);           
             }
 
             for (int i = 0; i < Report.ControlPaths.Data.Count; i++)
@@ -2017,10 +1558,9 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 
         private void GenerateSummary(int index, SingleCompromiseGraphData data)
         {
-            CustomData.GetTable("Summary of group", out var custTable);
-
+            CustomData.GetTable("Summary of group", out _);
             AddBeginRow();
-            AddTableKeyCell(custTable, data.Description);
+            CustomData.AddTableKeyCell("Summary of group", data.Description);
             AddCellText(ReportHelper.GetEnumDescription(data.ObjectRisk));
             bool isAGroup = true;
             foreach (var node in data.Nodes)
@@ -2135,17 +1675,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 Add(@""" data-toggle=""modal"">Analysis");
                 Add(@"</a></td>");
             }
-            if (custTable != null)
-            {
-                for (int i = 1; i < custTable.Columns.Count; i++)
-                {
-                    if (custTable.Columns[i].Values.ContainsKey(data.Description))
-                        AddCellText(custTable.Columns[i].Values[data.Description]);
-                    else
-                        AddCellText("");
-                }
-                
-            }
+            CustomData.GenerateTableRowCells("Summary of group", data.Description);
             AddEndRow();
         }
 
@@ -2510,20 +2040,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 true);
             AddHeaderText("Creation", "Indicates creation date of the underlying AD object");
             AddHeaderText("Is Active ?", "The account used to store the secret should be modified every 30 days if it is active. It indicates if a change occured during the last 40 days");
-            CustomTable custTable = null;
-            if (CustomData != null)
-            {
-                if (CustomData.GetTable("Trusts list", out custTable))
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                            AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                        else
-                            AddHeaderText(custTable.Columns[i].Header);
-                    }
-                }
-            }
+            CustomData.GenerateTableHeaders("Trusts list");
             AddBeginTableData();
 
             foreach (HealthCheckTrustData trust in Report.Trusts)
@@ -2550,14 +2067,9 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 }
                 AddBeginRow();
                 //Add(@"<td class='text'>");
-                if (GetUrlCallback == null)
-                {
-                    AddTableKeyCell(custTable, ReportHelper.Encode(trust.TrustPartner), tooltip: $"SID: {sid}<br>Netbios: {netbios}");
-                }
-                else
-                {
-                    AddTableKeyCell(custTable, ReportHelper.Encode(GetUrlCallback(trust.Domain, trust.TrustPartner)));
-                }
+                CustomData.AddTableKeyCell("Trusts list",
+                    GetUrlCallback == null ? ReportHelper.Encode(trust.TrustPartner) : ReportHelper.Encode(GetUrlCallback(trust.Domain, trust.TrustPartner)),
+                    tooltip: GetUrlCallback == null ? $"SID: {sid}<br>Netbios: {netbios}" : "");
                 //Add(@"</td>");
                 AddCellText(TrustAnalyzer.GetTrustType(trust.TrustType));
                 AddCellText(TrustAnalyzer.GetTrustAttribute(trust.TrustAttributes));
@@ -2569,30 +2081,13 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 Add("</td>");
                 AddCellDate(trust.CreationDate);
                 AddCellText((trust.IsActive ? "TRUE" : "FALSE"), true, trust.IsActive);
-                if (custTable != null)
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (custTable.Columns[i].Values.ContainsKey(trust.TrustPartner))
-                            AddCellText(custTable.Columns[i].Values[trust.TrustPartner]);
-                        else
-                            AddCellText("");
-                    }
-                }
+                CustomData.GenerateTableRowCells("Trusts list", trust.TrustPartner);
                 AddEndRow();
             }
             AddEndTable();
-            foreach (HealthCheckTrustData trust in Report.Trusts)
-            {
-                if (GetUrlCallback == null)
-                {
-                    AddTableKeyModal(custTable, ReportHelper.Encode(trust.TrustPartner));
-                }
-                else
-                {
-                    AddTableKeyModal(custTable, ReportHelper.Encode(GetUrlCallback(trust.Domain, trust.TrustPartner)));
-                }
-            }
+
+            CustomData.GenerateTableKeyModals("Trusts list", Report.Trusts, item => ReportHelper.Encode(item.TrustPartner), item => GetUrlCallback == null);
+            CustomData.GenerateTableKeyModals("Trusts list", Report.Trusts, item => ReportHelper.Encode(GetUrlCallback(item.Domain, item.TrustPartner)), item => GetUrlCallback != null);
             GenerateSubSection("Reachable Domains");
 			AddParagraph("These are the domains that RisX was able to detect but which is not releated to direct trusts. It may be children of a forest or bastions.");
 			AddBeginTable("Reachable domains list");
@@ -2600,20 +2095,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 			AddHeaderText("Discovered using");
 			AddHeaderText("Netbios");
 			AddHeaderText("Creation date");
-            custTable = null;
-            if (CustomData != null)
-            {
-                if (CustomData.GetTable("Reachable domains list", out custTable))
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                            AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                        else
-                            AddHeaderText(custTable.Columns[i].Header);
-                    }
-                }
-            }
+            CustomData.GenerateTableHeaders("Reachable domains list");
             AddBeginTableData();
 
             foreach (HealthCheckTrustData trust in Report.Trusts)
@@ -2630,14 +2112,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 {
                     AddBeginRow();
                     //Add(@"<td class='text'>");
-                    if (GetUrlCallback == null)
-                    {
-                        AddTableKeyCell(custTable, ReportHelper.Encode(di.DnsName));
-                    }
-                    else
-                    {
-                        AddTableKeyCell(custTable, GetUrlCallback(di.Domain, di.DnsName));
-                    }
+                    CustomData.AddTableKeyCell("Reachable domains list", GetUrlCallback == null ? ReportHelper.Encode(di.DnsName) : GetUrlCallback(di.Domain, di.DnsName));
                     //Add(@"</td><td class='text'>");
                     Add(@"<td class='text'>");
                     if (GetUrlCallback == null)
@@ -2660,16 +2135,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                         Add(di.CreationDate);
                     }
                     Add(@"</td>");
-                    if (custTable != null)
-                    {
-                        for (int i = 1; i < custTable.Columns.Count; i++)
-                        {
-                            if (custTable.Columns[i].Values.ContainsKey(di.DnsName))
-                                AddCellText(custTable.Columns[i].Values[di.DnsName]);
-                            else
-                                AddCellText("");
-                        }
-                    }
+                    CustomData.GenerateTableRowCells("Reachable domains list", di.DnsName);
                     AddEndRow();
                 }
             }
@@ -2679,28 +2145,12 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 {
                     AddBeginRow();
                     //Add(@"<td class='text'>");
-                    if (GetUrlCallback == null)
-                    {
-                        AddTableKeyCell(custTable, ReportHelper.Encode(di.DnsName));
-                    }
-                    else
-                    {
-                        AddTableKeyCell(custTable, GetUrlCallback(di.Domain, di.DnsName));
-                    }
+                    CustomData.AddTableKeyCell("Reachable domains list", GetUrlCallback == null ? ReportHelper.Encode(di.DnsName) : GetUrlCallback(di.Domain, di.DnsName));
                     //Add(@"</td>");
                     AddCellText("Unknown");
                     AddCellText(di.NetbiosName);
                     AddCellText("Unknown");
-                    if (custTable != null)
-                    {
-                        for (int i = 1; i < custTable.Columns.Count; i++)
-                        {
-                            if (custTable.Columns[i].Values.ContainsKey(di.DnsName))
-                                AddCellText(custTable.Columns[i].Values[di.DnsName]);
-                            else
-                                AddCellText("");
-                        }
-                    }
+                    CustomData.GenerateTableRowCells("Reachable domains list", di.DnsName);
                     AddEndRow();
                 }
             }
@@ -2716,32 +2166,11 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     return String.Compare(a.DnsName, b.DnsName);
                 }
                 );
-                foreach (HealthCheckTrustDomainInfoData di in trust.KnownDomains)
-                {
-                    if (GetUrlCallback == null)
-                    {
-                        AddTableKeyModal(custTable, ReportHelper.Encode(di.DnsName));
-                    }
-                    else
-                    {
-                        AddTableKeyModal(custTable, GetUrlCallback(di.Domain, di.DnsName));
-                    }
-                }
+                CustomData.GenerateTableKeyModals("Reachable domains list", trust.KnownDomains,
+                    item => ReportHelper.Encode(item.DnsName), item => GetUrlCallback(item.Domain, item.DnsName), GetUrlCallback == null);
             }
-            if (Report.ReachableDomains != null)
-            {
-                foreach (HealthCheckTrustDomainInfoData di in Report.ReachableDomains)
-                {
-                    if (GetUrlCallback == null)
-                    {
-                        AddTableKeyModal(custTable, ReportHelper.Encode(di.DnsName));
-                    }
-                    else
-                    {
-                        AddTableKeyModal(custTable, GetUrlCallback(di.Domain, di.DnsName));
-                    }
-                }
-            }
+            CustomData.GenerateTableKeyModals("Reachable domains list", Report.ReachableDomains,
+                item => ReportHelper.Encode(item.DnsName), item => GetUrlCallback(item.Domain, item.DnsName), GetUrlCallback == null);
 
             if (Report.AzureADSSOLastPwdChange != DateTime.MinValue)
             {
@@ -2757,15 +2186,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 		</div></div>
 ");
             }
-
-            if (CustomData != null)
-            {
-                if (CustomData.GetSection("TrustsInformation", out var section))
-                {
-                    GenerateAdvancedCustomSection(section);
-                    CustomData.InformationSections.Remove(section);
-                }
-            }
+            CustomData.GenerateAdvancedSection("TrustsInformation");
         }
         #endregion trust
 
@@ -2858,20 +2279,7 @@ Here is the list of servers configured for WEF found in GPO</p>
                                 AddHeaderText("GPO Name");
                                 AddHeaderText("Order");
                                 AddHeaderText("Server");
-                                CustomTable custTable = null;
-                                if (CustomData != null)
-                                {
-                                    if (CustomData.GetTable("WEF list", out custTable))
-                                    {
-                                        for (int i = 1; i < custTable.Columns.Count; i++)
-                                        {
-                                            if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                                                AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                                            else
-                                                AddHeaderText(custTable.Columns[i].Header);
-                                        }
-                                    }
-                                }
+                                CustomData.GenerateTableHeaders("WEF list");
                                 AddBeginTableData();
 
                                 // descending sort
@@ -2889,25 +2297,14 @@ Here is the list of servers configured for WEF found in GPO</p>
                                 foreach (var info in Report.GPOEventForwarding)
                                 {
                                     AddBeginRow();
-                                    AddTableKeyCell(custTable, info.GPOName);
+                                    CustomData.AddTableKeyCell("WEF list", info.GPOName);
                                     AddCellNum(info.Order);
                                     AddCellText(info.Server);
-                                    if (custTable != null)
-                                    {
-                                        for (int i = 1; i < custTable.Columns.Count; i++)
-                                        {
-                                            if (custTable.Columns[i].Values.ContainsKey(info.GPOName))
-                                                AddCellText(custTable.Columns[i].Values[info.GPOName]);
-                                            else
-                                                AddCellText("");
-                                        }
-                                        
-                                    }
+                                    CustomData.GenerateTableRowCells("WEF list", info.GPOName);
                                     AddEndRow();
                                 }
                                 AddEndTable();
-                                foreach (var info in Report.GPOEventForwarding)
-                                    AddTableKeyModal(custTable, info.GPOName);
+                                CustomData.GenerateTableKeyModals("WEF list", Report.GPOEventForwarding, item => item.GPOName);
                             });
                     });
                 Add(@"
@@ -2991,49 +2388,20 @@ Hackers can then perform a reconnaissance of the environement with only a networ
                                 {
                                     AddBeginTable("Null session list");
                                     AddHeaderText("Domain Controller");
-                                    CustomTable custTable2 = null;
-                                    if (CustomData != null)
-                                    {
-                                        if (CustomData.GetTable("Null session list", out custTable2))
-                                        {
-                                            for (int i = 1; i < custTable2.Columns.Count; i++)
-                                            {
-                                                if (!string.IsNullOrEmpty(custTable2.Columns[i].Tooltip))
-                                                    AddHeaderText(custTable2.Columns[i].Header, custTable2.Columns[i].Tooltip);
-                                                else
-                                                    AddHeaderText(custTable2.Columns[i].Header);
-                                            }
-                                        }
-                                    }
+                                    CustomData.GenerateTableHeaders("Null session list");
                                     AddBeginTableData();
                                     foreach (var DC in Report.DomainControllers)
                                     {
                                         if (DC.HasNullSession)
                                         {
                                             AddBeginRow();
-                                            AddTableKeyCell(custTable2, DC.DCName);
-                                            if (custTable2 != null)
-                                            {
-                                                for (int i = 1; i < custTable2.Columns.Count; i++)
-                                                {
-                                                    if (custTable2.Columns[i].Values.ContainsKey(DC.DCName))
-                                                        AddCellText(custTable2.Columns[i].Values[DC.DCName]);
-                                                    else
-                                                        AddCellText("");
-                                                }
-                                                
-                                            }
+                                            CustomData.AddTableKeyCell("Null session list", DC.DCName);
+                                            CustomData.GenerateTableRowCells("Null session list", DC.DCName);
                                             AddEndRow();
                                         }
                                     }
                                     AddEndTable();
-                                    foreach (var DC in Report.DomainControllers)
-                                    {
-                                        if (DC.HasNullSession)
-                                        {
-                                            AddTableKeyModal(custTable2, DC.DCName);
-                                        }
-                                    }
+                                    CustomData.GenerateTableKeyModals("Null session list", Report.DomainControllers, item => item.DCName, item => item.HasNullSession);
                                 }
                             );
                         }
@@ -3069,20 +2437,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 AddBeginTable("Logon script list");
                 AddHeaderText("Script Name");
                 AddHeaderText("Count");
-                CustomTable custTable = null;
-                if (CustomData != null)
-                {
-                    if (CustomData.GetTable("Logon script list", out custTable))
-                    {
-                        for (int i = 1; i < custTable.Columns.Count; i++)
-                        {
-                            if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                                AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                            else
-                                AddHeaderText(custTable.Columns[i].Header);
-                        }
-                    }
-                }
+                CustomData.GenerateTableHeaders("Logon script list");
                 AddBeginTableData();
                 // descending sort
                 Report.LoginScript.Sort(
@@ -3098,21 +2453,11 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 {
                     AddBeginRow();
                     if (!string.IsNullOrEmpty(script.LoginScript.Trim()))
-                        AddTableKeyCell(custTable, script.LoginScript);
+                        CustomData.AddTableKeyCell("Logon script list", script.LoginScript);
                     else
                         AddCellText("<spaces>");
                     AddCellNum(script.NumberOfOccurence);
-                    if (custTable != null)
-                    {
-                        for (int i = 1; i < custTable.Columns.Count; i++)
-                        {
-                            if (custTable.Columns[i].Values.ContainsKey(script.LoginScript.Trim()))
-                                AddCellText(custTable.Columns[i].Values[script.LoginScript.Trim()]);
-                            else
-                                AddCellText("");
-                        }
-                        
-                    }
+                    CustomData.GenerateTableRowCells("Logon script list", script.LoginScript.Trim());
                     AddEndRow();
                     number++;
                     if (number >= MaxNumberUsersInHtmlReport)
@@ -3133,12 +2478,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
 		</div>
 	</div>
 ");
-
-                foreach (HealthcheckLoginScriptData script in Report.LoginScript)
-                {
-                    if (!string.IsNullOrEmpty(script.LoginScript.Trim()))
-                        AddTableKeyModal(custTable, script.LoginScript);
-                }
+                CustomData.GenerateTableKeyModals("Logon script list", Report.LoginScript, item => item.LoginScript, item => !string.IsNullOrEmpty(item.LoginScript.Trim()));
                 // certificate
                 GenerateSubSection("Certificates", "certificates");
                 Add(@"
@@ -3165,20 +2505,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                                 AddHeaderText("Module size");
                                 AddHeaderText("Signature Alg");
                                 AddHeaderText("SC Logon");
-                                custTable = null;
-                                if (CustomData != null)
-                                {
-                                    if (CustomData.GetTable("Certificates list", out custTable))
-                                    {
-                                        for (int i = 1; i < custTable.Columns.Count; i++)
-                                        {
-                                            if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                                                AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                                            else
-                                                AddHeaderText(custTable.Columns[i].Header);
-                                        }
-                                    }
-                                }
+                                CustomData.GenerateTableHeaders("Certificates list");
                                 AddBeginTableData();
 
                                 foreach (HealthcheckCertificateData data in Report.TrustedCertificates)
@@ -3210,11 +2537,16 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                                     AddBeginRow();
                                     if (data.Source == "NTLMStore")
                                     {
-                                        AddTableKeyCell(custTable, "Enterprise NTAuth", "This store is used by the Windows PKI. You can view it with the command 'certutil -viewstore -enterprise NTAuth' or edit it with the command 'Manage AD Container' of the 'Enterprise PKI' snapin of mmc.");
+                                        Add("<td class='text'>");
+                                        Add(@"Enterprise NTAuth");
+                                        AddBeginTooltip();
+                                        Add("This store is used by the Windows PKI. You can view it with the command 'certutil -viewstore -enterprise NTAuth' or edit it with the command 'Manage AD Container' of the 'Enterprise PKI' snapin of mmc.");
+                                        AddEndTooltip();
+                                        Add(@"</td>");
                                     }
                                     else
                                     {
-                                        AddTableKeyCell(custTable, data.Source);
+                                        CustomData.AddTableKeyCell("Certificates list", data.Source);
                                     }
                                     AddCellText(data.Store);
                                     AddCellTextNoWrap(cert.Subject);
@@ -3224,30 +2556,13 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                                     AddCellNum(modulesize);
                                     AddCellText(cert.SignatureAlgorithm.FriendlyName);
                                     AddCellText(SCLogonAllowed.ToString());
-                                    if (custTable != null)
-                                    {
-                                        for (int i = 1; i < custTable.Columns.Count; i++)
-                                        {
-                                            if (custTable.Columns[i].Values.ContainsKey(data.Source))
-                                                AddCellText(custTable.Columns[i].Values[data.Source]);
-                                            else
-                                                AddCellText("");
-                                        }
-                                    }
+                                    CustomData.GenerateTableRowCells("Certificates list", data.Source);
                                     AddEndRow();
                                 }
                                 AddEndTable();
-                                foreach (HealthcheckCertificateData data in Report.TrustedCertificates)
-                                {
-                                    if (data.Source == "NTLMStore")
-                                    {
-                                        AddTableKeyModal(custTable, "Enterprise NTAuth");
-                                    }
-                                    else
-                                    {
-                                        AddTableKeyModal(custTable, data.Source);
-                                    }
-                                }
+
+                                CustomData.GenerateTableKeyModals("Certificates list", Report.TrustedCertificates, item => "Enterprise NTAuth", item => item.Source == "NTLMStore");
+                                CustomData.GenerateTableKeyModals("Certificates list", Report.TrustedCertificates, item => item.Source, item => item.Source != "NTLMStore");
                             }
                         );
                     }
@@ -3269,52 +2584,21 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
 		</div>");
                     AddBeginTable("LDAP forbidden list");
                     AddHeaderText("Entry");
-                    custTable = null;
-                    if (CustomData != null)
-                    {
-                        if (CustomData.GetTable("LDAP forbidden list", out custTable))
-                        {
-                            for (int i = 1; i < custTable.Columns.Count; i++)
-                            {
-                                if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                                    AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                                else
-                                    AddHeaderText(custTable.Columns[i].Header);
-                            }
-                        }
-                    }
+                    CustomData.GenerateTableHeaders("LDAP forbidden list");
                     AddBeginTableData();
                     foreach (var e in Report.lDAPIPDenyList)
                     {
                         AddBeginRow();
-                        AddTableKeyCell(custTable, e);
-                        if (custTable != null)
-                        {
-                            for (int i = 1; i < custTable.Columns.Count; i++)
-                            {
-                                if (custTable.Columns[i].Values.ContainsKey(e))
-                                    AddCellText(custTable.Columns[i].Values[e]);
-                                else
-                                    AddCellText("");
-                            }
-                        }
+                        CustomData.AddTableKeyCell("LDAP forbidden list", e);
+                        CustomData.GenerateTableRowCells("LDAP forbidden list", e);
                         AddEndRow();
                     }
                     AddEndTable();
-                    foreach (var e in Report.lDAPIPDenyList)
-                        AddTableKeyModal(custTable, e);
+                    CustomData.GenerateTableKeyModals("LDAP forbidden list", Report.lDAPIPDenyList, item => item);
                 }
 
             }
-
-            if (CustomData != null)
-            {
-                if (CustomData.GetSection("Anomalies", out var section))
-                {
-                    GenerateAdvancedCustomSection(section);
-                    CustomData.InformationSections.Remove(section);
-                }
-            }
+            CustomData.GenerateAdvancedSection("Anomalies");
         }
         #endregion anomaly
 
@@ -3335,27 +2619,14 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
             AddHeaderText("Lockout Threshold");
             AddHeaderText("Lockout Duration");
             AddHeaderText("Reset account counter locker after");
-            CustomTable custTable = null;
-            if (CustomData != null)
-            {
-                if (CustomData.GetTable("Password policies list", out custTable))
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                            AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                        else
-                            AddHeaderText(custTable.Columns[i].Header);
-                    }
-                }
-            }
+            CustomData.GenerateTableHeaders("Password policies list");
             AddBeginTableData();
             if (Report.GPPPasswordPolicy != null)
             {
                 foreach (GPPSecurityPolicy policy in Report.GPPPasswordPolicy)
                 {
                     AddBeginRow();
-                    AddGPOTableKeyCell(custTable, policy);
+                    CustomData.AddGPOTableKeyCell("Password policies list", policy, Report.GPOInfoDic);
                     AddPSOStringValue(policy, "PasswordComplexity");
                     AddPSOStringValue(policy, "MaximumPasswordAge");
                     AddPSOStringValue(policy, "MinimumPasswordAge");
@@ -3365,25 +2636,12 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddPSOStringValue(policy, "LockoutBadCount");
                     AddPSOStringValue(policy, "LockoutDuration");
                     AddPSOStringValue(policy, "ResetLockoutCount");
-                    if (custTable != null)
-                    {
-                        for (int i = 1; i < custTable.Columns.Count; i++)
-                        {
-                            if (custTable.Columns[i].Values.ContainsKey(policy.GPOName))
-                                AddCellText(custTable.Columns[i].Values[policy.GPOName]);
-                            else
-                                AddCellText("");
-                        }
-                    }
+                    CustomData.GenerateTableRowCells("Password policies list", policy.GPOName);
                     AddEndRow();
                 }
             }
             AddEndTable();
-            if (Report.GPPPasswordPolicy != null)
-            {
-                foreach (GPPSecurityPolicy policy in Report.GPPPasswordPolicy)
-                    AddTableKeyModal(custTable, ReportHelper.Encode(policy.GPOName));
-            }
+            CustomData.GenerateTableKeyModals("Password policies list", Report.GPPPasswordPolicy, item => item.GPOName);
 
             GenerateSubSection("Screensaver policies");
             AddParagraph("This is the settings related to screensavers stored in Group Policies. Each non compliant setting is written in red.");
@@ -3393,58 +2651,25 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
             AddHeaderText("Password request");
             AddHeaderText("Start after (seconds)");
             AddHeaderText("Grace Period (seconds)");
-            custTable = null;
-            if (CustomData != null)
-            {
-                if (CustomData.GetTable("Screensaver policies list", out custTable))
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                            AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                        else
-                            AddHeaderText(custTable.Columns[i].Header);
-                    }
-                }
-            }
+            CustomData.GenerateTableHeaders("Screensaver policies list");
             AddBeginTableData();
             if (Report.GPOScreenSaverPolicy != null)
             {
                 foreach (GPPSecurityPolicy policy in Report.GPOScreenSaverPolicy)
                 {
                     AddBeginRow();
-                    AddGPOTableKeyCell(custTable, policy);
+                    CustomData.AddGPOTableKeyCell("Screensaver policies list", policy, Report.GPOInfoDic);
                     AddPSOStringValue(policy, "ScreenSaveActive");
                     AddPSOStringValue(policy, "ScreenSaverIsSecure");
                     AddPSOStringValue(policy, "ScreenSaveTimeOut");
                     AddPSOStringValue(policy, "ScreenSaverGracePeriod");
-                    if (custTable != null)
-                    {
-                        for (int i = 1; i < custTable.Columns.Count; i++)
-                        {
-                            if (custTable.Columns[i].Values.ContainsKey(policy.GPOName))
-                                AddCellText(custTable.Columns[i].Values[policy.GPOName]);
-                            else
-                                AddCellText("");
-                        }
-                    }
+                    CustomData.GenerateTableRowCells("Screensaver policies list", policy.GPOName);
                     AddEndRow();
                 }
             }
             AddEndTable();
-            if (Report.GPOScreenSaverPolicy != null)
-            {
-                foreach (GPPSecurityPolicy policy in Report.GPOScreenSaverPolicy)
-                    AddTableKeyModal(custTable, ReportHelper.Encode(policy.GPOName));
-            }
-            if (CustomData != null)
-            {
-                if (CustomData.GetSection("PasswordPolicies", out var section))
-                {
-                    GenerateAdvancedCustomSection(section);
-                    CustomData.InformationSections.Remove(section);
-                }
-            }
+            CustomData.GenerateTableKeyModals("Screensaver policies list", Report.GPOScreenSaverPolicy, item => ReportHelper.Encode(item.GPOName));
+            CustomData.GenerateAdvancedSection("PasswordPolicies");
         }
 
         #endregion password policies
@@ -3464,45 +2689,22 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 AddHeaderText("Password");
                 AddHeaderText("Changed");
                 AddHeaderText("Other");
-                CustomTable custTable2 = null;
-                if (CustomData != null)
-                {
-                    if (CustomData.GetTable("Obfuscated passwords list", out custTable2))
-                    {
-                        for (int i = 1; i < custTable2.Columns.Count; i++)
-                        {
-                            if (!string.IsNullOrEmpty(custTable2.Columns[i].Tooltip))
-                                AddHeaderText(custTable2.Columns[i].Header, custTable2.Columns[i].Tooltip);
-                            else
-                                AddHeaderText(custTable2.Columns[i].Header);
-                        }
-                    }
-                }
+                CustomData.GenerateTableHeaders("Obfuscated passwords list");
                 AddBeginTableData();
                 foreach (GPPPassword password in Report.GPPPassword)
                 {
                     AddBeginRow();
-                    AddGPOTableKeyCell(custTable2, password);
+                    CustomData.AddGPOTableKeyCell("Obfuscated passwords list", password, Report.GPOInfoDic);
                     AddCellText(password.Type);
                     AddCellText(password.UserName);
                     AddCellText(password.Password, true);
                     AddCellDate(password.Changed);
                     AddCellText(password.Other);
-                    if (custTable2 != null)
-                    {
-                        for (int i = 1; i < custTable2.Columns.Count; i++)
-                        {
-                            if (custTable2.Columns[i].Values.ContainsKey(password.GPOName))
-                                AddCellText(custTable2.Columns[i].Values[password.GPOName]);
-                            else
-                                AddCellText("");
-                        }
-                    }
+                    CustomData.GenerateTableRowCells("Obfuscated passwords list", password.GPOName);
                     AddEndRow();
                 }
                 AddEndTable();
-                foreach (GPPPassword password in Report.GPPPassword)
-                    AddTableKeyModal(custTable2, ReportHelper.Encode(password.GPOName));
+                CustomData.GenerateTableKeyModals("Obfuscated passwords list", Report.GPPPassword, item => ReportHelper.Encode(item.GPOName));
             }
 
             GenerateSubSection("Restricted Groups");
@@ -3523,44 +2725,20 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 AddHeaderText("GPO Name");
                 AddHeaderText("User or group");
                 AddHeaderText("Member of");
-                CustomTable custTable2 = null;
-                if (CustomData != null)
-                {
-                    if (CustomData.GetTable("Restricted groups list", out custTable2))
-                    {
-                        for (int i = 1; i < custTable2.Columns.Count; i++)
-                        {
-                            if (!string.IsNullOrEmpty(custTable2.Columns[i].Tooltip))
-                                AddHeaderText(custTable2.Columns[i].Header, custTable2.Columns[i].Tooltip);
-                            else
-                                AddHeaderText(custTable2.Columns[i].Header);
-                        }
-                    }
-                }
+                CustomData.GenerateTableHeaders("Restricted groups list");
                 AddBeginTableData();
 
                 foreach (GPOMembership membership in Report.GPOLocalMembership)
                 {
                     AddBeginRow();
-                    AddGPOTableKeyCell(custTable2, membership);
+                    CustomData.AddGPOTableKeyCell("Restricted groups list", membership, Report.GPOInfoDic);
                     AddCellText(membership.User);
                     AddCellText(membership.MemberOf);
-                    if (custTable2 != null)
-                    {
-                        for (int i = 1; i < custTable2.Columns.Count; i++)
-                        {
-                            if (custTable2.Columns[i].Values.ContainsKey(membership.GPOName))
-                                AddCellText(custTable2.Columns[i].Values[membership.GPOName]);
-                            else
-                                AddCellText("");
-                        }
-                        
-                    }
+                    CustomData.GenerateTableRowCells("Restricted groups list", membership.GPOName);
                     AddEndRow();
                 }
                 AddEndTable();
-                foreach (GPOMembership membership in Report.GPOLocalMembership)
-                    AddTableKeyModal(custTable2, ReportHelper.Encode(membership.GPOName));
+                CustomData.GenerateTableKeyModals("Restricted groups list", Report.GPOLocalMembership, item => ReportHelper.Encode(item.GPOName));
             }
 
             GenerateSubSection("Security settings", "lsasettings");
@@ -3569,20 +2747,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
             AddHeaderText("Policy Name");
             AddHeaderText("Setting");
             AddHeaderText("Value");
-            CustomTable custTable = null;
-            if (CustomData != null)
-            {
-                if (CustomData.GetTable("Security settings list", out custTable))
-                {
-                    for (int i = 1; i < custTable.Columns.Count; i++)
-                    {
-                        if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                            AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                        else
-                            AddHeaderText(custTable.Columns[i].Header);
-                    }
-                }
-            }
+            CustomData.GenerateTableHeaders("Security settings list");
             AddBeginTableData();
             if (Report.GPOLsaPolicy != null)
             {
@@ -3591,30 +2756,18 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     foreach (GPPSecurityPolicyProperty property in policy.Properties)
                     {
                         AddBeginRow();
-                        AddGPOTableKeyCell(custTable, policy);
+                        CustomData.AddGPOTableKeyCell("Security settings list", policy, Report.GPOInfoDic);
                         Add(@"<td class='text'>");
                         Add(GetLinkForLsaSetting(property.Property));
                         Add(@"</td>");
                         AddLsaSettingsValue(property.Property, property.Value);
-                        if (custTable != null)
-                        {
-                            for (int i = 1; i < custTable.Columns.Count; i++)
-                            {
-                                if (custTable.Columns[i].Values.ContainsKey(policy.GPOName))
-                                    AddCellText(custTable.Columns[i].Values[policy.GPOName]);
-                                else
-                                    AddCellText("");
-                            }
-                            
-                        }
+                        CustomData.GenerateTableRowCells("Security settings list", policy.GPOName);
                         AddEndRow();
                     }
                 }
             }
             AddEndTable();
-            foreach (GPPSecurityPolicy policy in Report.GPOLsaPolicy)
-                AddTableKeyModal(custTable, ReportHelper.Encode(policy.GPOName));
-
+            CustomData.GenerateTableKeyModals("Security settings list", Report.GPOLsaPolicy, item => ReportHelper.Encode(item.GPOName));
 
             if (Report.version >= new Version(2, 8))
             {
@@ -3629,41 +2782,18 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 AddHeaderText("Category");
                 AddHeaderText("Setting");
                 AddHeaderText("Value");
-                custTable = null;
-                if (CustomData != null)
-                {
-                    if (CustomData.GetTable("Audit settings list", out custTable))
-                    {
-                        for (int i = 1; i < custTable.Columns.Count; i++)
-                        {
-                            if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                                AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                            else
-                                AddHeaderText(custTable.Columns[i].Header);
-                        }
-                    }
-                }
+                CustomData.GenerateTableHeaders("Audit settings list");
                 AddBeginTableData();
                 if (Report.GPOAuditSimple != null)
                 {
                     foreach (var a in Report.GPOAuditSimple)
                     {
                         AddBeginRow();
-                        AddTableKeyCell(custTable, a);
+                        CustomData.AddTableKeyCell("Audit settings list", a);
                         AddCellText("[Simple Audit]");
                         AddCellText(GetAuditSimpleDescription(a.Category));
                         AddCellText(GetAuditSimpleValue(a.Value));
-                        if (custTable != null)
-                        {
-                            for (int i = 1; i < custTable.Columns.Count; i++)
-                            {
-                                if (custTable.Columns[i].Values.ContainsKey(a.GPOName))
-                                    AddCellText(custTable.Columns[i].Values[a.GPOName]);
-                                else
-                                    AddCellText("");
-                            }
-                            
-                        }
+                        CustomData.GenerateTableRowCells("Audit settings list", a.GPOName);
                         AddEndRow();
                     }
                 }
@@ -3672,39 +2802,17 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     foreach (var a in Report.GPOAuditAdvanced)
                     {
                         AddBeginRow();
-                        AddGPOTableKeyCell(custTable, a);
+                        CustomData.AddGPOTableKeyCell("Audit settings list", a, Report.GPOInfoDic);
                         AddCellText(GetAuditAdvancedCategory(a.SubCategory));
                         AddCellText(GetAuditAdvancedDescription(a.SubCategory));
                         AddCellText(GetAuditSimpleValue(a.Value));
-                        if (custTable != null)
-                        {
-                            for (int i = 1; i < custTable.Columns.Count; i++)
-                            {
-                                if (custTable.Columns[i].Values.ContainsKey(a.GPOName))
-                                    AddCellText(custTable.Columns[i].Values[a.GPOName]);
-                                else
-                                    AddCellText("");
-                            }
-                            
-                        }
+                        CustomData.GenerateTableRowCells("Audit settings list", a.GPOName);
                         AddEndRow();
                     }
                 }
                 AddEndTable();
-                if (Report.GPOAuditSimple != null)
-                {
-                    foreach (var a in Report.GPOAuditSimple)
-                    {
-                        AddTableKeyModal(custTable, ReportHelper.Encode(a.GPOName));
-                    }
-                }
-                if (Report.GPOAuditAdvanced != null)
-                {
-                    foreach (var a in Report.GPOAuditAdvanced)
-                    {
-                        AddTableKeyModal(custTable, ReportHelper.Encode(a.GPOName));
-                    }
-                }
+                CustomData.GenerateTableKeyModals("Audit settings list", Report.GPOAuditSimple, item => ReportHelper.Encode(item.GPOName));
+                CustomData.GenerateTableKeyModals("Audit settings list", Report.GPOAuditAdvanced, item => ReportHelper.Encode(item.GPOName));
             }
 
             GenerateSubSection("Privileges", "gpoprivileges");
@@ -3715,44 +2823,20 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 AddHeaderText("GPO Name");
                 AddHeaderText("Privilege");
                 AddHeaderText("Members");
-                custTable = null;
-                if (CustomData != null)
-                {
-                    if (CustomData.GetTable("Privileges list", out custTable))
-                    {
-                        for (int i = 1; i < custTable.Columns.Count; i++)
-                        {
-                            if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                                AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                            else
-                                AddHeaderText(custTable.Columns[i].Header);
-                        }
-                    }
-                }
+                CustomData.GenerateTableHeaders("Privileges list");
                 AddBeginTableData();
 
                 foreach (GPPRightAssignment right in Report.GPPRightAssignment)
                 {
                     AddBeginRow();
-                    AddGPOTableKeyCell(custTable, right);
+                    CustomData.AddGPOTableKeyCell("Privileges list", right, Report.GPOInfoDic);
                     AddCellText(right.Privilege);
                     AddCellText(right.User);
-                    if (custTable != null)
-                    {
-                        for (int i = 1; i < custTable.Columns.Count; i++)
-                        {
-                            if (custTable.Columns[i].Values.ContainsKey(right.GPOName))
-                                AddCellText(custTable.Columns[i].Values[right.GPOName]);
-                            else
-                                AddCellText("");
-                        }
-                        
-                    }
+                    CustomData.GenerateTableRowCells("Privileges list", right.GPOName);
                     AddEndRow();
                 }
                 AddEndTable();
-                foreach (GPPRightAssignment right in Report.GPPRightAssignment)
-                    AddTableKeyModal(custTable, ReportHelper.Encode(right.GPOName));
+                CustomData.GenerateTableKeyModals("Privileges list", Report.GPPRightAssignment, item => ReportHelper.Encode(item.GPOName));
             }
 
             if (Report.version >= new Version(2, 8))
@@ -3765,46 +2849,22 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddHeaderText("GPO Name");
                     AddHeaderText("Privilege");
                     AddHeaderText("Members");
-                    custTable = null;
-                    if (CustomData != null)
-                    {
-                        if (CustomData.GetTable("Login list", out custTable))
-                        {
-                            for (int i = 1; i < custTable.Columns.Count; i++)
-                            {
-                                if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                                    AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                                else
-                                    AddHeaderText(custTable.Columns[i].Header);
-                            }
-                        }
-                    }
+                    CustomData.GenerateTableHeaders("Login list");
                     AddBeginTableData();
 
                     foreach (GPPRightAssignment right in Report.GPPLoginAllowedOrDeny)
                     {
                         AddBeginRow();
-                        AddGPOTableKeyCell(custTable, right);
+                        CustomData.AddGPOTableKeyCell("Login list", right, Report.GPOInfoDic);
                         Add(@"<td class='text'>");
                         AddPrivilegeToGPO(right.Privilege);
                         Add(@"</td>");
                         AddCellText(right.User);
-                        if (custTable != null)
-                        {
-                            for (int i = 1; i < custTable.Columns.Count; i++)
-                            {
-                                if (custTable.Columns[i].Values.ContainsKey(right.GPOName))
-                                    AddCellText(custTable.Columns[i].Values[right.GPOName]);
-                                else
-                                    AddCellText("");
-                            }
-                            
-                        }
+                        CustomData.GenerateTableRowCells("Login list", right.GPOName);
                         AddEndRow();
                     }
                     AddEndTable();
-                    foreach (GPPRightAssignment right in Report.GPPLoginAllowedOrDeny)
-                        AddTableKeyModal(custTable, ReportHelper.Encode(right.GPOName));
+                    CustomData.GenerateTableKeyModals("Login list", Report.GPPLoginAllowedOrDeny, item => ReportHelper.Encode(item.GPOName));
                 }
             }
 
@@ -3818,46 +2878,22 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 AddHeaderText("Source");
                 AddHeaderText("Command line");
                 AddHeaderText("Parameters");
-                custTable = null;
-                if (CustomData != null)
-                {
-                    if (CustomData.GetTable("GPO login script list", out custTable))
-                    {
-                        for (int i = 1; i < custTable.Columns.Count; i++)
-                        {
-                            if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                                AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                            else
-                                AddHeaderText(custTable.Columns[i].Header);
-                        }
-                    }
-                }
+                CustomData.GenerateTableHeaders("GPO login script list");
                 AddBeginTableData();
 
                 foreach (HealthcheckGPOLoginScriptData loginscript in Report.GPOLoginScript)
                 {
                     AddBeginRow();
-                    AddGPOTableKeyCell(custTable, loginscript);
+                    CustomData.AddGPOTableKeyCell("GPO login script list", loginscript, Report.GPOInfoDic);
                     AddCellText(loginscript.Action);
                     AddCellText(loginscript.Source);
                     AddCellText(loginscript.CommandLine);
                     AddCellText(loginscript.Parameters);
-                    if (custTable != null)
-                    {
-                        for (int i = 1; i < custTable.Columns.Count; i++)
-                        {
-                            if (custTable.Columns[i].Values.ContainsKey(loginscript.GPOName))
-                                AddCellText(custTable.Columns[i].Values[loginscript.GPOName]);
-                            else
-                                AddCellText("");
-                        }
-                        
-                    }
+                    CustomData.GenerateTableRowCells("GPO login script list", loginscript.GPOName);
                     AddEndRow();
                 }
                 AddEndTable();
-                foreach (HealthcheckGPOLoginScriptData loginscript in Report.GPOLoginScript)
-                    AddTableKeyModal(custTable, ReportHelper.Encode(loginscript.GPOName));
+                CustomData.GenerateTableKeyModals("GPO login script list", Report.GPOLoginScript, item => ReportHelper.Encode(item.GPOName));
             }
             if (Report.version >= new Version(2, 7, 0, 0))
             {
@@ -3869,58 +2905,24 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddHeaderText("GPO Name");
                     AddHeaderText("Type");
                     AddHeaderText("File");
-                    custTable = null;
-                    if (CustomData != null)
-                    {
-                        if (CustomData.GetTable("GPO deployed files list", out custTable))
-                        {
-                            for (int i = 1; i < custTable.Columns.Count; i++)
-                            {
-                                if (!string.IsNullOrEmpty(custTable.Columns[i].Tooltip))
-                                    AddHeaderText(custTable.Columns[i].Header, custTable.Columns[i].Tooltip);
-                                else
-                                    AddHeaderText(custTable.Columns[i].Header);
-                            }
-                        }
-                    }
+                    CustomData.GenerateTableHeaders("GPO deployed files list");
                     AddBeginTableData();
 
                     foreach (var file in Report.GPPFileDeployed)
                     {
                         AddBeginRow();
-                        AddGPOTableKeyCell(custTable, file);
+                        CustomData.AddGPOTableKeyCell("GPO deployed files list", file, Report.GPOInfoDic);
                         AddCellText(file.Type);
                         AddCellText(file.FileName);
-                        if (custTable != null)
-                        {
-                            for (int i = 1; i < custTable.Columns.Count; i++)
-                            {
-                                if (custTable.Columns[i].Values.ContainsKey(file.GPOName))
-                                    AddCellText(custTable.Columns[i].Values[file.GPOName]);
-                                else
-                                    AddCellText("");
-                            }
-                            
-                        }
+                        CustomData.GenerateTableRowCells("GPO deployed files list", file.GPOName);
                         AddEndRow();
                     }
                     AddEndTable();
 
-                    foreach(var file in Report.GPPFileDeployed)
-                    {
-                        AddTableKeyModal(custTable, ReportHelper.Encode(file.GPOName));
-                    }
+                    CustomData.GenerateTableKeyModals("GPO deployed files list", Report.GPPFileDeployed, item => ReportHelper.Encode(item.GPOName));
                 }
             }
-
-            if (CustomData != null)
-            {
-                if (CustomData.GetSection("GPOInformation", out var section))
-                {
-                    GenerateAdvancedCustomSection(section);
-                    CustomData.InformationSections.Remove(section);
-                }
-            }
+            CustomData.GenerateAdvancedSection("GPOInformation");
         }
 
         private string GetAuditSimpleDescription(string category)
@@ -4206,283 +3208,15 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
 
         #region Custom Methods
 
-        private void AddTableKeyModal(CustomTable custTable, object cellValue)
+        public void SetCustomData(CustomHealthCheckData customData)
         {
-            try
-            {
-                if (cellValue == null)
-                    return;
-                string value = cellValue.ToString();
-                if (custTable != null && custTable.GetKeyLinkedSection(value, out var targetSection))
-                {
-                    AddBeginModal(GenerateModalAdminGroupIdFromGroupName(targetSection.Id), targetSection.Name, ShowModalType.XL);
-                    GenerateAdvancedCustomSection(targetSection);
-                    AddEndModal();
-                }
-                else if (custTable != null && custTable.GetNestedTable(value, CustomData.CustomDelimiter, out var targetTable))
-                {
-                    AddBeginModal(GenerateModalAdminGroupIdFromGroupName($"table_{value}"), value, ShowModalType.XL);
-                    AddCustomTableHtml(targetTable);
-                    AddEndModal();
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Problem on 'AddTableKeyModal' method on 'ReportHealthCheckSingle':");
-                Console.WriteLine(e);
-            }
+            CustomData = customData != null ? customData : CustomHealthCheckData.CreateEmpty();
+            CustomData.SetRefsManager(
+                new CustomMethodsReferenceManager(AddHeaderText, AddCellText, Add, AddGPOName, AddEncoded, AddCellNum, AddCellNumScore,
+                AddBeginModal, GenerateModalAdminGroupIdFromGroupName, AddEndModal, AddBeginTooltip, AddEndTooltip,
+                AddBeginTable, AddBeginTableData, AddBeginRow, AddEndRow, AddEndTable,
+                 GenerateSection, GenerateSubSection, GenerateSubIndicator, GenerateSubIndicator, GenerateAdvancedIndicatorPanel, AddParagraph, null));
         }
-
-        private void AddTableKeyCell(CustomTable custTable, object cellValue, string valueType = "string", string tooltip = null)
-        {
-            try
-            {
-                if (cellValue == null)
-                {
-                    AddCellText("");
-                    return;
-                }
-                string value = cellValue.ToString();
-                if (custTable != null && custTable.GetKeyLinkedSection(value, out var targetSection))
-                {
-                    Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                    Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                    Add(@""">");
-                    AddEncoded(value);
-                    Add("</a>");
-                    AddCustomTooltip(tooltip);
-                    Add("</td>");
-                }
-                else if (custTable != null && custTable.GetNestedTable(value, CustomData.CustomDelimiter, out var targetTable))
-                {
-                    Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                    Add(GenerateModalAdminGroupIdFromGroupName($"table_{value}"));
-                    Add(@""">");
-                    AddEncoded(value);
-                    Add("</a>");
-                    AddCustomTooltip(tooltip);
-                    Add("</td>");
-                }
-                else
-                {
-                    switch (valueType)
-                    {
-                        case "string":
-                            AddCellText(value, tooltip: tooltip);
-                            break;
-                        case "number":
-                            AddCellNum((int)cellValue);
-                            break;
-                        case "header":
-                            AddHeaderText(value);
-                            break;
-                    }
-
-                }
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine("Problem on 'AddTableKeyCell' method on 'ReportHealthCheckSingle':");
-                Console.WriteLine(e);
-            }
-        }
-
-        private void AddGPOTableKeyCell(CustomTable custTable, IGPOReference cellValue)
-        {
-            try
-            {
-                if (custTable != null && custTable.GetKeyLinkedSection(ReportHelper.Encode(cellValue.GPOName), out var targetSection))
-                {
-                    Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                    Add(GenerateModalAdminGroupIdFromGroupName(targetSection.Id));
-                    Add(@""">");
-                    AddEncoded(cellValue.GPOName);
-                    Add("</a>");
-                    if (!string.IsNullOrEmpty(cellValue.GPOId))
-                    {
-                        if (!Report.GPOInfoDic.ContainsKey(cellValue.GPOId))
-                        {
-                            Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                            return;
-                        }
-                        var refGPO = Report.GPOInfoDic[cellValue.GPOId];
-                        if (refGPO.IsDisabled)
-                        {
-                            Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                        }
-                        if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
-                        {
-                            AddBeginTooltip(true);
-                            Add("<div class='text-left'>Linked to:<br><ul>");
-                            foreach (var i in refGPO.AppliedTo)
-                            {
-                                Add("<li>");
-                                AddEncoded(i);
-                                Add("</li>");
-                            }
-                            Add("</ul></div>");
-                            Add("<div class='text-left'>Technical id:<br>");
-                            AddEncoded(cellValue.GPOId);
-                            Add("</div>");
-                            AddEndTooltip();
-                        }
-                        else
-                        {
-                            Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
-                            AddBeginTooltip();
-                            Add("<div class='text-left'>Technical id:<br>");
-                            AddEncoded(cellValue.GPOId);
-                            Add("</div>");
-                            AddEndTooltip();
-                        }
-                    }
-                    Add("</td>");
-                }
-                else if (custTable != null && custTable.GetNestedTable(ReportHelper.Encode(cellValue.GPOName), CustomData.CustomDelimiter, out var targetTable))
-                {
-                    Add(@"<td class='text'><a data-toggle=""modal"" href=""#");
-                    Add(GenerateModalAdminGroupIdFromGroupName($"table_{ReportHelper.Encode(cellValue.GPOName)}"));
-                    Add(@""">");
-                    AddEncoded(cellValue.GPOName);
-                    Add("</a>");
-                    if (!string.IsNullOrEmpty(cellValue.GPOId))
-                    {
-                        if (!Report.GPOInfoDic.ContainsKey(cellValue.GPOId))
-                        {
-                            Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                            return;
-                        }
-                        var refGPO = Report.GPOInfoDic[cellValue.GPOId];
-                        if (refGPO.IsDisabled)
-                        {
-                            Add(@" <span class=""font-weight-light"">[Disabled]</span>");
-                        }
-                        if (refGPO.AppliedTo != null && refGPO.AppliedTo.Count > 0)
-                        {
-                            AddBeginTooltip(true);
-                            Add("<div class='text-left'>Linked to:<br><ul>");
-                            foreach (var i in refGPO.AppliedTo)
-                            {
-                                Add("<li>");
-                                AddEncoded(i);
-                                Add("</li>");
-                            }
-                            Add("</ul></div>");
-                            Add("<div class='text-left'>Technical id:<br>");
-                            AddEncoded(cellValue.GPOId);
-                            Add("</div>");
-                            AddEndTooltip();
-                        }
-                        else
-                        {
-                            Add(@" <span class=""font-weight-light"">[Not&nbsp;linked]</span>");
-                            AddBeginTooltip();
-                            Add("<div class='text-left'>Technical id:<br>");
-                            AddEncoded(cellValue.GPOId);
-                            Add("</div>");
-                            AddEndTooltip();
-                        }
-                    }
-                    Add("</td>");
-                }
-                else
-                {
-                    AddGPOName(cellValue);
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Problem on 'AddGPOTableKeyCell' method on 'ReportHealthCheckSingle':");
-                Console.WriteLine(e);
-            }
-        }
-
-        private void AddCustomTableHtml(List<string> data)
-        {
-            try
-            {
-                var firstLineParts = data[0].Split(' ');
-                if (firstLineParts.Length > 1 && firstLineParts[0].EndsWith(":"))
-                {
-                    var tokens = new List<string>();
-                    for (int i = 0; i < firstLineParts.Length; i++)
-                    {
-                        if (!string.IsNullOrEmpty(firstLineParts[i]) && firstLineParts[i].EndsWith(":"))
-                        {
-                            tokens.Add(firstLineParts[i]);
-                        }
-                    }
-                    Add(@"<div class=""row"">
-			<div class=""col-md-12 table-responsive"">
-				<table class=""table table-striped table-bordered"">
-					<thead><tr>");
-                    foreach (var token in tokens)
-                    {
-                        Add("<th>");
-                        string parsedToken = token.Replace("#$%%$#", " ").Replace("#$%:%$#", ": ");
-                        AddEncoded(parsedToken.Substring(0, parsedToken.Length - 1));
-                        Add("</th>");
-                    }
-                    Add("</tr></thead><tbody>");
-                    foreach (var d in data)
-                    {
-                        if (string.IsNullOrEmpty(d))
-                            continue;
-                        Add("<tr>");
-                        var t = d.Split(' ');
-                        for (int i = 0, j = 0; i < t.Length && j <= tokens.Count; i++)
-                        {
-                            if (j < tokens.Count && t[i] == tokens[j])
-                            {
-                                if (j != 0)
-                                {
-                                    Add("</td>");
-                                }
-                                j++;
-                                Add("<td>");
-                            }
-                            else
-                            {
-                                Add(t[i].Replace("#$%:%$#", ": "));
-                                Add(" ");
-                            }
-                        }
-                        Add("</td>");
-                        Add("</tr>");
-                    }
-                    Add("</tbody></table></div></div>");
-
-                }
-                else
-                {
-                    Add("<p>");
-                    Add(String.Join("<br>\r\n", data.ToArray()));
-                    Add("</p>");
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Problem on 'AddCustomTableHtml' method on 'ReportHealthCheckSingle':");
-                Console.WriteLine(e);
-            }
-        }
-        private void AddCustomTooltip(string tooltip)
-        {
-            try
-            {
-                if (!string.IsNullOrEmpty(tooltip))
-                {
-                    AddBeginTooltip();
-                    Add(tooltip);
-                    AddEndTooltip();
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Problem on 'AddCustomTooltip' method on 'ReportHealthCheckSingle':");
-                Console.WriteLine(e);
-            }
-        }
+        #endregion
     }
-    #endregion
 }

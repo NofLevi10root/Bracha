@@ -1,9 +1,10 @@
-﻿using System;
+﻿using PingCastle.Addition.ReportEnteties;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace PingCastle.Addition
+namespace PingCastle.Addition.StructureEnteties
 {
     public class CustomRiskRuleCategory
     {
@@ -35,6 +36,14 @@ namespace PingCastle.Addition
                 Console.WriteLine("Problem on 'ParseCategoriesToTableHeaders' method on 'CustomRiskRuleCategory':");
                 Console.WriteLine(e);
                 return null;
+            }
+        }
+
+        public static void AddCategoriesToRiskModelDictionary(Dictionary<string, List<CustomRiskModelCategory>> riskModelDict, List<CustomRiskRuleCategory> categories)
+        {
+            foreach (var category in categories)
+            {
+                riskModelDict[category.Id] = new List<CustomRiskModelCategory>();
             }
         }
         #endregion

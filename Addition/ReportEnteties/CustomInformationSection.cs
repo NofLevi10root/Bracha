@@ -1,9 +1,10 @@
-﻿using System;
+﻿using PingCastle.Addition.StructureEnteties;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace PingCastle.Addition
+namespace PingCastle.Addition.ReportEnteties
 {
     public class CustomInformationSection
     {

@@ -195,6 +195,7 @@ namespace PingCastle.Bot
                     HealthcheckData healthcheckData = DataHelper<HealthcheckData>.LoadXml(ms, "bot", null);
                     var endUserReportGenerator = PingCastleFactory.GetEndUserReportGenerator<HealthcheckData>();
                     var license = LicenseManager.Validate(typeof(Program), new Program()) as ADHealthCheckingLicense;
+                    endUserReportGenerator.SetCustomData(null);
                     var report = endUserReportGenerator.GenerateReportFile(healthcheckData, license, healthcheckData.GetHumanReadableFileName());
 
                     var o = new BotInputOutput();

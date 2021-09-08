@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace PingCastle.Addition
+namespace PingCastle.Addition.ReportEnteties
 {
     public class CustomRiskModelCategory
     {

@@ -1,4 +1,5 @@
-﻿using PingCastle.Report;
+﻿using PingCastle.Addition.StructureEnteties;
+using PingCastle.Report;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,7 +8,7 @@ using System.IO;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace PingCastle.Addition
+namespace PingCastle.Addition.ReportEnteties
 {
     public class CustomChart
     {

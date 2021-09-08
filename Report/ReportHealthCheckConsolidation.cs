@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using PingCastle.Addition;
+using PingCastle.Addition.LogicEnteties;
 using PingCastle.Data;
 using PingCastle.Healthcheck;
 using PingCastle.Rules;
@@ -23,15 +24,6 @@ namespace PingCastle.Report
 		public string GenerateReportFile(PingCastleReportCollection<HealthcheckData> report, ADHealthCheckingLicense license, string filename)
 		{
 			Report = report;
-			CustomConsoData = null;
-			Brand(license);
-			return GenerateReportFile(filename);
-		}
-
-		public string GenerateReportFile(PingCastleReportCollection<HealthcheckData> report, ADHealthCheckingLicense license, string filename, CustomConsolidationData customConsoData)
-		{
-			Report = report;
-			CustomConsoData = customConsoData;
 			Brand(license);
 			return GenerateReportFile(filename);
 		}
@@ -177,27 +169,7 @@ $('table').not('.model_table').DataTable(
                     AddCellText(rule.Rationale);
                     AddEndRow();
                 }
-                if (CustomConsoData != null && CustomConsoData.DomainsData.ContainsKey(data.DomainFQDN))
-                {
-                    foreach(var rule in CustomConsoData.DomainsData[data.DomainFQDN].HealthRules)
-                    {
-                        AddBeginRow();
-                        AddPrintDomain(data.Domain);
-                        AddCellText(string.Join(", ", rule.Categories.ToArray()));
-                        AddCellText(rule.RiskId);
-                        AddCellNum(rule.Points);
-                        if (CustomConsoData.GetRiskRule(rule.RiskId, out var riskRule))
-                        {
-                            AddCellText(riskRule.Description);
-                        }
-                        else
-                        {
-                            AddCellText("");
-                        }
-                        AddCellText(rule.Rationale);
-                        AddEndRow();
-                    }
-                }
+                CustomConsoData.GenerateDomainMatchedRules(data.DomainFQDN, data.Domain);
             }
             AddEndTable();
         }
@@ -258,10 +230,7 @@ $('table').not('.model_table').DataTable(
             {
                 rules.AddRange(data.RiskRules);
             }
-            if (CustomConsoData != null)
-                GenerateAdvancedRiskModelPanel(rules, Report.Count, true);
-            else
-                GenerateRiskModelPanel(rules, Report.Count);
+            GenerateRiskModelPanel(rules, Report.Count);
             GenerateIndicatorsTable();
         }
 
@@ -281,11 +250,7 @@ $('table').not('.model_table').DataTable(
             AddHeaderText("Privileged accounts");
             AddHeaderText("Trusts");
             AddHeaderText("Anomalies");
-            if(CustomConsoData != null)
-            {
-                foreach (var category in CustomConsoData.Categories)
-                    AddHeaderText(category.Name);
-            }
+            CustomConsoData.GenerateCategoriesHeaders();
             AddHeaderText("Generated");
             AddBeginTableData();
             foreach (HealthcheckData data in Report)
@@ -298,20 +263,7 @@ $('table').not('.model_table').DataTable(
                 AddCellNumScore(data.PrivilegiedGroupScore);
                 AddCellNumScore(data.TrustScore);
                 AddCellNumScore(data.AnomalyScore);
-                if(CustomConsoData != null)
-                {
-                    foreach(var category in CustomConsoData.Categories)
-                    {
-                        if(CustomConsoData.DomainsData.ContainsKey(data.DomainFQDN) && CustomConsoData.DomainsData[data.DomainFQDN].GetCategory(category.Id, out var _category))
-                        {
-                            AddCellNumScore(_category.Score);
-                        }
-                        else
-                        {
-                            AddCellNumScore(0);
-                        }
-                    }
-                }
+                CustomConsoData.GenerateDomainCategoriesScores(data.DomainFQDN);
                 AddCellDate(data.GenerationDate);
                 AddEndRow();
             }
@@ -1188,5 +1140,18 @@ $('table').not('.model_table').DataTable(
                 return "SID: " + key.DomainSID;
             return "Error please contact the support";
         }
+
+        #region Custom Methods
+
+        public void SetCustomData(CustomConsolidationData customData)
+        {
+            CustomConsoData = customData != null ? customData : new CustomConsolidationData() { IsEmpty = true};
+            CustomData.SetRefsManager(
+                new CustomMethodsReferenceManager(AddHeaderText, AddCellText, Add, null, AddEncoded, AddCellNum, AddCellNumScore,
+                AddBeginModal, null, AddEndModal, AddBeginTooltip, AddEndTooltip,
+                AddBeginTable, AddBeginTableData, AddBeginRow, AddEndRow, AddEndTable,
+                 GenerateSection, GenerateSubSection, GenerateSubIndicator, GenerateSubIndicator, GenerateAdvancedIndicatorPanel, AddParagraph, AddPrintDomain));
+        }
+        #endregion
     }
 }

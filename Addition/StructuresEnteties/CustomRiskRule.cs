@@ -1,10 +1,12 @@
-﻿using PingCastle.Rules;
+﻿using PingCastle.Addition.ReportEnteties;
+using PingCastle.Addition.StructureEnteties;
+using PingCastle.Rules;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace PingCastle.Addition
+namespace PingCastle.Addition.StructureEnteties
 {
     public class CustomRiskRule
     {

@@ -1,11 +1,14 @@
-﻿using PingCastle.Healthcheck;
+﻿using PingCastle.Addition.ReportEnteties;
+using PingCastle.Addition.StructureEnteties;
+using PingCastle.Data;
+using PingCastle.Healthcheck;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace PingCastle.Addition
+namespace PingCastle.Addition.LogicEnteties
 {
-    public class CustomConsolidationData
+    public class CustomConsolidationData : ICustomData
     {
         #region Properties
         public Dictionary<string, CustomHealthCheckData> DomainsData { get; set; } = new Dictionary<string, CustomHealthCheckData>();
@@ -13,6 +16,7 @@ namespace PingCastle.Addition
         public List<CustomRiskModelCategory> Models { get; set; } = new List<CustomRiskModelCategory>();
         public List<CustomHealthCheckRiskRule> HealthRules { get; set; } = new List<CustomHealthCheckRiskRule>();
         public List<CustomRiskRule> RiskRules { get; set; } = new List<CustomRiskRule>();
+        public bool IsEmpty { get; set; }
         #endregion
 
         #region Fields
@@ -20,6 +24,7 @@ namespace PingCastle.Addition
         private readonly Dictionary<string, CustomRiskModelCategory> dictModels = new Dictionary<string, CustomRiskModelCategory>();
         private readonly Dictionary<string, CustomHealthCheckRiskRule> dictHealthRules = new Dictionary<string, CustomHealthCheckRiskRule>();
         private readonly Dictionary<string, CustomRiskRule> dictRiskRules = new Dictionary<string, CustomRiskRule>();
+        private CustomMethodsReferenceManager refsManager = new CustomMethodsReferenceManager();
         #endregion
 
         #region Constructors
@@ -115,6 +120,11 @@ namespace PingCastle.Addition
             }
         }
 
+        public void SetRefsManager(CustomMethodsReferenceManager referenceManager)
+        {
+            refsManager = referenceManager;
+        }
+
         public bool GetRiskRule(string id, out CustomRiskRule riskRule)
         {
             try
@@ -132,6 +142,52 @@ namespace PingCastle.Addition
             }
             riskRule = null;
             return false;
+        }
+
+        public void GenerateDomainMatchedRules(string domainFQDN, DomainKey domain)
+        {
+            if (DomainsData.ContainsKey(domainFQDN))
+            {
+                foreach (var rule in DomainsData[domainFQDN].HealthRules)
+                {
+                    refsManager.AddBeginRowRef();
+                    refsManager.AddPrintDomainRef(domain);
+                    refsManager.AddCellTextRef(string.Join(", ", rule.Categories.ToArray()));
+                    refsManager.AddCellTextRef(rule.RiskId);
+                    refsManager.AddCellNumRef(rule.Points);
+                    if (GetRiskRule(rule.RiskId, out var riskRule))
+                    {
+                        refsManager.AddCellTextRef(riskRule.Description);
+                    }
+                    else
+                    {
+                        refsManager.AddCellTextRef("");
+                    }
+                    refsManager.AddCellTextRef(rule.Rationale);
+                    refsManager.AddEndRowRef();
+                }
+            }
+        }
+
+        public void GenerateCategoriesHeaders()
+        {
+            foreach (var category in Categories)
+                refsManager.AddHeaderTextRef(category.Name);
+        }
+
+        public void GenerateDomainCategoriesScores(string domainFQDN)
+        {
+            foreach (var category in Categories)
+            {
+                if (DomainsData.ContainsKey(domainFQDN) && DomainsData[domainFQDN].GetCategory(category.Id, out var _category))
+                {
+                    refsManager.AddCellNumScoreRef(_category.Score);
+                }
+                else
+                {
+                    refsManager.AddCellNumScoreRef(0);
+                }
+            }
         }
         #endregion
     }

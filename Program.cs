@@ -620,6 +620,15 @@ namespace PingCastle
 						case "--scmode-single":
 							ScannerBase.ScanningMode = 2;
 							break;
+                        case "--scmode-workstation":
+                            ScannerBase.ScanningMode = 3;
+                            break;
+                        case "--scmode-server":
+                            ScannerBase.ScanningMode = 4;
+                            break;
+                        case "--scmode-dc":
+                            ScannerBase.ScanningMode = 5;
+                            break;
 						case "--sendxmlTo":
 						case "--sendXmlTo":
 							if (i + 1 >= args.Length)

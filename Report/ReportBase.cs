@@ -15,6 +15,7 @@ using System.IO;
 using System.Security.Cryptography;
 using PingCastle.Addition;
 using System.Text;
+using PingCastle.Addition.LogicEnteties;
 
 namespace PingCastle.Report
 {
@@ -115,7 +116,6 @@ namespace PingCastle.Report
 			{
 				ComputeCSPHash(css);
 			}
-            //Add(@" 'unsafe-inline'; object-src 'none'; base-uri https://www.pingcastle.com ; img-src data: https://www.pingcastle.com;""/>");
             Add(@" 'unsafe-inline'; object-src 'none'; base-uri https://www.10root.com ; img-src data: https://www.10root.com;""/>");
 		}
 
@@ -424,7 +424,7 @@ namespace PingCastle.Report
             Add(@"</td>");
         }
 
-        protected enum ShowModalType
+        public enum ShowModalType
         {
             Normal,
             XL,
@@ -493,7 +493,7 @@ namespace PingCastle.Report
 </div>");
         }
 
-        protected delegate void GenerateContentDelegate();
+        public delegate void GenerateContentDelegate();
 
         protected abstract void GenerateFooterInformation();
 

@@ -21,6 +21,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.DirectoryServices;
 using PingCastle.Addition;
+using PingCastle.Addition.LogicEnteties;
 
 namespace PingCastle
 {
@@ -261,6 +262,7 @@ namespace PingCastle
                         foreach (var pingCastleReport in hcconso)
                         {
                             var enduserReportGenerator = PingCastleFactory.GetEndUserReportGenerator<HealthcheckData>();
+                            enduserReportGenerator.SetCustomData(null);
                             enduserReportGenerator.GenerateReportFile(pingCastleReport, License, pingCastleReport.GetHumanReadableFileName());
                             pingCastleReport.SetExportLevel(ExportLevel);
                             DataHelper<HealthcheckData>.SaveAsXml(pingCastleReport, pingCastleReport.GetMachineReadableFileName(), EncryptReport);
@@ -268,6 +270,7 @@ namespace PingCastle
                         }
 
                         var reportConso = new ReportHealthCheckConsolidation();
+                        reportConso.SetCustomData(null);
                         reportConso.GenerateReportFile(hcconso, License, "ad_hc_summary.html");
                         ReportHealthCheckMapBuilder nodeAnalyzer = new ReportHealthCheckMapBuilder(hcconso, License);
                         nodeAnalyzer.Log = Console.WriteLine;
@@ -444,10 +447,12 @@ namespace PingCastle
                     {
                         domainsCustomData[domain].FillData(pingCastleReport as HealthcheckData);
                         domainsCustomData[domain].MergeData(pingCastleReport as HealthcheckData);
-                        htmlreports[domain] = enduserReportGenerator.GenerateReportFile(pingCastleReport, License, pingCastleReport.GetHumanReadableFileName(), domainsCustomData[domain]);
+                        enduserReportGenerator.SetCustomData(domainsCustomData[domain]);
+                        htmlreports[domain] = enduserReportGenerator.GenerateReportFile(pingCastleReport, License, pingCastleReport.GetHumanReadableFileName());
                     }
                     else
                     {
+                        enduserReportGenerator.SetCustomData(null);
                         htmlreports[domain] = enduserReportGenerator.GenerateReportFile(pingCastleReport, License, pingCastleReport.GetHumanReadableFileName());
                     }
                     DisplayAdvancement("Generating xml file for consolidation report" + (EncryptReport ? " (encrypted)" : ""));
@@ -503,11 +508,13 @@ namespace PingCastle
                                 {
                                     customData.MergeDomainData(domain);
                                 }
-								report.GenerateReportFile(hcconso, License, "ad_hc_summary.html", customData);
+                                report.SetCustomData(customData);
+								report.GenerateReportFile(hcconso, License, "ad_hc_summary.html");
 							}
 							else
                             {
-								report.GenerateReportFile(hcconso, License, "ad_hc_summary.html");
+                                report.SetCustomData(null);
+                                report.GenerateReportFile(hcconso, License, "ad_hc_summary.html");
                             }
 							ReportHealthCheckMapBuilder nodeAnalyzer = new ReportHealthCheckMapBuilder(hcconso, License);
 							nodeAnalyzer.Log = Console.WriteLine;
@@ -565,11 +572,13 @@ namespace PingCastle
                         {
                             customHealthCheckData.FillData(healthcheckData);
                             customHealthCheckData.MergeData(healthcheckData);
-                            endUserReportGenerator.GenerateReportFile(healthcheckData, License, healthcheckData.GetHumanReadableFileName(), customHealthCheckData);
+                            endUserReportGenerator.SetCustomData(customHealthCheckData);
+                            endUserReportGenerator.GenerateReportFile(healthcheckData, License, healthcheckData.GetHumanReadableFileName());
                         }
                         else
                         {
-						    endUserReportGenerator.GenerateReportFile(healthcheckData, License, healthcheckData.GetHumanReadableFileName());
+                            endUserReportGenerator.SetCustomData(null);
+                            endUserReportGenerator.GenerateReportFile(healthcheckData, License, healthcheckData.GetHumanReadableFileName());
                         }
 					}
 				);
@@ -680,7 +689,8 @@ namespace PingCastle
 						{
 							string domain = data.DomainFQDN;
 							var endUserReportGenerator = PingCastleFactory.GetEndUserReportGenerator<HealthcheckData>();
-							string html = endUserReportGenerator.GenerateReportFile(data, License, Path.Combine(path, data.GetHumanReadableFileName()));
+                            endUserReportGenerator.SetCustomData(null);
+                            string html = endUserReportGenerator.GenerateReportFile(data, License, Path.Combine(path, data.GetHumanReadableFileName()));
 							data.SetExportLevel(ExportLevel);
 							string xml = DataHelper<HealthcheckData>.SaveAsXml(data, Path.Combine(path, data.GetMachineReadableFileName()), EncryptReport);
 						}

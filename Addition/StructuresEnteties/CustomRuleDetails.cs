@@ -7,7 +7,7 @@ using System.IO;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace PingCastle.Addition
+namespace PingCastle.Addition.StructureEnteties
 {
     public class CustomRuleDetails
     {

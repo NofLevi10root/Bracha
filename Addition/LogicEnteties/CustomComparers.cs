@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PingCastle.Addition
+namespace PingCastle.Addition.LogicEnteties
 {
     public class MaturityComparer : Comparer<int>
     {

@@ -852,24 +852,23 @@ namespace PingCastle.Healthcheck
         {
             version = new Version(EngineVersion.Split(' ')[0]);
 
-			applicableRules = new List<RuleBase<HealthcheckData>>();
-			foreach (var rule in RuleSet<HealthcheckData>.Rules)
-			{
-				object[] models = rule.GetType().GetCustomAttributes(typeof(RuleIntroducedInAttribute), true);
-				if (models != null && models.Length != 0)
-				{
-					RuleIntroducedInAttribute model = (RuleIntroducedInAttribute)models[0];
-					if (model.Version <= version)
-					{
-						applicableRules.Add(rule);
-					}
-				}
-				else
-				{
-					applicableRules.Add(rule);
-				}
-			}
-            //Add Custom Rules [RuleBase]
+            applicableRules = new List<RuleBase<HealthcheckData>>();
+            foreach (var rule in RuleSet<HealthcheckData>.Rules)
+            {
+                object[] models = rule.GetType().GetCustomAttributes(typeof(RuleIntroducedInAttribute), true);
+                if (models != null && models.Length != 0)
+                {
+                    RuleIntroducedInAttribute model = (RuleIntroducedInAttribute)models[0];
+                    if (model.Version <= version)
+                    {
+                        applicableRules.Add(rule);
+                    }
+                }
+                else
+                {
+                    applicableRules.Add(rule);
+                }
+            }
             if (MaturityLevel == 0)
             {
                 MaturityLevel = 5;
