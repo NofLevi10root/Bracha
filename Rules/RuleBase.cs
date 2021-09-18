@@ -66,7 +66,7 @@ namespace PingCastle.Rules
             }
         }
 
-        protected RuleBase()
+        public RuleBase()
         {
             object[] models = GetType().GetCustomAttributes(typeof(RuleModelAttribute), true);
             if (models != null && models.Length != 0)

@@ -1,4 +1,4 @@
-?using PingCastle.Addition;
+using PingCastle.Addition;
 using PingCastle.Addition.LogicEnteties;
 using PingCastle.Addition.ReportEnteties;
 using PingCastle.Addition.StructureEnteties;
@@ -477,14 +477,20 @@ namespace PingCastle.Report
         protected void GenerateIndicatorPanelDetail(string category, HealthcheckRiskRule rule, string optionalId = null)
         {
             string safeRuleId = rule.RiskId.Replace("$", "dollar");
-            var hcrule = CustomRiskRule.GetFromRuleBase(RuleSet<T>.GetRuleFromID(rule.RiskId));
-	    if(hcrule == null)
-            {
-				CustomData.GetRiskRule(rule.RiskId, out hcrule);
-	    }
-            GenerateAccordionDetailForRule("rules" + optionalId + safeRuleId, "rules" + category, rule.Rationale, rule, hcrule,
+            var originHCrule = RuleSet<HealthcheckData>.GetRuleFromID(rule.RiskId);
+	    
+            GenerateAccordionDetailForRule("rules" + optionalId + safeRuleId, "rules" + category, rule.Rationale, rule, originHCrule,
                 () =>
                 {
+                    CustomRiskRule hcrule = null;
+                    if (originHCrule != null)
+                    {
+                        hcrule = CustomRiskRule.GetFromRuleBase(originHCrule);
+                    }
+                    else
+                    {
+                        CustomData.GetRiskRule(rule.RiskId, out hcrule);
+                    }
                     if (hcrule != null)
                     {
                         Add("<h3>");
@@ -559,10 +565,10 @@ namespace PingCastle.Report
                                         }
                                     }
                                     Add("</td>");
-                                    if (ActionPlanOrchestrator != null)
+                                    if (ActionPlanOrchestrator != null && originHCrule != null)
                                     {
                                         Add("<td>");
-                                        ActionPlanOrchestrator.GenerateDetailledActionPlan(sb, rule, hcrule, d);
+                                        ActionPlanOrchestrator.GenerateDetailledActionPlan(sb, rule, originHCrule, d);
                                         Add("</td>");
                                     }
                                     Add("</tr>");
@@ -583,16 +589,21 @@ namespace PingCastle.Report
 
 		protected void GenerateAdvancedIndicatorPanelDetail(string category, CustomHealthCheckRiskRule rule, string optionalId = null)
 		{
-			string safeRuleId = rule.RiskId.Replace("$", "dollar");
-			var hcrule = CustomRiskRule.GetFromRuleBase(RuleSet<T>.GetRuleFromID(rule.RiskId));
-			if (hcrule == null)
-			{
-				CustomData.GetRiskRule(rule.RiskId, out hcrule);
-			}
-			GenerateAccordionDetail("rules" + optionalId + safeRuleId, "rules" + category, rule.Rationale, rule.Points, true,
+            string safeRuleId = rule.RiskId.Replace("$", "dollar");
+            var originHCrule = RuleSet<HealthcheckData>.GetRuleFromID(rule.RiskId);
+            GenerateAccordionDetailForRule("rules" + optionalId + safeRuleId, "rules" + category, rule.Rationale, CustomHealthCheckRiskRule.ParseToHealthcheckRiskRule(rule), originHCrule,
 				() =>
 				{
-					if (hcrule != null)
+                    CustomRiskRule hcrule = null;
+                    if (originHCrule != null)
+                    {
+                        hcrule = CustomRiskRule.GetFromRuleBase(originHCrule);
+                    }
+                    else
+                    {
+                        CustomData.GetRiskRule(rule.RiskId, out hcrule);
+                    }
+                    if (hcrule != null)
 					{
 						Add("<h3>");
 						Add(hcrule.Title);

@@ -235,6 +235,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Report\IActionPlan.cs" />
     <Compile Include="Report\IPingCastleReportUser.cs" />
     <Compile Include="Report\ReportBase.cs" />
     <Compile Include="Report\ReportHealthCheckConsolidation.cs" />
@@ -333,7 +334,6 @@
     <Compile Include="Scanners\bluekeepscanner.cs" />
     <Compile Include="Scanners\ComputerVersion.cs" />
     <Compile Include="Scanners\ZeroLogonScanner.cs" />
-    <Compile Include="Scanners\ExportUsersScanner.cs" />
     <Compile Include="Scanners\RemoteScanner.cs" />
     <Compile Include="Scanners\Smb3QueryNetworkScanner.cs" />
     <Compile Include="Scanners\OxidBindingScanner.cs" />

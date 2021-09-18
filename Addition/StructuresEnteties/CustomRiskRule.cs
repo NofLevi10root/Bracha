@@ -1,5 +1,7 @@
-﻿using PingCastle.Addition.ReportEnteties;
+﻿using PingCastle.Addition.LogicEnteties;
+using PingCastle.Addition.ReportEnteties;
 using PingCastle.Addition.StructureEnteties;
+using PingCastle.Healthcheck;
 using PingCastle.Rules;
 using System;
 using System.Collections.Generic;
