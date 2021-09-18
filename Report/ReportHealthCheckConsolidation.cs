@@ -1146,7 +1146,7 @@ $('table').not('.model_table').DataTable(
         public void SetCustomData(CustomConsolidationData customData)
         {
             CustomConsoData = customData != null ? customData : new CustomConsolidationData() { IsEmpty = true};
-            CustomData.SetRefsManager(
+            CustomConsoData.SetRefsManager(
                 new CustomMethodsReferenceManager(AddHeaderText, AddCellText, Add, null, AddEncoded, AddCellNum, AddCellNumScore,
                 AddBeginModal, null, AddEndModal, AddBeginTooltip, AddEndTooltip,
                 AddBeginTable, AddBeginTableData, AddBeginRow, AddEndRow, AddEndTable,

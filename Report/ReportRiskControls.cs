@@ -126,7 +126,7 @@ namespace PingCastle.Report
 		<div class=""row collapse show d-print-none"" id=""riskModel"">
 			<div class=""col-md-12 table-responsive"">
 				<table class=""model_table"">
-					<thead><tr><th>Stale Objects</th><th>Privileged accounts</th><th>Trusts</th><th>Anomalies</th>"
+					<thead><tr><th></th><th>Stale Objects</th><th>Privileged accounts</th><th>Trusts</th><th>Anomalies</th>"
 					+ CustomRiskRuleCategory.ParseCategoriesToTableHeaders(customData.Categories)
 					+ @"</tr></thead>
 					<tbody>
@@ -138,11 +138,11 @@ namespace PingCastle.Report
 			}
 			CustomRiskRuleCategory.AddCategoriesToRiskModelDictionary(riskmodel, customData.Categories);
 
-			for (int j = 0; j < 4; j++)
+			for (int j = 1; j <= 4; j++)
 			{
 				for (int i = 0; ; i++)
 				{
-					int id = (1000 * j + 1000 + i);
+					int id = (1000 * j + i);
 					if (Enum.IsDefined(typeof(RiskModelCategory), id))
 					{
 						riskmodel[((RiskRuleCategory)j).ToString()].Add(new CustomRiskModelCategory((RiskModelCategory)id));
