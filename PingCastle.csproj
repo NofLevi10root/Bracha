@@ -13,7 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>C:\Users\m4t4n\Desktop\AD\PingCastleOriginPublish\</PublishUrl>
+    <PublishUrl>publier\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -23,7 +23,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -134,6 +134,10 @@
     <Compile Include="Data\PingCastleReportHelper.cs" />
     <Compile Include="Data\PingCastleReportDataExportLevel.cs" />
     <Compile Include="Data\SafeXmlWriter.cs" />
+    <Compile Include="Exports\ExportBase.cs" />
+    <Compile Include="Exports\ExportComputers.cs" />
+    <Compile Include="Exports\ExportUsers.cs" />
+    <Compile Include="Exports\IExport.cs" />
     <Compile Include="Graph\Database\LiveDataStorage.cs" />
     <Compile Include="Graph\Database\MappingType.cs" />
     <Compile Include="Graph\Database\RelationType.cs" />
@@ -155,6 +159,7 @@
     <Compile Include="Data\HealthCheckBUEntityData.cs" />
     <Compile Include="Data\CompromiseGraphData.cs" />
     <Compile Include="Healthcheck\HoneyPotSettings.cs" />
+    <Compile Include="Healthcheck\Rules\HeatlcheckRuleAnomalyPreWin2000AuthenticatedUsers.cs" />
     <Compile Include="Healthcheck\Rules\HeatlcheckRuleStaledObsoleteWin7.cs" />
     <Compile Include="Healthcheck\Rules\HeatlcheckRuleTrustAzureADSSO.cs" />
     <Compile Include="Healthcheck\Rules\HeatlcheckRuleAnomalyUnixPassword.cs" />
@@ -220,6 +225,7 @@
     <Compile Include="Healthcheck\Rules\HeatlcheckRulePrivilegedDelegationKeyAdmin.cs" />
     <Compile Include="Healthcheck\Rules\HeatlcheckRulePrivilegedExchangeAdminSDHolder.cs" />
     <Compile Include="Healthcheck\Rules\HeatlcheckRulePrivilegedUnconstrainedDelegation.cs" />
+    <Compile Include="misc\DnsQuery.cs" />
     <Compile Include="misc\ROCAVulnerabilityTester.cs" />
     <Compile Include="misc\Subnet.cs" />
     <Compile Include="PingCastleException.cs" />

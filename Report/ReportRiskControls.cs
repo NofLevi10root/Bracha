@@ -1,4 +1,4 @@
-﻿using PingCastle.Addition;
+?using PingCastle.Addition;
 using PingCastle.Addition.LogicEnteties;
 using PingCastle.Addition.ReportEnteties;
 using PingCastle.Addition.StructureEnteties;
@@ -131,64 +131,60 @@ namespace PingCastle.Report
 					+ @"</tr></thead>
 					<tbody>
 ");
-			var riskmodel = new Dictionary<string, List<CustomRiskModelCategory>>();
-			foreach (RiskRuleCategory category in Enum.GetValues(typeof(RiskRuleCategory)))
-			{
-				riskmodel[category.ToString()] = new List<CustomRiskModelCategory>();
-			}
-			CustomRiskRuleCategory.AddCategoriesToRiskModelDictionary(riskmodel, customData.Categories);
+            var riskmodel = new Dictionary<string, List<CustomRiskModelCategory>>();
+            foreach (RiskRuleCategory category in Enum.GetValues(typeof(RiskRuleCategory)))
+            {
+                riskmodel[category.ToString()] = new List<CustomRiskModelCategory>();
+            }
+	    CustomRiskRuleCategory.AddCategoriesToRiskModelDictionary(riskmodel, customData.Categories);
+            for (int j = 1; j <= 4; j++)
+            {
+                for (int i = 0; ; i++)
+                {
+                    int id = (1000 * j + i);
+                    if (Enum.IsDefined(typeof(RiskModelCategory), id))
+                    {
+                        riskmodel[((RiskRuleCategory)j).ToString()].Add(new CustomRiskModelCategory((RiskModelCategory)id));
+                    }
+                    else
+                        break;
+                }
+            }
+            foreach (var model in customData.Models)
+		{
+			riskmodel[model.Category].Add(model);
+		}
 
-			for (int j = 1; j <= 4; j++)
+		foreach (var category in riskmodel.Keys)
+		{
+			riskmodel[category].Sort((CustomRiskModelCategory a, CustomRiskModelCategory b) =>
 			{
-				for (int i = 0; ; i++)
-				{
-					int id = (1000 * j + i);
-					if (Enum.IsDefined(typeof(RiskModelCategory), id))
-					{
-						riskmodel[((RiskRuleCategory)j).ToString()].Add(new CustomRiskModelCategory((RiskModelCategory)id));
-					}
-					else
-						break;
-				}
-			}
-
-			foreach (var model in customData.Models)
-			{
-				riskmodel[model.Category].Add(model);
-			}
-
-			foreach (var category in riskmodel.Keys)
-			{
-				riskmodel[category].Sort((CustomRiskModelCategory a, CustomRiskModelCategory b) =>
-				{
-					return string.Compare(a.Description, b.Description);
-				});
-			}
-
-			for (int i = 0; ; i++)
-			{
-				string line = "<tr>";
-				bool HasValue = false;
-				foreach (var category in riskmodel.Keys)
-				{
-					if (i < riskmodel[category].Count)
-					{
-						HasValue = true;
-						CustomRiskModelCategory model = riskmodel[category][i];
-						int score = 0;
-						int numrules = 0;
-						List<HealthcheckRiskRule> rulematched = new List<HealthcheckRiskRule>();
-						foreach (HealthcheckRiskRule rule in rules)
-						{
-							if (rule.Model.ToString() == model.Id)
-							{
-								numrules++;
-								score += rule.Points;
-								rulematched.Add(rule);
-							}
-						}
-
-						foreach (CustomHealthCheckRiskRule rule in customData.HealthRules)
+				return string.Compare(a.Description, b.Description);
+			});
+		}
+            for (int i = 0; ; i++)
+            {
+                string line = "<tr>";
+                bool HasValue = false;
+                foreach (var category in riskmodel.Keys)
+                {
+                    if (i < riskmodel[category].Count)
+                    {
+                        HasValue = true;
+                        CustomRiskModelCategory model = riskmodel[category][i];
+                        int score = 0;
+                        int numrules = 0;
+                        List<HealthcheckRiskRule> rulematched = new List<HealthcheckRiskRule>();
+                        foreach (HealthcheckRiskRule rule in rules)
+                        {
+                            if (rule.Model.ToString() == model.Id)
+                            {
+                                numrules++;
+                                score += rule.Points;
+                                rulematched.Add(rule);
+                            }
+                        }
+			foreach (CustomHealthCheckRiskRule rule in customData.HealthRules)
 						{
 							if (rule.CheckIsInModel(model.Id))
 							{
@@ -197,62 +193,62 @@ namespace PingCastle.Report
 								rulematched.Add(CustomHealthCheckRiskRule.ParseToHealthcheckRiskRule(rule));
 							}
 						}
-						string tdclass = "";
-						if (numrules == 0)
-						{
-							tdclass = "model_good";
-						}
-						else if (score == 0)
-						{
-							tdclass = "model_info";
-						}
-						else if (score <= 10 * numberOfDomain)
-						{
-							tdclass = "model_toimprove";
-						}
-						else if (score <= 30 * numberOfDomain)
-						{
-							tdclass = "model_warning";
-						}
-						else
-						{
-							tdclass = "model_danger";
-						}
-						string tooltip = "Rules: " + numrules + " Score: " + (numberOfDomain == 0? 100 : score / numberOfDomain);
-						string tooltipdetail = null;
-						string modelstring = model.Description;
-						rulematched.Sort((HealthcheckRiskRule a, HealthcheckRiskRule b)
-							=>
-						{
-							return a.Points.CompareTo(b.Points);
-						});
-						foreach (var rule in rulematched)
-						{
-							tooltipdetail += ReportHelper.Encode(rule.Rationale) + "<br>";
-							var hcrule = CustomRiskRule.GetFromRuleBase(RuleSet<T>.GetRuleFromID(rule.RiskId));
+                        string tdclass = "";
+                        if (numrules == 0)
+                        {
+                            tdclass = "model_good";
+                        }
+                        else if (score == 0)
+                        {
+                            tdclass = "model_info";
+                        }
+                        else if (score <= 10 * numberOfDomain)
+                        {
+                            tdclass = "model_toimprove";
+                        }
+                        else if (score <= 30 * numberOfDomain)
+                        {
+                            tdclass = "model_warning";
+                        }
+                        else
+                        {
+                            tdclass = "model_danger";
+                        }
+                        string tooltip = "Rules: " + numrules + " Score: " + (numberOfDomain == 0 ? 100 : score / numberOfDomain);
+                        string tooltipdetail = null;
+                        string modelstring = model.Description;
+                        rulematched.Sort((HealthcheckRiskRule a, HealthcheckRiskRule b)
+                            =>
+                        {
+                            return a.Points.CompareTo(b.Points);
+                        });
+                        foreach (var rule in rulematched)
+                        {
+                            tooltipdetail += ReportHelper.Encode(rule.Rationale) + "<br>";
+                            var hcrule = CustomRiskRule.GetFromRuleBase(RuleSet<T>.GetRuleFromID(rule.RiskId));
 							if(hcrule == null)
                             {
 								customData.GetRiskRule(rule.RiskId, out hcrule);
                             }
-							if (hcrule != null && !string.IsNullOrEmpty(hcrule.ReportLocation))
-							{
-								tooltipdetail += "<small  class='text-muted'>" + ReportHelper.Encode(hcrule.ReportLocation) + "</small><br>";
-							}
-						}
-						line += "<td class=\"model_cell " + tdclass + "\"><div class=\"div_model\" placement=\"auto right\" data-toggle=\"popover\" title=\"" +
-							tooltip + "\" data-html=\"true\" data-content=\"" +
-							(String.IsNullOrEmpty(tooltipdetail) ? "No rule matched" : "<p>" + tooltipdetail + "</p>") + "\"><span class=\"small\">" + modelstring + "</span></div></td>";
-					}
-					else
-						line += "<td class=\"model_empty_cell\"></td>";
-				}
-				line += "</tr>";
-				if (HasValue)
-					Add(line);
-				else
-					break;
-			}
-			Add(@"
+                            if (hcrule != null && !string.IsNullOrEmpty(hcrule.ReportLocation))
+                            {
+                                tooltipdetail += "<small  class='text-muted'>" + ReportHelper.Encode(hcrule.ReportLocation) + "</small><br>";
+                            }
+                        }
+                        line += "<td class=\"model_cell " + tdclass + "\"><div class=\"div_model\" placement=\"auto right\" data-toggle=\"popover\" title=\"" +
+                            tooltip + "\" data-html=\"true\" data-content=\"" +
+                            (String.IsNullOrEmpty(tooltipdetail) ? "No rule matched" : "<p>" + tooltipdetail + "</p>") + "\"><span class=\"small\">" + modelstring + "</span></div></td>";
+                    }
+                    else
+                        line += "<td class=\"model_empty_cell\"></td>";
+                }
+                line += "</tr>";
+                if (HasValue)
+                    Add(line);
+                else
+                    break;
+            }
+            Add(@"
 					</tbody>
 				</table>
 			</div>
@@ -264,12 +260,11 @@ namespace PingCastle.Report
 			<i class=""risk_model_high"">&nbsp;</i> score higher than 30 - major risks identified
 			</div>
 		</div>");
-		}
+        }
 
         protected void GenerateIndicatorPanel(string id, string title, RiskRuleCategory category, List<HealthcheckRiskRule> rules, List<RuleBase<HealthcheckData>> applicableRules)
         {
-
-			Add(@"
+            Add(@"
 		<div class=""row""><div class=""col-lg-12 mt-2"">
 			<a data-toggle=""collapse"" data-target=""#" + id + @""">
 				<h2>");
@@ -414,91 +409,146 @@ namespace PingCastle.Report
 ");
         }
 
-		protected void GenerateIndicatorPanelDetail(string category, HealthcheckRiskRule rule, string optionalId = null)
-		{
-			string safeRuleId = rule.RiskId.Replace("$", "dollar");
-			var hcrule = CustomRiskRule.GetFromRuleBase(RuleSet<T>.GetRuleFromID(rule.RiskId));
-			if(hcrule == null)
+        public IActionPlan ActionPlanOrchestrator { get; set; }
+
+        protected void GenerateAccordionDetailForRule(string id, string dataParent, string title, HealthcheckRiskRule rule, RuleBase<HealthcheckData> hcrule, GenerateContentDelegate content)
+        {
+            GenerateAccordionDetail(id, dataParent, title,
+                () =>
+                {
+                    if (rule.Points == 0)
+                    {
+                        Add(@"<i class=""float-right"">Informative rule</i>");
+                    }
+                    else
+                    {
+                        Add(@"<i class=""float-right""><span class='float-right'>+ ");
+                        Add(rule.Points);
+                        Add(@" Point(s)</span>");
+                        if (ActionPlanOrchestrator != null)
+                        {
+                            ActionPlanOrchestrator.GenerateMainActionPlan(sb, rule, hcrule);
+                        }
+                        Add("</i>");
+                    }
+                }, content);
+        }
+
+        List<string> GetTokens(List<string> details)
+        {
+            if (details == null || details.Count == 0 || string.IsNullOrEmpty(details[0]))
+                return null;
+            var tokens = GetTokens(details[0]);
+            for (int i = 1; i < details.Count; i++)
+            {
+                var t = GetTokens(details[i]);
+                var toRemove = new List<string>();
+                foreach (var t1 in tokens)
+                {
+                    if (!t.Contains(t1))
+                        toRemove.Add(t1);
+                }
+                foreach (var t1 in toRemove)
+                {
+                    tokens.Remove(t1);
+                }
+            }
+            return tokens;
+        }
+
+        List<string> GetTokens(string detail)
+        {
+            if (string.IsNullOrEmpty(detail))
+                return null;
+            var tokens = new List<string>();
+            var test = detail.Replace("Domain controller:", "Domain_controller:").Split(' ');
+            if (test.Length <= 1 || !test[0].EndsWith(":"))
+                return null;
+            for (int i = 0; i < test.Length; i++)
+            {
+                if (!string.IsNullOrEmpty(test[i]) && test[i].EndsWith(":"))
+                {
+                    tokens.Add(test[i]);
+                }
+            }
+            return tokens;
+        }
+
+        protected void GenerateIndicatorPanelDetail(string category, HealthcheckRiskRule rule, string optionalId = null)
+        {
+            string safeRuleId = rule.RiskId.Replace("$", "dollar");
+            var hcrule = CustomRiskRule.GetFromRuleBase(RuleSet<T>.GetRuleFromID(rule.RiskId));
+	    if(hcrule == null)
             {
 				CustomData.GetRiskRule(rule.RiskId, out hcrule);
-			}
-			GenerateAccordionDetail("rules" + optionalId + safeRuleId, "rules" + category, rule.Rationale, rule.Points, true,
-				() =>
-				{
-					if (hcrule != null)
-					{
-						Add("<h3>");
-						Add(hcrule.Title);
-						Add("</h3>\r\n<strong>Rule ID:</strong><p class=\"text-justify\">");
-						Add(hcrule.Id);
-						Add("</p>\r\n<strong>Description:</strong><p class=\"text-justify\">");
-						Add(NewLineToBR(hcrule.Description));
-						Add("</p>\r\n<strong>Technical explanation:</strong><p class=\"text-justify\">");
-						Add(NewLineToBR(hcrule.TechnicalExplanation));
-						Add("</p>\r\n<strong>Advised solution:</strong><p class=\"text-justify\">");
-						Add(NewLineToBR(hcrule.Solution));
-						Add("</p>\r\n<strong>Points:</strong><p>");
-						Add(NewLineToBR(hcrule.GetComputationModelString()));
-						Add("</p>\r\n");
-						if (!String.IsNullOrEmpty(hcrule.Documentation))
-						{
-							Add("<strong>Documentation:</strong><p>");
-							Add(hcrule.Documentation);
-							Add("</p>");
-						}
-					}
-					
-					if ((rule.Details != null && rule.Details.Count > 0) || (hcrule != null && !String.IsNullOrEmpty(hcrule.ReportLocation)))
-					{
-						Add("<strong>Details:</strong>");
-						if (!String.IsNullOrEmpty(hcrule.ReportLocation))
-						{
-							Add("<p>");
-							Add(hcrule.ReportLocation);
-							Add("</p>");
-						}
-						if (rule.Details != null && rule.Details.Count > 0 && !string.IsNullOrEmpty(rule.Details[0]))
-						{
-							var test = rule.Details[0].Replace("Domain controller:","Domain_controller:").Split(' ');
-							if (test.Length > 1 && test[0].EndsWith(":"))
-							{
-								var tokens = new List<string>();
-								for (int i = 0; i < test.Length; i++)
-								{
-									if (!string.IsNullOrEmpty(test[i]) && test[i].EndsWith(":"))
-									{
-										tokens.Add(test[i]);
-									}
-								}
-								Add(@"<div class=""row"">
+	    }
+            GenerateAccordionDetailForRule("rules" + optionalId + safeRuleId, "rules" + category, rule.Rationale, rule, hcrule,
+                () =>
+                {
+                    if (hcrule != null)
+                    {
+                        Add("<h3>");
+                        Add(hcrule.Title);
+                        Add("</h3>\r\n<strong>Rule ID:</strong><p class=\"text-justify\">");
+                        Add(hcrule.Id);
+                        Add("</p>\r\n<strong>Description:</strong><p class=\"text-justify\">");
+                        Add(NewLineToBR(hcrule.Description));
+                        Add("</p>\r\n<strong>Technical explanation:</strong><p class=\"text-justify\">");
+                        Add(NewLineToBR(hcrule.TechnicalExplanation));
+                        Add("</p>\r\n<strong>Advised solution:</strong><p class=\"text-justify\">");
+                        Add(NewLineToBR(hcrule.Solution));
+                        Add("</p>\r\n<strong>Points:</strong><p>");
+                        Add(NewLineToBR(hcrule.GetComputationModelString()));
+                        Add("</p>\r\n");
+                        if (!String.IsNullOrEmpty(hcrule.Documentation))
+                        {
+                            Add("<strong>Documentation:</strong><p>");
+                            Add(hcrule.Documentation);
+                            Add("</p>");
+                        }
+                    }
+                    if ((rule.Details != null && rule.Details.Count > 0) || (hcrule != null && !String.IsNullOrEmpty(hcrule.ReportLocation)))
+                    {
+                        Add("<strong>Details:</strong>");
+                        if (hcrule != null && !String.IsNullOrEmpty(hcrule.ReportLocation))
+                        {
+                            Add("<p>");
+                            Add(hcrule.ReportLocation);
+                            Add("</p>");
+                        }
+                        if (rule.Details != null && rule.Details.Count > 0 && !string.IsNullOrEmpty(rule.Details[0]))
+                        {
+                            var tokens = GetTokens(rule.Details);
+                            if (tokens != null && tokens.Count > 0)
+                            {
+                                Add(@"<div class=""row"">
 			<div class=""col-md-12 table-responsive"">
 				<table class=""table table-striped table-bordered"">
 					<thead><tr>");
-								foreach(var token in tokens)
-								{
-									Add("<th>");
-									if(token == "Domain_controller:")
-										AddEncoded(token.Replace("Domain_controller:", "Domain controller:").Substring(0, token.Length - 1));
-									else
+                                foreach (var token in tokens)
+                                {
+                                    Add("<th>");
+				    string parsedToken = token.Replace("#$%%$#", " ").Replace("#$%:%$#", ": ");
+                                    AddEncoded(parsedToken.Replace("Domain_controller:", "Domain controller:").Substring(0, parsedToken.Length - 1));
+                                    Add("</th>");
+                                }
+                                if (ActionPlanOrchestrator != null)
+                                {
+                                    Add("<th>Action Plan</th>");
+                                }
+                                Add("</tr></thead><tbody>");
+                                foreach (var d in rule.Details)
+                                {
+                                    if (string.IsNullOrEmpty(d))
+                                        continue;
+                                    Add("<tr>");
+                                    var t = d.Replace("Domain controller:", "Domain_controller:").Split(' ');
+                                    for (int i = 0, j = 0; i < t.Length && j <= tokens.Count; i++)
                                     {
-										string parsedToken = token.Replace("#$%%$#", " ").Replace("#$%:%$#", ": ");
-										AddEncoded(parsedToken.Substring(0, parsedToken.Length - 1));
-									}
-									Add("</th>");
-								}
-								Add("</tr></thead><tbody>");
-								foreach (var d in rule.Details)
-								{
-									if (string.IsNullOrEmpty(d))
-										continue;
-									Add("<tr>");
-									var t = d.Replace("Domain controller:", "Domain_controller:").Split(' ');
-									for (int i = 0, j = 0; i < t.Length && j <= tokens.Count; i++)
-									{
-										if (j < tokens.Count && t[i] == tokens[j])
-										{
-											if (j != 0)
-												Add("</td>");
+                                        if (j < tokens.Count && t[i] == tokens[j])
+                                        {
+                                            if (j != 0)
+                                                Add("</td>");
                                             j++;
                                             Add("<td>");
                                         }
@@ -509,6 +559,12 @@ namespace PingCastle.Report
                                         }
                                     }
                                     Add("</td>");
+                                    if (ActionPlanOrchestrator != null)
+                                    {
+                                        Add("<td>");
+                                        ActionPlanOrchestrator.GenerateDetailledActionPlan(sb, rule, hcrule, d);
+                                        Add("</td>");
+                                    }
                                     Add("</tr>");
                                 }
                                 Add("</tbody></table></div></div>");
@@ -646,3 +702,4 @@ namespace PingCastle.Report
 		#endregion indicators
 	}
 }
+

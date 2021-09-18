@@ -1,10 +1,11 @@
-﻿//
+//
 // Copyright (c) Ping Castle. All rights reserved.
 // https://www.pingcastle.com
 //
 // Licensed under the Non-Profit OSL. See LICENSE file in the project root for full license information.
 //
 using PingCastle.Data;
+using PingCastle.Exports;
 using PingCastle.Healthcheck;
 using PingCastle.misc;
 using PingCastle.Report;
@@ -25,43 +26,44 @@ using PingCastle.Addition.LogicEnteties;
 
 namespace PingCastle
 {
-	public class Tasks
-	{
-		public ADHealthCheckingLicense License { get; set; }
-		public string Server = null;
-		public int Port = 0;
-		public NetworkCredential Credential = null;
-		public List<string> NodesToInvestigate = new List<string>();
-		public string FileOrDirectory = null;
-		public string CustomConfigFileOrDirectory = null;
+    public class Tasks
+    {
+        public ADHealthCheckingLicense License { get; set; }
+        public string Server = null;
+        public int Port = 0;
+        public NetworkCredential Credential = null;
+        public List<string> NodesToInvestigate = new List<string>();
+        public string FileOrDirectory = null;
+	public string CustomConfigFileOrDirectory = null;
         public bool AddCustsomData = false;
-		public PingCastleReportDataExportLevel ExportLevel = PingCastleReportDataExportLevel.Normal;
-		public string sendXmlTo;
-		public string sendHtmlTo;
-		public string sendAllTo;
-		public string sharepointdirectory;
-		public string sharepointuser;
-		public string sharepointpassword;
-		public string CenterDomainForSimpliedGraph = null;
-		public bool ExploreTerminalDomains;
-		public bool ExploreForestTrust;
-		public List<string> DomainToNotExplore;
-		public bool EncryptReport = false;
-		public bool InteractiveMode = false;
-		public string mailNotification;
-		public string smtpLogin;
-		public string smtpPassword;
-		public DateTime FilterReportDate = DateTime.MaxValue;
-		public bool smtpTls;
-		public Type Scanner;
-		public string apiEndpoint;
-		public string apiKey;
-		public bool AnalyzeReachableDomains;
-		public string botPipe;
+        public PingCastleReportDataExportLevel ExportLevel = PingCastleReportDataExportLevel.Normal;
+        public string sendXmlTo;
+        public string sendHtmlTo;
+        public string sendAllTo;
+        public string sharepointdirectory;
+        public string sharepointuser;
+        public string sharepointpassword;
+        public string CenterDomainForSimpliedGraph = null;
+        public bool ExploreTerminalDomains;
+        public bool ExploreForestTrust;
+        public List<string> DomainToNotExplore;
+        public bool EncryptReport = false;
+        public bool InteractiveMode = false;
+        public string mailNotification;
+        public string smtpLogin;
+        public string smtpPassword;
+        public DateTime FilterReportDate = DateTime.MaxValue;
+        public bool smtpTls;
+        public Type Scanner;
+        public Type Export;
+        public string apiEndpoint;
+        public string apiKey;
+        public bool AnalyzeReachableDomains;
+        public string botPipe;
 
-		public Dictionary<string, string> xmlreports = new Dictionary<string, string>(); // Addition -> I've changed it from [] to [public]
-		public Dictionary<string, string> htmlreports = new Dictionary<string, string>();// Addition -> I've changed it from [] to [public]
-        private Dictionary<string, CustomHealthCheckData> domainsCustomData;
+        public Dictionary<string, string> xmlreports = new Dictionary<string, string>();
+        public Dictionary<string, string> htmlreports = new Dictionary<string, string>();
+	private Dictionary<string, CustomHealthCheckData> domainsCustomData;
 
         public bool GenerateKeyTask()
         {
@@ -82,7 +84,11 @@ namespace PingCastle
                         string name = pi.GetValue(scanner, null) as string;
                         DisplayAdvancement("Running scanner " + name);
                         scanner.Initialize(Server, Port, Credential);
-                        scanner.Export("ad_scanner_" + name + "_" + Server + ".txt");
+                        if (scanner as ScannerBase != null)
+                            ((ScannerBase)scanner).FileOrDirectory = FileOrDirectory;
+                        string file = "ad_scanner_" + name + "_" + Server + ".txt";
+                        scanner.Export(file);
+                        DisplayAdvancement("Results saved to " + new FileInfo(file).FullName);
                     }
                 );
         }
@@ -463,37 +469,36 @@ namespace PingCastle
             return pingCastleReport;
         }
 
-		public bool ConsolidationTask<T>() where T : IPingCastleReport
-		{
-			return StartTask("RisX report consolidation (" + typeof(T).Name + ")",
-					() =>
-					{
-						if (String.IsNullOrEmpty(FileOrDirectory))
-						{
-							FileOrDirectory = Directory.GetCurrentDirectory();
-						}
-						if (!Directory.Exists(FileOrDirectory))
-						{
-							WriteInRed("The directory " + FileOrDirectory + " doesn't exist");
-							return;
-						}
-						if (AddCustsomData && FileOrDirectory.ToLower() == CustomConfigFileOrDirectory.ToLower())
+        public bool ConsolidationTask<T>() where T : IPingCastleReport
+        {
+            return StartTask("RisX report consolidation (" + typeof(T).Name + ")",
+                    () =>
+                    {
+                        if (String.IsNullOrEmpty(FileOrDirectory))
+                        {
+                            FileOrDirectory = Directory.GetCurrentDirectory();
+                        }
+                        if (!Directory.Exists(FileOrDirectory))
+                        {
+                            WriteInRed("The directory " + FileOrDirectory + " doesn't exist");
+                            return;
+                        }
+			if (AddCustsomData && FileOrDirectory.ToLower() == CustomConfigFileOrDirectory.ToLower())
                         {
 							WriteInRed("The reports directory and the data directory cannot be the same: " + FileOrDirectory);
 							return;
 						}
-						var consolidation = PingCastleReportHelper<T>.LoadXmls(FileOrDirectory, FilterReportDate);
-						if (consolidation.Count == 0)
-						{
-							WriteInRed("No report has been found. Please generate one with RisX and try again. The task will stop.");
-							return;
-						}
-						// create here dictionary with all the domains as keys, and foreach value generated custom data
-						if (typeof(T) == typeof(HealthcheckData))
-						{
-							var hcconso = consolidation as PingCastleReportCollection<HealthcheckData>;
-							var report = new ReportHealthCheckConsolidation();
-							if(AddCustsomData == true)
+                        var consolidation = PingCastleReportHelper<T>.LoadXmls(FileOrDirectory, FilterReportDate);
+                        if (consolidation.Count == 0)
+                        {
+                            WriteInRed("No report has been found. Please generate one with RisX and try again. The task will stop.");
+                            return;
+                        }
+                        if (typeof(T) == typeof(HealthcheckData))
+                        {
+                            var hcconso = consolidation as PingCastleReportCollection<HealthcheckData>;
+                            var report = new ReportHealthCheckConsolidation();
+			    if(AddCustsomData == true)
                             {
 								CustomConsolidationData customData = new CustomConsolidationData();
                                 foreach (var file in Directory.GetFiles(CustomConfigFileOrDirectory, "*.xml"))
@@ -509,45 +514,45 @@ namespace PingCastle
                                     customData.MergeDomainData(domain);
                                 }
                                 report.SetCustomData(customData);
-								report.GenerateReportFile(hcconso, License, "ad_hc_summary.html");
-							}
+                            report.GenerateReportFile(hcconso, License, "ad_hc_summary.html");
+			    }
 							else
                             {
                                 report.SetCustomData(null);
                                 report.GenerateReportFile(hcconso, License, "ad_hc_summary.html");
                             }
-							ReportHealthCheckMapBuilder nodeAnalyzer = new ReportHealthCheckMapBuilder(hcconso, License);
-							nodeAnalyzer.Log = Console.WriteLine;
-							nodeAnalyzer.GenerateReportFile("ad_hc_summary_full_node_map.html");
-							nodeAnalyzer.FullNodeMap = false;
-							nodeAnalyzer.CenterDomainForSimpliedGraph = CenterDomainForSimpliedGraph;
-							nodeAnalyzer.GenerateReportFile("ad_hc_summary_simple_node_map.html");
-							var mapReport = new ReportNetworkMap();
-							mapReport.GenerateReportFile(hcconso, License, "ad_hc_hilbert_map.html");
-						}
-					}
-				);
-		}
+                            ReportHealthCheckMapBuilder nodeAnalyzer = new ReportHealthCheckMapBuilder(hcconso, License);
+                            nodeAnalyzer.Log = Console.WriteLine;
+                            nodeAnalyzer.GenerateReportFile("ad_hc_summary_full_node_map.html");
+                            nodeAnalyzer.FullNodeMap = false;
+                            nodeAnalyzer.CenterDomainForSimpliedGraph = CenterDomainForSimpliedGraph;
+                            nodeAnalyzer.GenerateReportFile("ad_hc_summary_simple_node_map.html");
+                            var mapReport = new ReportNetworkMap();
+                            mapReport.GenerateReportFile(hcconso, License, "ad_hc_hilbert_map.html");
+                        }
+                    }
+                );
+        }
 
-		public bool HealthCheckRulesTask()
-		{
-			return StartTask("RisX Health Check rules",
-					() =>
-					{
-						if (String.IsNullOrEmpty(FileOrDirectory))
-						{
-							FileOrDirectory = Directory.GetCurrentDirectory();
-						}
-						if (!Directory.Exists(FileOrDirectory))
-						{
-							WriteInRed("The directory " + FileOrDirectory + " doesn't exist");
-							return;
-						}
-						var rulesBuilder = new ReportHealthCheckRules();
-						rulesBuilder.GenerateReportFile("ad_hc_rules_list.html");
-					}
-				);
-		}
+        public bool HealthCheckRulesTask()
+        {
+            return StartTask("RisX Health Check rules",
+                    () =>
+                    {
+                        if (String.IsNullOrEmpty(FileOrDirectory))
+                        {
+                            FileOrDirectory = Directory.GetCurrentDirectory();
+                        }
+                        if (!Directory.Exists(FileOrDirectory))
+                        {
+                            WriteInRed("The directory " + FileOrDirectory + " doesn't exist");
+                            return;
+                        }
+                        var rulesBuilder = new ReportHealthCheckRules();
+                        rulesBuilder.GenerateReportFile("ad_hc_rules_list.html");
+                    }
+                );
+        }
 
 
 		public bool RegenerateHtmlTask()
@@ -691,9 +696,9 @@ namespace PingCastle
 							var endUserReportGenerator = PingCastleFactory.GetEndUserReportGenerator<HealthcheckData>();
                             endUserReportGenerator.SetCustomData(null);
                             string html = endUserReportGenerator.GenerateReportFile(data, License, Path.Combine(path, data.GetHumanReadableFileName()));
-							data.SetExportLevel(ExportLevel);
-							string xml = DataHelper<HealthcheckData>.SaveAsXml(data, Path.Combine(path, data.GetMachineReadableFileName()), EncryptReport);
-						}
+                            data.SetExportLevel(ExportLevel);
+                            string xml = DataHelper<HealthcheckData>.SaveAsXml(data, Path.Combine(path, data.GetMachineReadableFileName()), EncryptReport);
+                        }
 
                     }
                 );
@@ -823,6 +828,7 @@ namespace PingCastle
                                     Trace.WriteLine(ex.Message);
                                     Trace.WriteLine(ex.StackTrace);
                                     WriteInRed(report.Key + "-" + ex.Message);
+                                    DisplayException(null, ex);
                                 }
                             }
                         }
@@ -922,6 +928,24 @@ This is the PingCastle program sending reports for:
                     {
                         var bot = new PingCastle.Bot.Bot();
                         bot.Run(botPipe);
+                    }
+            );
+        }
+
+        public bool ExportTask()
+        {
+            return StartTask("Running Export",
+                    () =>
+                    {
+
+                        PropertyInfo pi = Export.GetProperty("Name");
+                        IExport export = PingCastleFactory.LoadExport(Export);
+                        string name = pi.GetValue(export, null) as string;
+                        DisplayAdvancement("Running export " + name);
+                        export.Initialize(Server, Port, Credential);
+                        string file = "ad_export_" + name + "_" + Server + ".txt";
+                        export.Export(file);
+                        DisplayAdvancement("Results saved to " + new FileInfo(file).FullName);
                     }
             );
         }
@@ -1081,3 +1105,4 @@ This is the PingCastle program sending reports for:
         }
     }
 }
+
