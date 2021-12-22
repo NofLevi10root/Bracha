@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+    - name: Setup Nuget
+      uses: NuGet/setup-nuget@v1.0.5
+    - name: Restore NuGet Packages
+      run: nuget restore PingCastle.sln
+ 
+    - name: Build and Publish
+      run: msbuild PingCastle.sln /p:Configuration=Release /p:DeployOnBuild=true /p:TargetFrameworkVersion="v3.0"
+      
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v2.2.2
+      with:
+        name: published
+        path: bin\Release\app.publish
