@@ -204,6 +204,21 @@
                         </xsd:sequence>
                       </xsd:complexType>
                     </xsd:element>
+					  <xsd:element name="NestedColumns" minOccurs="0">
+						  <xsd:complexType>
+							  <xsd:sequence>
+								  <xsd:element maxOccurs="unbounded" name="NestedColumn">
+									  <xsd:complexType>
+										  <xsd:sequence>
+											  <xsd:element name="Column" type="xsd:string" />
+											  <xsd:element name="Delimiter" type="xsd:string" />
+											  <xsd:element name="NestedColumnPath" type="xsd:string" />
+										  </xsd:sequence>
+									  </xsd:complexType>
+								  </xsd:element>
+							  </xsd:sequence>
+						  </xsd:complexType>
+					  </xsd:element>
                   </xsd:sequence>
                 </xsd:complexType>
               </xsd:element>

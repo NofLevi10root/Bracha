@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
@@ -567,7 +568,7 @@ namespace PingCastle.Addition.LogicEnteties
                 else if (custTable.GetNestedTable(value, CustomDelimiter, out var targetTable))
                 {
                     refsManager.AddBeginModalRef(refsManager.GenerateModalAdminGroupIdFromGroupNameRef($"table_{value}"), value, ShowModalType.XL);
-                    AddCustomTableHtml(targetTable);
+                    AddCustomTableHtml(targetTable, custTable);
                     refsManager.AddEndModalRef(ShowModalType.XL);
                 }
             }
@@ -659,7 +660,7 @@ namespace PingCastle.Addition.LogicEnteties
             }
         }
 
-        private void AddCustomTableHtml(List<string> data)
+        private void AddCustomTableHtml(List<string> data, CustomTable custTable)
         {
             try
             {
@@ -678,11 +679,14 @@ namespace PingCastle.Addition.LogicEnteties
 			<div class=""col-md-12 table-responsive"">
 				<table class=""table table-striped table-bordered"">
 					<thead><tr>");
+                    var headers = new List<string>();
                     foreach (var token in tokens)
                     {
                         refsManager.AddRef("<th>");
                         string parsedToken = token.Replace("#$%%$#", " ").Replace("#$%:%$#", ": ");
-                        refsManager.AddEncodedRef(parsedToken.Substring(0, parsedToken.Length - 1));
+                        var header = parsedToken.Substring(0, parsedToken.Length - 1);
+                        headers.Add(header);
+                        refsManager.AddEncodedRef(header);
                         refsManager.AddRef("</th>");
                     }
                     refsManager.AddRef("</tr></thead><tbody>");
@@ -692,6 +696,7 @@ namespace PingCastle.Addition.LogicEnteties
                             continue;
                         refsManager.AddRef("<tr>");
                         var t = d.Split(' ');
+                        t = t.Where(x => !string.IsNullOrEmpty(x)).ToArray();
                         for (int i = 0, j = 0; i < t.Length && j <= tokens.Count; i++)
                         {
                             if (j < tokens.Count && t[i] == tokens[j])
@@ -705,7 +710,27 @@ namespace PingCastle.Addition.LogicEnteties
                             }
                             else
                             {
-                                refsManager.AddRef(t[i].Replace("#$%:%$#", ": "));
+                                var value = t[i].Replace("#$%:%$#", ": ");
+                                var resualt = string.Empty;
+                                if (custTable != null)
+                                {
+                                    if (custTable.GetNestedColumnPath(headers[j - 1], value, out var spcialColumnValue))
+                                    {
+                                        foreach (var v in spcialColumnValue)
+                                        {
+                                            resualt += $@"<a href=""{v.Value}"">{v.Key}</a>";
+                                            if (!(i == t.Length - 1))
+                                            {
+                                                resualt += ",";
+                                            }
+                                        }
+                                    }
+                                }
+                                if (!string.IsNullOrEmpty(resualt))
+                                {
+                                    value = resualt;
+                                }
+                                refsManager.AddRef(value);
                                 refsManager.AddRef(" ");
                             }
                         }

@@ -19,7 +19,7 @@ namespace PingCastle.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -67,9 +67,8 @@ namespace PingCastle.Properties {
         ///    &lt;xsd:complexType&gt;
         ///      &lt;xsd:sequence minOccurs=&quot;1&quot;&gt;
         ///        &lt;xsd:element name=&quot;Domain&quot; type=&quot;xsd:string&quot;/&gt;
-        ///        &lt;xsd:element name=&quot;Categories&quot; minOccurs=&quot;0&quot;&gt;
-        ///          &lt;xsd:complexType&gt;
-        ///      [rest of string was truncated]&quot;;.
+        ///        &lt;xsd:element name=&quot;CustomDelimiter&quot; type=&quot;xsd:string&quot; minOccurs=&quot;0&quot;/&gt;
+        ///        &lt;x [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string DataScheme {
             get {

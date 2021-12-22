@@ -3,6 +3,7 @@ using PingCastle.Addition.StructureEnteties;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 
@@ -14,6 +15,10 @@ namespace PingCastle.Addition.ReportEnteties
         public string Id { get; set; }
 
         public string NestedTablesDirectory { get; set; }
+
+        [XmlArray("NestedColumns")]
+        [XmlArrayItem("NestedColumn")]
+        public List<NestedColumn> NestedColumns { get; set; }
 
         [XmlArray("Columns")]
         [XmlArrayItem("Column")]
@@ -34,6 +39,8 @@ namespace PingCastle.Addition.ReportEnteties
         private readonly Dictionary<string, CustomInformationSection> dictKeyLinks = new Dictionary<string, CustomInformationSection>();
 
         private readonly Dictionary<string, bool> dictNestedTables = new Dictionary<string, bool>();
+
+        private readonly Dictionary<NestedColumn, Dictionary<string, bool>> dictNestedColumnFile = new Dictionary<NestedColumn, Dictionary<string, bool>>();
         #endregion
 
 
@@ -54,6 +61,27 @@ namespace PingCastle.Addition.ReportEnteties
                         {
                             string fileName = Path.GetFileNameWithoutExtension(file);
                             dictNestedTables[fileName] = true;
+                        }
+
+                        if(NestedColumns != null && NestedColumns.Count > 0)
+                        {
+                            foreach (var nestedColumn in NestedColumns)
+                            {
+                                if(!string.IsNullOrEmpty(nestedColumn.NestedColumnPath))
+                                {
+                                    dictNestedColumnFile[nestedColumn] = new Dictionary<string, bool>();
+                                    if (nestedColumn.NestedColumnPath.StartsWith(@".\"))
+                                        nestedColumn.NestedColumnPath = baseDataDirectory + "\\" + nestedColumn.NestedColumnPath.Substring(2);
+                                    if(Directory.Exists(nestedColumn.NestedColumnPath))
+                                    {
+                                        foreach (var file in Directory.GetFiles(nestedColumn.NestedColumnPath))
+                                        {
+                                            string fileName = Path.GetFileNameWithoutExtension(file);
+                                            dictNestedColumnFile[nestedColumn][fileName] = true;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -217,6 +245,41 @@ namespace PingCastle.Addition.ReportEnteties
             result = GetTable($"{NestedTablesDirectory}\\{name}.csv", delimiter);
             return true;
         }
+
+        public bool GetNestedColumnPath(string column, string cellValue, out List<KeyValuePair<string, string>> result)
+        {
+            try
+            {
+                if (!dictNestedColumnFile.Any(c => c.Key.Column == column) || string.IsNullOrEmpty(cellValue))
+                {
+                    result = null;
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Problem on 'GetNestedColumnPath' method on 'CustomTable':");
+                Console.WriteLine(e);
+            }
+
+            result = new List<KeyValuePair<string, string>>();
+            var nestedColumn = dictNestedColumnFile.First(c => c.Key.Column == column);
+
+            var values = cellValue.Split(new string[] { nestedColumn.Key.Delimiter }, StringSplitOptions.None);
+
+            foreach (var value in values)
+            {
+                if (nestedColumn.Value.ContainsKey(value))
+                {
+                    var path = $"{nestedColumn.Key.NestedColumnPath}\\{value}.csv";
+                    if (File.Exists(path)){
+                        result.Add(new KeyValuePair<string, string>(value, path));
+                    }
+                }
+            }
+            return true;
+        }
+
         #endregion
     }
 }
