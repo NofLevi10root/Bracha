@@ -323,7 +323,8 @@ namespace PingCastle.Report
             try
             {
 	    	Add("<td class='text'>");
-	        if (footerMode)
+            Add("<p class = 'line-clamp'>");
+                if (footerMode)
 	    	    Add("<b>");
 	        if (highlight)
 	        {
@@ -343,7 +344,8 @@ namespace PingCastle.Report
 	            Add(tooltip);
 	            AddEndTooltip();
 	        }
-	    	Add(@"</td>");
+                Add(@"</p>");
+                Add(@"</td>");
 	    }
             catch (Exception e)
             {

@@ -316,3 +316,8 @@ $( document ).ready(function() {
         $('#' + hash).modal('show');
     }
 });
+
+$(".line-clamp").on('click', function () {
+    $(this).toggleClass('line-clamp')
+        .trigger('line-clamp-new');
+});
