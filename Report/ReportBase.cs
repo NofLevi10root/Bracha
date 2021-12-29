@@ -538,12 +538,7 @@ namespace PingCastle.Report
 	<div class=""container"">
 <a href=""#"" class=""navbar-brand"">
 			<img src=""data:image/png;base64,");
-			Add(tRootLogo);
-			Add(@""" />
-		</a>
-		<a href=""#"" class=""navbar-brand"">
-			<img src=""data:image/png;base64,");
-            Add(brandLogo);
+            Add(tRootLogo);
             Add(@""" />
 		</a>
 		<button class=""navbar-toggler"" type=""button"" data-toggle=""collapse"" data-target=""#navbarToggler"" aria-controls=""navbarToggler"" aria-expanded=""false"" aria-label=""Toggle navigation"">
