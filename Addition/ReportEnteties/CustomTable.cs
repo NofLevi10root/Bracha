@@ -271,7 +271,7 @@ namespace PingCastle.Addition.ReportEnteties
             {
                 if (nestedColumn.Value.ContainsKey(value))
                 {
-                    var path = $"{nestedColumn.Key.NestedColumnPath}\\{value}.csv";
+                    var path = $"{nestedColumn.Key.NestedColumnPath}\\{value}.json";
                     if (File.Exists(path)){
                         result.Add(new KeyValuePair<string, string>(value, path));
                     }

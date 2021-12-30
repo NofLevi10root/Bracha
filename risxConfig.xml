@@ -5,19 +5,19 @@
     <Categories>
         <Category>
             <Id>compliance_category_id</Id>
-            <Name>Compliance</Name>
+            <Name>Host Checks</Name>
             <Explanation>Windows Hardening</Explanation>
         </Category>
     </Categories>
     <Models>
         <Model>
             <Id>compliance_model_id</Id>
-            <Description>compliance</Description>
+            <Description>Compliance</Description>
             <Category>compliance_category_id</Category>
         </Model>
         <Model>
             <Id>zircolite_model_id</Id>
-            <Description>this is zircolite!!!!!</Description>
+            <Description>Threat Hunting</Description>
             <Category>compliance_category_id</Category>
         </Model>
     </Models>
@@ -34,7 +34,7 @@
             <Solution>Solution</Solution>
 	    <ReportLocation>
 		<Target>panelsectioncompliance_section_id</Target>
-		<Text>compliance</Text>
+		<Text>Windows Hardening</Text>
 	    </ReportLocation>
         </RiskRule>
         <RiskRule>
@@ -49,7 +49,7 @@
             <Solution>Solution</Solution>
 	    <ReportLocation>
 		<Target>panelsectionzircolite_section_id</Target>
-		<Text>zircolite</Text>
+		<Text>sigma rules section</Text>
 	    </ReportLocation>
         </RiskRule>
     </RiskRules>
@@ -66,11 +66,11 @@
                     <Id>compliance_table_id</Id>
                 </Detail>
             </Details>
-		</HealthcheckRiskRule>
+	</HealthcheckRiskRule>
         <HealthcheckRiskRule>
 			<Points>0</Points>
 			<RiskId>zircolite_table</RiskId>
-			<Rationale>zircolite logs</Rationale>
+			<Rationale>Sigma Rules</Rationale>
             <Details>
                 <Detail>
                     <Type>SharedTable</Type>
@@ -78,7 +78,7 @@
                     <Id>zircolite_table_id</Id>
                 </Detail>
             </Details>
-		</HealthcheckRiskRule>
+	</HealthcheckRiskRule>
     </HealthcheckRiskRules>
     <InformationSections>
         <InformationSection>
@@ -93,7 +93,7 @@
         </InformationSection>
         <InformationSection>
             <Id>zircolite_section_id</Id>
-            <Name>zircolite section</Name>
+            <Name>Sigma Rules Section</Name>
             <Children>
                 <Child>
                     <Type>Table</Type>
@@ -105,10 +105,10 @@
     <Tables>
         <Table>
             <Id>compliance_table_id</Id>
-           <NestedTablesDirectory>.\Reports\hardeningKitty\LastReport\settings</NestedTablesDirectory>
+            <NestedTablesDirectory>.\Reports\hardeningKitty\LastReport\settings</NestedTablesDirectory>
         </Table>
         <Table>
-            <Id>zircolite_table_id</Id>
+           <Id>zircolite_table_id</Id>
            <NestedTablesDirectory>.\Reports\zircolite\lastReport\settings</NestedTablesDirectory>
 	   <NestedColumns>
 		<NestedColumn>

@@ -718,7 +718,7 @@ namespace PingCastle.Addition.LogicEnteties
                                     {
                                         foreach (var v in spcialColumnValue)
                                         {
-                                            resualt += $@"<a href=""{v.Value}"">{v.Key}</a>";
+                                            resualt += $@"<a target=""_blank"" href=""{v.Value}"">{v.Key}</a>";
                                             if (!(i == t.Length - 1))
                                             {
                                                 resualt += ",";
