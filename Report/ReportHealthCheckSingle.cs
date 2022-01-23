@@ -138,10 +138,10 @@ $(document).ready(function(){
 ");
         }
 
-		protected override void GenerateBodyInformation()
-		{
-			GenerateNavigation("HealthCheck report", Report.DomainFQDN, Report.GenerationDate);
-			GenerateAbout(@"<p><strong>Generated with <a class=""hyperlink"" href=""https://10root.com"">10Root RisX</a> powered by <a class=""hyperlink"" href=""https://www.pingcastle.com"">Ping Castle</a> all rights reserved</strong></p>
+        protected override void GenerateBodyInformation()
+        {
+            GenerateNavigation("HealthCheck report", Report.DomainFQDN, Report.GenerationDate);
+            GenerateAbout(@"<p><strong>Generated with <a class=""hyperlink"" href=""https://10root.com"">10Root RisX</a> powered by <a class=""hyperlink"" href=""https://www.pingcastle.com"">Ping Castle</a> all rights reserved</strong></p>
 <p>Open source components:</p>
 <ul>
 <li><a class=""hyperlink"" href=""https://getbootstrap.com/"">Bootstrap</a> licensed under the <a class=""hyperlink"" href=""https://tldrlegal.com/license/mit-license"">MIT license</a></li>
@@ -167,20 +167,20 @@ $(document).ready(function(){
             Add(Report.EngineVersion);
             Add(@"</h3>
 ");
-			Add(@"<div class=""alert alert-info"">
+            Add(@"<div class=""alert alert-info"">
 This report has been generated with 10Root RisX powered by the ");
-			Add(String.IsNullOrEmpty(_license.Edition) ? "Basic" : _license.Edition);
-			Add(@" Edition of PingCastle");
-			if (!string.IsNullOrEmpty(_license.CustomerNotice))
-			{
-				Add(@"&nbsp;<i class=""info-mark d-print-none"" data-placement=""bottom"" data-toggle=""tooltip""");
-				Add(@" title="""" data-original-title=""");
-				AddEncoded(_license.CustomerNotice);
-				Add(@""">?</i>.");
-			}
-			if (String.IsNullOrEmpty(_license.Edition))
-			{
-				Add(@"
+            Add(String.IsNullOrEmpty(_license.Edition) ? "Basic" : _license.Edition);
+            Add(@" Edition of PingCastle");
+            if (!string.IsNullOrEmpty(_license.CustomerNotice))
+            {
+                Add(@"&nbsp;<i class=""info-mark d-print-none"" data-placement=""bottom"" data-toggle=""tooltip""");
+                Add(@" title="""" data-original-title=""");
+                AddEncoded(_license.CustomerNotice);
+                Add(@""">?</i>.");
+            }
+            if (String.IsNullOrEmpty(_license.Edition))
+            {
+                Add(@"
 <br><strong class='auditor'>Being part of a commercial package is forbidden</strong> (selling the information contained in the report).<br>
 If you are an auditor, you MUST purchase an Auditor license to share the development effort.");
             }
@@ -285,7 +285,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 GenerateSubIndicator("Anomalies", Report.GlobalScore, Report.AnomalyScore, "It is about specific security control points");
                 GenerateIndicatorPanel("DetailAnomalies", "Anomalies rule details", RiskRuleCategory.Anomalies, Report.RiskRules, Report.applicableRules);
             });
-	    CustomData.GenerateCustomCategoriesSections(Report.GlobalScore);
+            CustomData.GenerateCustomCategoriesSections(Report.GlobalScore);
             GenerateSection("Domain Information", GenerateDomainInformation);
             GenerateSection("User Information", GenerateUserInformation);
             GenerateSection("Computer Information", GenerateComputerInformation);
@@ -295,10 +295,9 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             GenerateSection("PKI", GeneratePKIDetail);
             GenerateSection("Infrastructure", GenerateInfrastructureDetail);
             GenerateSection("Anomalies", GenerateAnomalyDetail);
-            GenerateSection("PKI", GeneratePKIDetail);
             GenerateSection("Password Policies", GeneratePasswordPoliciesDetail);
             GenerateSection("GPO", GenerateGPODetail);
-	    CustomData.GenerateCustomInformationSections();
+            CustomData.GenerateCustomInformationSections();
         }
 
         protected override void GenerateFooterInformation()
@@ -434,8 +433,8 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 if (data.ContainsKey(i) && data[i].Count > 0)
                 {
                     var l = data[i];
-                    
-                    
+
+
                     Add(@"<div id=""maturitylevel");
                     Add(i);
                     Add(@""" class=""tab-pane");
@@ -445,7 +444,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     }
                     Add(@""">");
 
-            
+
                     Add("<p class='mt-2'>");
 
                     if (nextLevels.ContainsKey(i))
@@ -473,34 +472,34 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     Add(" you need to fix the following rules:</p>");
                     GenerateAccordion("rulesmaturity" + i, () =>
                     {
-		    	SortedDictionary<int, List<object>> levelRules = new SortedDictionary<int, List<object>>(new MaturityComparer());
-  			foreach(var rule in Report.RiskRules)
-                    	{
+                        SortedDictionary<int, List<object>> levelRules = new SortedDictionary<int, List<object>>(new MaturityComparer());
+                        foreach (var rule in Report.RiskRules)
+                        {
                             if (l.Contains(rule.RiskId))
                             {
-                            	if (!levelRules.ContainsKey(rule.Points))
+                                if (!levelRules.ContainsKey(rule.Points))
                                     levelRules.Add(rule.Points, new List<object>());
-                            	levelRules[rule.Points].Add(rule);
+                                levelRules[rule.Points].Add(rule);
                             }
-                    	}
-                    	CustomData.AddHealthRulesToCurrentMaturityLevel(l, levelRules);
+                        }
+                        CustomData.AddHealthRulesToCurrentMaturityLevel(l, levelRules);
 
-                    	foreach (var listRule in levelRules)
-                    	{
-                            foreach(var rule in listRule.Value)
+                        foreach (var listRule in levelRules)
+                        {
+                            foreach (var rule in listRule.Value)
                             {
-                            	if (rule is HealthcheckRiskRule)
-                                	GenerateIndicatorPanelDetail("maturity" + i, rule as HealthcheckRiskRule, "maturity" + i);
-                            	else if (rule is CustomHealthCheckRiskRule)
+                                if (rule is HealthcheckRiskRule)
+                                    GenerateIndicatorPanelDetail("maturity" + i, rule as HealthcheckRiskRule, "maturity" + i);
+                                else if (rule is CustomHealthCheckRiskRule)
                                     GenerateAdvancedIndicatorPanelDetail("maturity" + i, rule as CustomHealthCheckRiskRule, "maturity" + i);
 
                             }
 
-                    	}
-						
-               	    });
-		    Add("</div>");
-                    
+                        }
+
+                    });
+                    Add("</div>");
+
                 }
             }
             Add("</div>");
@@ -885,7 +884,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             AddBeginTableData();
             AddBeginRow();
             CustomData.AddTableKeyCell("Domain information", Report.DomainFQDN);
-            AddCellText(Report.NetBIOSName);
+           AddCellText(Report.NetBIOSName);
             AddCellText(ReportHelper.DecodeDomainFunctionalLevel(Report.DomainFunctionalLevel));
             AddCellText(ReportHelper.DecodeForestFunctionalLevel(Report.ForestFunctionalLevel));
             AddCellDate(Report.DomainCreation);
@@ -905,9 +904,9 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             CustomData.GenerateTableRowCells("Domain information", Report.DomainFQDN);
             AddEndRow();
             AddEndTable();
-  CustomData.AddTableKeyModal("Domain information", Report.DomainFQDN);
+            CustomData.AddTableKeyModal("Domain information", Report.DomainFQDN);
             CustomData.GenerateAdvancedSection("DomainInformation");
-    if (Report.version >= new Version(2, 10, 1))
+            if (Report.version >= new Version(2, 10, 1))
             {
                 GenerateSubSection("Azure AD Configuration", "azureAD");
                 if (string.IsNullOrEmpty(Report.AzureADName))
@@ -917,7 +916,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 else
                 {
                     AddParagraph(@"Here is the Azure AD configuration that has been found in the domain");
-                
+
                     AddBeginTable("Azure AD information", true);
                     AddHeaderText("Tenant name");
                     AddHeaderText("Tenant id");
@@ -1342,35 +1341,35 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             CustomData.GenerateAdvancedSection("ComputerInformation");
         }
 
-		private void GenerateOperatingSystemList()
-		{
-			GenerateSubSection("Operating Systems", "operatingsystems");
-			bool oldOS = Report.version <= new Version(2, 5, 0, 0);
-			if (oldOS)
-			{
-				AddBeginTable("Operating System list");
-				AddHeaderText("Operating System");
-				AddHeaderText("Count");
+        private void GenerateOperatingSystemList()
+        {
+            GenerateSubSection("Operating Systems", "operatingsystems");
+            bool oldOS = Report.version <= new Version(2, 5, 0, 0);
+            if (oldOS)
+            {
+                AddBeginTable("Operating System list");
+                AddHeaderText("Operating System");
+                AddHeaderText("Count");
 
                 CustomData.GenerateTableHeaders("Operating System list");
                 AddBeginTableData();
-				Report.OperatingSystem.Sort(
-					(HealthcheckOSData x, HealthcheckOSData y) =>
-					{
-						return OrderOS(x.OperatingSystem, y.OperatingSystem);
-					}
-					);
-				{
-					foreach (HealthcheckOSData os in Report.OperatingSystem)
-					{
-						AddBeginRow();
+                Report.OperatingSystem.Sort(
+                    (HealthcheckOSData x, HealthcheckOSData y) =>
+                    {
+                        return OrderOS(x.OperatingSystem, y.OperatingSystem);
+                    }
+                    );
+                {
+                    foreach (HealthcheckOSData os in Report.OperatingSystem)
+                    {
+                        AddBeginRow();
                         CustomData.AddTableKeyCell("Operating System list", os.OperatingSystem);
-						AddCellNum(os.NumberOfOccurence);
+                        AddCellNum(os.NumberOfOccurence);
                         CustomData.GenerateTableRowCells("Operating System list", os.OperatingSystem);
                         AddEndRow();
-					}
-				}
-				AddEndTable();
+                    }
+                }
+                AddEndTable();
                 CustomData.GenerateTableKeyModals("Operating System list", Report.OperatingSystem, item => item.OperatingSystem);
             }
             else if (Report.OperatingSystemVersion == null || Report.OperatingSystemVersion.Count == 0)
@@ -1380,7 +1379,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 AddHeaderText("Nb OS");
                 AddAccountCheckHeader(true);
                 AddBeginTableData();
-		CustomData.GenerateTableHeaders("Operating System list");
+                CustomData.GenerateTableHeaders("Operating System list");
                 Report.OperatingSystem.Sort(
                     (HealthcheckOSData x, HealthcheckOSData y) =>
                     {
@@ -1401,7 +1400,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                         AddCellNum(os.data.NumberBadPrimaryGroup);
                         AddCellNum(os.data.NumberTrustedToAuthenticateForDelegation);
                         AddCellNum(os.data.NumberReversibleEncryption);
-			CustomData.GenerateTableRowCells("Operating System list", os.OperatingSystem);
+                        CustomData.GenerateTableRowCells("Operating System list", os.OperatingSystem);
                         AddEndRow();
                     }
                 }
@@ -1420,7 +1419,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     if (os.OperatingSystem.Contains("Windows"))
                         continue;
                     AddBeginRow();
-		    CustomData.AddTableKeyCell("Operating System list", os.OperatingSystem);
+                    CustomData.AddTableKeyCell("Operating System list", os.OperatingSystem);
                     AddCellNum(os.data.Number);
                     AddCellNum(os.data.NumberEnabled);
                     AddCellNum(os.data.NumberDisabled);
@@ -1430,13 +1429,13 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     AddCellNum(os.data.NumberBadPrimaryGroup);
                     AddCellNum(os.data.NumberTrustedToAuthenticateForDelegation);
                     AddCellNum(os.data.NumberReversibleEncryption);
-		    CustomData.GenerateTableRowCells("Operating System list", os.OperatingSystem);
+                    CustomData.GenerateTableRowCells("Operating System list", os.OperatingSystem);
                     AddEndRow();
                 }
                 foreach (HealthcheckOSVersionData os in Report.OperatingSystemVersion)
                 {
                     AddBeginRow();
-		    CustomData.AddTableKeyCell("Operating System list", GetOSVersionString(os));
+                    CustomData.AddTableKeyCell("Operating System list", GetOSVersionString(os));
                     AddCellNum(os.data.Number);
                     AddCellNum(os.data.NumberEnabled);
                     AddCellNum(os.data.NumberDisabled);
@@ -1446,11 +1445,11 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     AddCellNum(os.data.NumberBadPrimaryGroup);
                     AddCellNum(os.data.NumberTrustedToAuthenticateForDelegation);
                     AddCellNum(os.data.NumberReversibleEncryption);
-		    CustomData.GenerateTableRowCells("Operating System list", GetOSVersionString(os));
+                    CustomData.GenerateTableRowCells("Operating System list", GetOSVersionString(os));
                     AddEndRow();
                 }
                 AddEndTable();
-		CustomData.GenerateTableKeyModals("Operating System list", Report.OperatingSystem, item => item.OperatingSystem);
+                CustomData.GenerateTableKeyModals("Operating System list", Report.OperatingSystem, item => item.OperatingSystem);
             }
         }
 
@@ -2003,11 +2002,11 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 AddEndRow();
             }
             AddEndTable();
-            CustomData.GenerateTableKeyModals("Compromission graph dependancies list", Report.ControlPaths.Dependancies, 
+            CustomData.GenerateTableKeyModals("Compromission graph dependancies list", Report.ControlPaths.Dependancies,
                 item => ReportHelper.Encode(item.FQDN),
                 item => GetUrlCallback == null);
 
-            CustomData.GenerateTableKeyModals("Compromission graph dependancies list", Report.ControlPaths.Dependancies, 
+            CustomData.GenerateTableKeyModals("Compromission graph dependancies list", Report.ControlPaths.Dependancies,
                 item => GetUrlCallback(item.Domain, !string.IsNullOrEmpty(item.FQDN) ? item.FQDN : item.Netbios),
                 item => GetUrlCallback != null);
         }
@@ -2097,7 +2096,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     GenerateSummary(i, line[i]);
                 }
                 AddEndTable();
-                CustomData.AddTableKeyCellIteration("Summary of group", line.Keys, item => line[item].Description);           
+                CustomData.AddTableKeyCellIteration("Summary of group", line.Keys, item => line[item].Description);
             }
 
             for (int i = 0; i < Report.ControlPaths.Data.Count; i++)
@@ -2643,12 +2642,12 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             CustomData.GenerateTableKeyModals("Trusts list", Report.Trusts, item => ReportHelper.Encode(item.TrustPartner), item => GetUrlCallback == null);
             CustomData.GenerateTableKeyModals("Trusts list", Report.Trusts, item => ReportHelper.Encode(GetUrlCallback(item.Domain, item.TrustPartner)), item => GetUrlCallback != null);
             GenerateSubSection("Reachable Domains");
-			AddParagraph("These are the domains that RisX was able to detect but which is not releated to direct trusts. It may be children of a forest or bastions.");
-			AddBeginTable("Reachable domains list");
-			AddHeaderText("Reachable domain");
-			AddHeaderText("Discovered using");
-			AddHeaderText("Netbios");
-			AddHeaderText("Creation date");
+            AddParagraph("These are the domains that RisX was able to detect but which is not releated to direct trusts. It may be children of a forest or bastions.");
+            AddBeginTable("Reachable domains list");
+            AddHeaderText("Reachable domain");
+            AddHeaderText("Discovered using");
+            AddHeaderText("Netbios");
+            AddHeaderText("Creation date");
             CustomData.GenerateTableHeaders("Reachable domains list");
             AddBeginTableData();
 
@@ -2797,6 +2796,145 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             }
             Add("</td>");
         }
+
+        #region infrastructure
+        private void GenerateInfrastructureDetail()
+        {
+            GenerateAzureADConnect();
+            GenerateWSUS();
+            GenerateServicePoints();
+        }
+
+        private void GenerateAzureADConnect()
+        {
+            if (Report.version >= new Version(2, 10, 1))
+            {
+                GenerateSubSection("Azure AD Connect settings");
+                AddParagraph(@"Azure AD Connect help maintaining a synchronization between the Active Directory and Azure AD. Azure AD Connect servers should be considered as Tiers0 as they usually have the right to read of the hashes of the user passwords.");
+                AddBeginTable("Azure AD Connect account list");
+                AddHeaderText("Identifier", "This is the technical identifier set by Microsoft to identify this connection");
+                AddHeaderText("Computer", "This is the server where the synchronization is supposed to be performed");
+                AddHeaderText("Tenant", "This is the tenant FQDN");
+                AddHeaderText("IsEnabled", "Indicates if the account has not been disabled");
+                AddHeaderText("Created", "The creation time of the MSOL account");
+                AddHeaderText("LastLogon", "This is the last time the account has been used");
+                AddHeaderText("PwdLastSet", "This is the last time the password of the account has been changed");
+                AddHeaderText("Computer object found", "This indicates if the computer object associated with this account has been found or not");
+                AddBeginTableData();
+                if (Report.AzureADConnect != null)
+                {
+                    foreach (var a in Report.AzureADConnect)
+                    {
+                        AddBeginRow();
+                        AddCellText(a.Identifier);
+                        AddCellText(a.Computer);
+                        AddCellText(a.Tenant);
+                        AddCellText(a.MSOLIsEnabled ? "TRUE" : "FALSE", !a.MSOLIsEnabled);
+                        AddCellText(a.MSOLCreated.ToString("u"));
+                        AddCellText(a.MSOLLastLogon.ToString("u"), a.MSOLLastLogon.AddMonths(2) < DateTime.Now);
+                        AddCellText(a.MSOLPwdLastSet.ToString("u"), a.MSOLPwdLastSet.AddMonths(2) < DateTime.Now);
+                        var noComputer = string.IsNullOrEmpty(a.ComputerDN);
+                        AddCellText(noComputer ? "FALSE" : "TRUE", noComputer);
+                        AddEndRow();
+                    }
+                }
+                AddEndTable();
+            }
+        }
+
+        private void GenerateWSUS()
+        {
+            if (Report.version >= new Version(2, 10, 1))
+            {
+                GenerateSubSection("WSUS settings", "WSUSsettings");
+                AddParagraph(@"WSUS settings allow workstations and servers located on the intranet to be updated. 
+The <a href=""https://docs.microsoft.com/en-us/windows/deployment/update/waas-wu-settings"">reference documentation is here</a>. 
+Here are the settings found in GPO.");
+                AddBeginTable("WSUS settings list");
+                AddHeaderText("Policy Name");
+                AddHeaderText("WSUS Server", "This is the server that will distribute Windows Update inside the network");
+                AddHeaderText("UseWUServer", "This option defines if the configuration is activated or ignored");
+                AddHeaderText("ElevateNonAdmins", "This option specifies if normal user can disapprove updates");
+                AddHeaderText("AUOptions", "This option determines if the local user can skip some updates");
+                AddHeaderText("NoAutoUpdate", "This option disable the auto update behavior");
+                AddHeaderText("NoAutoRebootWithLoggedOnUsers", "This option can block the update if there is a logged on user");
+                AddBeginTableData();
+                if (Report.GPOWSUS != null)
+                {
+                    foreach (var a in Report.GPOWSUS)
+                    {
+                        AddBeginRow();
+                        AddGPOName(a);
+                        AddCellText(a.WSUSserver);
+                        AddCellText(GetAUOptionsText(a, "UseWUServer"));
+                        AddCellText(GetAUOptionsText(a, "ElevateNonAdmins"));
+                        AddCellText(GetAUOptionsText(a, "AUOptions"));
+                        AddCellText(GetAUOptionsText(a, "NoAutoUpdate"));
+                        AddCellText(GetAUOptionsText(a, "NoAutoRebootWithLoggedOnUsers"));
+                        AddEndRow();
+                    }
+                }
+                AddEndTable();
+            }
+        }
+
+
+        private void GenerateServicePoints()
+        {
+            if (Report.version >= new Version(2, 10, 1))
+            {
+                GenerateSubSection("Service Connection Points", "servicePoints");
+                AddParagraph(@"Service Connection Points are a configuration stored in the AD to expose services to all computers.");
+                AddBeginTable("Service Connection Points list");
+                AddHeaderText("Service", "This value is guessed by PingCastle based on well known class names");
+                AddHeaderText("Class", "This is the value of the property ServiceClassName");
+                AddHeaderText("DNS", "This is the value of the property ServiceDNSName");
+                AddHeaderText("Binding Info", "The value used to establish the connection. Its meaning is on a per class basis");
+                AddHeaderText("DN", "This is the location of the object in the AD");
+                AddBeginTableData();
+                if (Report.ServicePoints != null)
+                {
+                    var spref = new Dictionary<string, string>
+                    {
+                        {"BEMainService", "BackupExec server"},
+                        {"Novel", "Novell Groupwise"},
+                        {"7802DE87-9F23-4DAB-A31D-7991A4F11625", "Novell Groupwise"},
+                        {"FB6F0931-1D3A-4C36-8F97-EC97636138DD", "Novell Groupwise"},
+                        {"Groupwise", "Novell Groupwise"},
+                        {"ldap", "AD LDS"},
+                        {"LDAP", "AD LDS"},
+                        {"TSGateway", "RDS Gateway"},
+                        {"ms-Exchange-AutoDiscover-Service", "Exchange Autodiscover"},
+                        {"", ""},
+                    };
+                    foreach (var a in Report.ServicePoints)
+                    {
+                        AddBeginRow();
+                        if (spref.ContainsKey(a.ClassName))
+                        {
+                            AddCellText(spref[a.ClassName]);
+                        }
+                        else
+                        {
+                            AddCellText(null);
+                        }
+                        AddCellText(a.ClassName);
+                        AddCellText(a.DNS);
+                        string bindingInfo = null;
+                        if (a.BindingInfo != null)
+                        {
+                            bindingInfo = string.Join("\r\n", a.BindingInfo.ToArray());
+                        }
+                        AddCellText(bindingInfo);
+                        AddCellText(a.DN);
+                        AddEndRow();
+                    }
+                }
+                AddEndTable();
+            }
+        }
+
+        #endregion infrastructure
 
         #region anomaly
         protected void GenerateAnomalyDetail()
@@ -3071,7 +3209,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
 		</div>
 	</div>
 ");
-		CustomData.GenerateTableKeyModals("Logon script list", Report.LoginScript, item => item.LoginScript, item => !string.IsNullOrEmpty(item.LoginScript.Trim()));
+                CustomData.GenerateTableKeyModals("Logon script list", Report.LoginScript, item => item.LoginScript, item => !string.IsNullOrEmpty(item.LoginScript.Trim()));
 
                 GenerateSubSection("Advanced");
                 AddParagraph("This section display advanced information, if any has been found");
@@ -3085,12 +3223,12 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
 		</div>");
                     AddBeginTable("LDAP forbidden list");
                     AddHeaderText("Entry");
-		    CustomData.GenerateTableHeaders("LDAP forbidden list");
+                    CustomData.GenerateTableHeaders("LDAP forbidden list");
                     AddBeginTableData();
                     foreach (var e in Report.lDAPIPDenyList)
                     {
                         AddBeginRow();
-			CustomData.AddTableKeyCell("LDAP forbidden list", e);
+                        CustomData.AddTableKeyCell("LDAP forbidden list", e);
                         CustomData.GenerateTableRowCells("LDAP forbidden list", e);
                         AddEndRow();
                     }
@@ -3158,7 +3296,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     AddHeaderText("Module size");
                     AddHeaderText("Signature Alg");
                     AddHeaderText("SC Logon");
-		    CustomData.GenerateTableHeaders("Certificates list");
+                    CustomData.GenerateTableHeaders("Certificates list");
                     AddBeginTableData();
 
                     foreach (HealthcheckCertificateData data in Report.TrustedCertificates)
@@ -3219,11 +3357,11 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                         AddCellNum(modulesize);
                         AddCellText(cert.SignatureAlgorithm.FriendlyName);
                         AddCellText(SCLogonAllowed.ToString());
-			CustomData.GenerateTableRowCells("Certificates list", data.Source);
+                        CustomData.GenerateTableRowCells("Certificates list", data.Source);
                         AddEndRow();
                     }
                     AddEndTable();
-		    CustomData.GenerateTableKeyModals("Certificates list", Report.TrustedCertificates, item => "Enterprise NTAuth", item => item.Source == "NTLMStore");
+                    CustomData.GenerateTableKeyModals("Certificates list", Report.TrustedCertificates, item => "Enterprise NTAuth", item => item.Source == "NTLMStore");
                     CustomData.GenerateTableKeyModals("Certificates list", Report.TrustedCertificates, item => item.Source, item => item.Source != "NTLMStore");
                 }
                 );
@@ -3299,7 +3437,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                             ctdelegations.AddRange(data.Delegations);
                     }
 
-                        Add(@"
+                    Add(@"
 		<div class=""row"">
 			<div class=""col-lg-12"">");
                     AddParagraph("Each delegations for certificate templates are listed below.");
@@ -3428,7 +3566,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                             AddCellNum(modulesize);
                             AddCellText(cert.SignatureAlgorithm.FriendlyName);
                             AddEndRow();
-                           
+
 
                         }
                         AddEndTable();
@@ -3677,7 +3815,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 CustomData.GenerateTableKeyModals("Audit settings list", Report.GPOAuditSimple, item => ReportHelper.Encode(item.GPOName));
                 CustomData.GenerateTableKeyModals("Audit settings list", Report.GPOAuditAdvanced, item => ReportHelper.Encode(item.GPOName));
             }
-            
+
             GenerateSubSection("Privileges", "gpoprivileges");
             AddParagraph("Giving privileges in a GPO is a way to become administrator without being part of a group.<br>For example, SeTcbPriviledge give the right to act as SYSTEM, which has more privileges than the administrator account.");
             if (Report.GPPRightAssignment != null && Report.GPPRightAssignment.Count > 0)
@@ -3782,11 +3920,11 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     }
                     AddEndTable();
                 }
-            } 
-CustomData.GenerateAdvancedSection("GPOInformation");
+            }
+            CustomData.GenerateAdvancedSection("GPOInformation");
 
         }
-        
+
         private string GetAUOptionsText(HealthcheckWSUSData data, string name)
         {
             HealthcheckWSUSDataOption Option = null;
@@ -4136,5 +4274,18 @@ CustomData.GenerateAdvancedSection("GPOInformation");
 
         }
         #endregion GPO
+
+        #region Custom Methods
+
+        public void SetCustomData(CustomHealthCheckData customData)
+        {
+            CustomData = customData != null ? customData : CustomHealthCheckData.CreateEmpty();
+            CustomData.SetRefsManager(
+                new CustomMethodsReferenceManager(AddHeaderText, AddCellText, Add, AddGPOName, AddEncoded, AddCellNum, AddCellNumScore,
+                AddBeginModal, GenerateModalAdminGroupIdFromGroupName, AddEndModal, AddBeginTooltip, AddEndTooltip,
+                AddBeginTable, AddBeginTableData, AddBeginRow, AddEndRow, AddEndTable,
+                 GenerateSection, GenerateSubSection, GenerateSubIndicator, GenerateSubIndicator, GenerateAdvancedIndicatorPanel, AddParagraph, null));
+        }
+        #endregion
     }
 }

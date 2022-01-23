@@ -359,12 +359,6 @@ namespace PingCastle.Report
                 Console.WriteLine("Problem on 'AddCellText' method on 'ReportHealthCheckSingle':");
                 Console.WriteLine(e);
             }
-            AddEncoded(text);
-            if (highlight)
-                Add("</span>");
-            if (footerMode)
-                Add("</b>");
-            Add(@"</td>");
         }
 
         protected void AddCellTextNoWrap(string text)
