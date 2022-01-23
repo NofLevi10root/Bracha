@@ -29,6 +29,7 @@ namespace PingCastle.Report
 
         protected HealthcheckData Report;
         public static int MaxNumberUsersInHtmlReport = 100;
+        public static string MaxNumberUsersInHtmlReportMessage = "Output limited to {0} items - go to the advanced menu before running the report or add \"--no-enum-limit\" to remove that limit";
         protected ADHealthCheckingLicense _license;
 
         public string GenerateReportFile(HealthcheckData report, ADHealthCheckingLicense license, string filename)
@@ -193,17 +194,76 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 ");
         }
 
+        void AddHiddenValue(string name, string value)
+        {
+            Add("<input type='hidden' name='");
+            AddEncoded(name);
+            Add("' value='");
+            AddEncoded(value);
+            Add("'>");
+        }
+
+
+        protected void AddBenchmarkSection()
+        {
+            Add(@"
+<div class=""modal"" tabindex=""-1"" role=""dialog"" id=""privacyNoticeStatistics"" >
+  <div class=""modal-dialog"" role=""document"">
+    <div class=""modal-content"">
+      <div class=""modal-header"">
+        <h4 class=""modal-title"">Privacy notive</h4>
+        <button type=""button"" class=""close"" data-dismiss=""modal"" aria-label=""Close"">
+          <span aria-hidden=""true"">&times;</span>
+        </button>
+      </div>
+      <div class=""modal-body"">
+        <p>To produce the statistics page, PingCastle will collect anonymous information in order to build this database.</p>
+        <p>The information collected depends on the license level.</p>
+        <p>Information collected:</p>
+<ul>
+<li>IP Adress<br><span class='text-muted'><small>The goal is to compute country statistics and provide protection against database poisoning.</small></span></li>
+<li>for the free license, the hash of the domain FQDN combined with the SID of the domain<br><span class='text-muted'><small>The goal is to compute the number of domains reported, without duplicates. The SID act as a salt to prohibit retrieving the original data by bruteforce.</small></span></li>
+<li>Report generation date<br><span class='text-muted'><small>This is to remove duplicates.</small></span></li>
+<li>The number of active users & active computers<br><span class='text-muted'><small>This is to compare with similar domain size.</small></span></li>
+<li>The domain score and maturity level<br><span class='text-muted'><small>This is to compare with similar domain.</small></span></li>
+<li>Rules ID that matched<br><span class='text-muted'><small>This is to present expected or non expected rules.</small></span></li>
+<li>the license<br><span class='text-muted'><small>This allows licensed customer to not transmit their domain identifier.</small></span></li>
+</ul>
+<p>Information not listed here are not sent to PingCastle</p>
+      </div>
+      <div class=""modal-footer"">
+        <button type=""button"" class=""btn btn-secondary"" data-dismiss=""modal"">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+");
+
+
+            var d = ReportBenchmark.GetData(Report, _license);
+            Add(@"<form action='");
+            Add(ReportBenchmark.GetDestination());
+            Add("' method='POST'>");
+
+            foreach (var item in d)
+            {
+                AddHiddenValue(item.Key, item.Value);
+            }
+            Add(@"<button type='submit' class='btn btn-default'>Compare with statistics</button></form>");
+            AddParagraph("<a href='#' data-toggle='modal' data-target='#privacyNoticeStatistics'>Privacy notice</a>");
+        }
+
         protected void GenerateContent()
         {
             GenerateSection("Active Directory Indicators", () =>
             {
                 AddParagraph("This section focuses on the core security indicators.<br>Locate the sub-process determining the score and fix some rules in that area to get a score improvement.");
-                GenerateIndicators(Report, Report.AllRiskRules);
+                GenerateIndicators(Report, Report.AllRiskRules, AddBenchmarkSection);
                 GenerateRiskModelPanel(Report.RiskRules);
             });
 
             GenerateSection("Maturity Level", GenerateMaturityInformation);
-            GenerateSection("Mitre Att&ck&#174;", GenerateMitreAttackInformation);
+            GenerateSection("MITRE ATT&CK&#174;", GenerateMitreAttackInformation);
 
             GenerateSection("Stale Objects", () =>
             {
@@ -232,6 +292,8 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             GenerateSection("Admin Groups", GenerateAdminGroupsInformation);
             GenerateSection("Control Paths Analysis", GenerateCompromissionGraphInformation);
             GenerateSection("Trusts details", GenerateTrustInformation);
+            GenerateSection("PKI", GeneratePKIDetail);
+            GenerateSection("Infrastructure", GenerateInfrastructureDetail);
             GenerateSection("Anomalies", GenerateAnomalyDetail);
             GenerateSection("PKI", GeneratePKIDetail);
             GenerateSection("Password Policies", GeneratePasswordPoliciesDetail);
@@ -470,7 +532,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 
         protected void GenerateMitreAttackInformation()
         {
-            AddParagraph(@"This section represents an evaluation of the techniques available in the <a href=""https://attack.mitre.org/"">Mitre Att&ck&#174;</a>");
+            AddParagraph(@"This section represents an evaluation of the techniques available in the <a href=""https://attack.mitre.org/"">MITRE ATT&CK&#174;</a>");
             if (string.IsNullOrEmpty(_license.Edition))
             {
                 AddParagraph("This feature is reserved for customers who have <a href='https://www.pingcastle.com/services/'>purchased a license</a>");
@@ -843,8 +905,32 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             CustomData.GenerateTableRowCells("Domain information", Report.DomainFQDN);
             AddEndRow();
             AddEndTable();
-            CustomData.AddTableKeyModal("Domain information", Report.DomainFQDN);
+  CustomData.AddTableKeyModal("Domain information", Report.DomainFQDN);
             CustomData.GenerateAdvancedSection("DomainInformation");
+    if (Report.version >= new Version(2, 10, 1))
+            {
+                GenerateSubSection("Azure AD Configuration", "azureAD");
+                if (string.IsNullOrEmpty(Report.AzureADName))
+                {
+                    AddParagraph("No Azure AD configuration has been found in this domain");
+                }
+                else
+                {
+                    AddParagraph(@"Here is the Azure AD configuration that has been found in the domain");
+                
+                    AddBeginTable("Azure AD information", true);
+                    AddHeaderText("Tenant name");
+                    AddHeaderText("Tenant id");
+                    AddHeaderText("Kerberos Enabled");
+                    AddBeginTableData();
+                    AddBeginRow();
+                    AddCellText(Report.AzureADName);
+                    AddCellText(Report.AzureADId);
+                    AddCellText(string.IsNullOrEmpty(Report.AzureADKerberosSid) ? "FALSE" : "TRUE");
+                    AddEndRow();
+                    AddEndTable();
+                }
+            }
         }
 
         #endregion domain info
@@ -886,8 +972,6 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             AddBeginTable("Account analysis list", true);
             AddHeaderText("Nb User Accounts");
             AddAccountCheckHeader(false);
-
-            CustomData.GenerateTableHeaders("Account analysis list");
             AddBeginTableData();
             AddBeginRow();
             CustomData.AddTableKeyCell("Account analysis list", Report.UserAccountData.Number, "number");
@@ -1177,9 +1261,9 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                         {
                             Add("<td colspan='");
                             Add(eventDate ? 5 : 4);
-                            Add("' class='text'>Output limited to ");
-                            Add(MaxNumberUsersInHtmlReport);
-                            Add(" items - go to the advanced menu before running the report or add \"--no-enum-limit\" to remove that limit</td>");
+                            Add("' class='text'>");
+                            AddEncoded(string.Format(MaxNumberUsersInHtmlReportMessage, MaxNumberUsersInHtmlReport));
+                            Add("</td>");
                         }
                     });
                 });
@@ -1224,8 +1308,6 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 AddEndRow();
             }
             AddEndTable();
-
-            CustomData.GenerateTableKeyModals("SID History list", data.ListDomainSidHistory, item => item.FriendlyName);
         }
 
         #endregion user info
@@ -1237,8 +1319,6 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             AddBeginTable("Computer information list", true);
             AddHeaderText("Nb Computer Accounts");
             AddAccountCheckHeader(true);
-
-            CustomData.GenerateTableHeaders("Computer information list");
             AddBeginTableData();
 
             AddBeginRow();
@@ -1404,7 +1484,6 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                             {
                                 AddHeaderText("FSMO role", "Flexible Single Master Operation. Indicates the server responsible for each role.");
                             }
-                            CustomData.GenerateTableHeaders("Domain Controllers list");
                             AddBeginTableData();
 
                             int count = 0;
@@ -1455,7 +1534,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             if (Report.PrivilegedGroups != null)
             {
                 GenerateSubSection("Groups", "admingroups");
-                AddParagraph("This section is focused on the groups which are critical for admin activities. If the report has been saved which the full details, each group can be zoomed with its members. If it is not the case, for privacy reasons, only general statictics are available.");
+                AddParagraph("This section is focused on the groups which are critical for admin activities. If the report has been saved which the full details, each group can be zoomed with its members. If it is not the case, for privacy reasons, only general statistics are available.");
                 AddBeginTable("Admin groups list");
                 AddHeaderText("Group Name");
                 AddHeaderText("Nb Admins", "This is the number of user accounts member of this group");
@@ -1609,9 +1688,20 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 GenerateAccordion("delegationaccordeon",
                     () =>
                     {
-                        GenerateAccordionDetailForDetail("alldelegation", "delegationaccordeon", "All delegations", Report.Delegations.Count, GenerateDelegationDetail);
+                        GenerateAccordionDetailForDetail("alldelegation", "delegationaccordeon", "All delegations", Report.Delegations.Count, () => GenerateDelegationDetail(Report.Delegations));
                     });
                 Add("</div></div>");
+                List<HealthcheckDelegationData> dcsync = new List<HealthcheckDelegationData>();
+                foreach (var d in Report.Delegations)
+                    if (d.Right.Contains(RelationType.EXT_RIGHT_REPLICATION_GET_CHANGES_ALL.ToString()))
+                        dcsync.Add(d);
+                AddParagraph("In particular for AD database access (DCSync, AADConnect, ...).");
+                GenerateAccordion("delegationaccordeondcsync",
+                    () =>
+                    {
+                        GenerateAccordionDetailForDetail("dcsyncdelegation", "delegationaccordeondcsync", "AD Database Access", dcsync.Count,
+                            () => GenerateDelegationDetail(dcsync));
+                    });
             }
             CustomData.GenerateAdvancedSection("AdminGroups");
         }
@@ -1679,7 +1769,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             return "modal" + groupname.Replace(" ", "-").Replace("<", "");
         }
 
-        private void GenerateDelegationDetail()
+        private void GenerateDelegationDetail(List<HealthcheckDelegationData> delegations)
         {
             AddBeginTable("Delegations list");
             AddHeaderText("DistinguishedName");
@@ -1688,9 +1778,9 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             CustomData.GenerateTableHeaders("Delegations list");
             AddBeginTableData();
 
-            Report.Delegations.Sort(OrderDelegationData);
+            delegations.Sort(OrderDelegationData);
 
-            foreach (HealthcheckDelegationData delegation in Report.Delegations)
+            foreach (HealthcheckDelegationData delegation in delegations)
             {
                 int dcPathPos = delegation.DistinguishedName.IndexOf(",DC=");
                 string path = delegation.DistinguishedName;
@@ -1871,8 +1961,6 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 AddHeaderText(ReportHelper.GetEnumDescription(typology), colspan: 3);
                 numTypology++;
             }
-
-            CustomData.GenerateTableHeaders("Compromission graph dependancies list");
             AddEndRow();
             AddBeginRow();
             for (int i = 0; i < numTypology; i++)
@@ -1939,8 +2027,6 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             AddHeaderText("Number of objects with Indirect", "Indicates the count of objects per category having at least one indirect user detected.");
             AddHeaderText("Max number of indirect numbers", "Indicates the maximum on all objects of the number of users having indirect access to the object.");
             AddHeaderText("Max ratio", "Indicates in percentage the value of (number of indirect users / number of direct users) if at least one direct users exists. Else the value is zero.");
-
-            CustomData.GenerateTableHeaders("Compromission Grapth Indirect links list");
             AddBeginTableData();
             foreach (var objectRisk in (CompromiseGraphDataObjectRisk[])Enum.GetValues(typeof(CompromiseGraphDataObjectRisk)))
             {
@@ -1994,7 +2080,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     continue;
 
                 GenerateSubSection(ReportHelper.GetEnumDescription(typology));
-                AddParagraph("If the report has been saved which the full details, each object can be zoomed with its full detail. If it is not the case, for privacy reasons, only general statictics are available.");
+                AddParagraph("If the report has been saved which the full details, each object can be zoomed with its full detail. If it is not the case, for privacy reasons, only general statistics are available.");
                 AddBeginTable("Summary of group");
                 AddHeaderText("Group or user account", "The graph represents the objects which can take control of this group or user account.");
                 AddHeaderText("Priority", "Indicates relatively to other objects the importance of this object when establishing a remediation plan. This importance is computed based on the impact and the easiness to proceed.");
@@ -2144,7 +2230,6 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 Add(@""" data-toggle=""modal"">Analysis");
                 Add(@"</a></td>");
             }
-            CustomData.GenerateTableRowCells("Summary of group", data.Description);
             AddEndRow();
         }
 
@@ -2586,6 +2671,15 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     Add(@"<td class='text'>");
                     if (GetUrlCallback == null)
                     {
+                        AddEncoded(di.DnsName);
+                    }
+                    else
+                    {
+                        Add(GetUrlCallback(di.Domain, di.DnsName));
+                    }
+                    Add(@"</td><td class='text'>");
+                    if (GetUrlCallback == null)
+                    {
                         AddEncoded(trust.TrustPartner);
                     }
                     else
@@ -2835,6 +2929,30 @@ The userPassword attribute is also used in classic LDAP systems to change the us
                 GenerateAccordion("unixpasswords", () => GenerateListAccountDetail("unixpasswords", "unixpasswordspanel", "User List With Unix Passwords", Report.UnixPasswordUsers));
             }
 
+            // java code reference
+            if (Report.version >= new Version(2, 10, 1))
+            {
+                GenerateSubSection("Java code reference", "javacoderefence");
+                Add(@"
+		<div class=""row""><div class=""col-lg-12"">
+<p>This control detects if one of the attributes javaCodebase, javaFactory or javaClassname has been set on accounts.
+Indeed, these attributes are designed to add custom code to AD object when running java code. However it can be abused to run code on servers having the flag com.sun.jndi.ldap.object.trustURLCodebase set to true.
+This is a vulnerability similar to the log4shell vulnerability.</p>
+<p><strong>Java Schema extension:</strong> " +
+            (Report.JavaClassFound ? "<span class=\"unticked\">Found</span>" : "Not Found")
+        + @"</p>
+		</div></div>
+");
+                if (Report.JavaClassFound && Report.JavaClassFoundDetail != null && Report.JavaClassFoundDetail.Count > 0)
+                {
+                    GenerateAccordion("javacoderefencedetails", () => GenerateListAccountDetail("javacoderefencedetails", "javacoderefencedetailspanel", "User object with custom javacode", Report.JavaClassFoundDetail));
+                }
+                else
+                {
+                    AddParagraph("No active user account found with Java code");
+                }
+            }
+
             if (Report.DomainControllers != null)
             {
                 int countnullsession = 0;
@@ -2978,7 +3096,35 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                     }
                     AddEndTable();
                 }
+                if (Report.GPOHardenedPath != null && Report.GPOHardenedPath.Count > 0)
+                {
+                    AddAnchor("HardenedPaths");
+                    Add(@"
+		<div class=""row"">
+			<div class=""col-lg-12"">
+				<p><strong>Hardened Paths configuration</strong>
+			</div>
+		</div>");
+                    AddBeginTable("Hardened Paths");
+                    AddHeaderText("Policy Name");
+                    AddHeaderText("Key");
+                    AddHeaderText("RequireIntegrity");
+                    AddHeaderText("RequireMutualAuthentication");
+                    AddHeaderText("RequirePrivacy");
 
+                    AddBeginTableData();
+                    foreach (var e in Report.GPOHardenedPath)
+                    {
+                        AddBeginRow();
+                        AddGPOName(e);
+                        AddCellText(e.Key);
+                        AddCellText(e.RequireIntegrity == null ? null : ((bool)e.RequireIntegrity ? "Required" : "Disabled"), e.RequireIntegrity == false, false);
+                        AddCellText(e.RequireMutualAuthentication == null ? null : ((bool)e.RequireMutualAuthentication ? "Required" : "Disabled"), e.RequireMutualAuthentication == false, false);
+                        AddCellText(e.RequirePrivacy == null ? null : ((bool)e.RequirePrivacy ? "Required" : "Disabled"), e.RequirePrivacy == false, false);
+                        AddEndRow();
+                    }
+                    AddEndTable();
+                }
             }
         }
         #endregion anomaly
@@ -3144,10 +3290,33 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
 			</div>
 		</div>
 ");
+                if (Report.version >= new Version(2, 10, 1))
+                {
+                    var ctdelegations = new List<HealthcheckDelegationData>();
+                    foreach (var data in Report.CertificateTemplates)
+                    {
+                        if (data.Delegations != null)
+                            ctdelegations.AddRange(data.Delegations);
+                    }
+
+                        Add(@"
+		<div class=""row"">
+			<div class=""col-lg-12"">");
+                    AddParagraph("Each delegations for certificate templates are listed below.");
+                    GenerateAccordion("ctdelegationaccordeon",
+                        () =>
+                        {
+                            GenerateAccordionDetailForDetail("ctalldelegation", "ctdelegationaccordeon", "Certificate Templates delegations", ctdelegations.Count, () => GenerateDelegationDetail(ctdelegations));
+                        });
+                    Add(@"
+			</div>
+		</div>
+");
+                }
             }
 
             int DCCertCount = 0;
-            foreach(var dc in Report.DomainControllers)
+            foreach (var dc in Report.DomainControllers)
             {
                 if (dc.LDAPCertificate != null && dc.LDAPCertificate.Length > 0)
                     DCCertCount++;
@@ -3182,7 +3351,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                         AddHeaderText("Signature Alg");
                         AddBeginTableData();
 
-                        foreach(var dc in Report.DomainControllers)
+                        foreach (var dc in Report.DomainControllers)
                         {
                             if (dc.LDAPCertificate == null || dc.LDAPCertificate.Length == 0)
                                 continue;
@@ -3191,7 +3360,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                             {
                                 cert = new X509Certificate2(dc.LDAPCertificate);
                             }
-                            catch(Exception)
+                            catch (Exception)
                             {
                                 continue;
                             }
@@ -3373,7 +3542,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
         {
             AddParagraph("This section focuses on security settings stored in the Active Directory technical security policies.");
             GenerateSubSection("Obfuscated Passwords", "gpoobfuscatedpassword");
-            AddParagraph("The password in GPO are obfuscated, not encrypted. Consider any passwords listed here as compromised and change it immediatly.");
+            AddParagraph("The password in GPO are obfuscated, not encrypted. Consider any passwords listed here as compromised and change them immediately.");
             if (Report.GPPPassword != null && Report.GPPPassword.Count > 0)
             {
                 AddBeginTable("Obfuscated passwords list");
@@ -3388,7 +3557,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 foreach (GPPPassword password in Report.GPPPassword)
                 {
                     AddBeginRow();
-                    CustomData.AddGPOTableKeyCell("Obfuscated passwords list", password, Report.GPOInfoDic);
+                    AddGPOName(password);
                     AddCellText(password.Type);
                     AddCellText(password.UserName);
                     AddCellText(password.Password, true);
@@ -3508,7 +3677,7 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                 CustomData.GenerateTableKeyModals("Audit settings list", Report.GPOAuditSimple, item => ReportHelper.Encode(item.GPOName));
                 CustomData.GenerateTableKeyModals("Audit settings list", Report.GPOAuditAdvanced, item => ReportHelper.Encode(item.GPOName));
             }
-
+            
             GenerateSubSection("Privileges", "gpoprivileges");
             AddParagraph("Giving privileges in a GPO is a way to become administrator without being part of a group.<br>For example, SeTcbPriviledge give the right to act as SYSTEM, which has more privileges than the administrator account.");
             if (Report.GPPRightAssignment != null && Report.GPPRightAssignment.Count > 0)
@@ -3612,11 +3781,79 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
                         AddEndRow();
                     }
                     AddEndTable();
+                }
+            } 
+CustomData.GenerateAdvancedSection("GPOInformation");
 
-                    CustomData.GenerateTableKeyModals("GPO deployed files list", Report.GPPFileDeployed, item => ReportHelper.Encode(item.GPOName));
+        }
+        
+        private string GetAUOptionsText(HealthcheckWSUSData data, string name)
+        {
+            HealthcheckWSUSDataOption Option = null;
+            foreach (var o in data.Options)
+            {
+                if (o.Name == name)
+                {
+                    Option = o;
+                    break;
                 }
             }
-            CustomData.GenerateAdvancedSection("GPOInformation");
+            if (Option == null)
+            {
+                if (name == "UseWUServer")
+                    return "The WUServer value is not respected unless this key is set";
+                return null;
+
+            }
+            if (Option.Name == "AUOptions")
+            {
+                switch (Option.Value)
+                {
+                    case 2:
+                        return "Notify before download";
+                    case 3:
+                        return "Automatically download and notify of installation";
+                    case 4:
+                        return "Automatic download and scheduled installation";
+                    case 5:
+                        return "Automatic Updates is required, but end users can configure it";
+                }
+            }
+            else if (Option.Name == "NoAutoUpdate")
+            {
+                switch (Option.Value)
+                {
+                    case 0:
+                        return "Enable Automatic Updates";
+                    case 1:
+                        return "Disable Automatic Updates";
+                }
+            }
+            else if (Option.Name == "UseWUServer")
+            {
+                return "UseWUServer set";
+            }
+            else if (Option.Name == "NoAutoRebootWithLoggedOnUsers")
+            {
+                switch (Option.Value)
+                {
+                    case 0:
+                        return "Automatic Updates notifies user that the computer will restart in 5 minutes";
+                    case 1:
+                        return "Logged-on user gets to choose whether or not to restart his or her computer";
+                }
+            }
+            else if (Option.Name == "ElevateNonAdmins")
+            {
+                switch (Option.Value)
+                {
+                    case 0:
+                        return "Only users in the Administrators user group can approve or disapprove updates";
+                    case 1:
+                        return "Users in the Users security group are allowed to approve or disapprove updates";
+                }
+            }
+            return "Unknown option (" + Option.Value + ")";
         }
 
         private string GetAuditSimpleDescription(string category)
@@ -3899,18 +4136,5 @@ The best practice is to reset these passwords on a regular basis or to uncheck a
 
         }
         #endregion GPO
-
-        #region Custom Methods
-
-        public void SetCustomData(CustomHealthCheckData customData)
-        {
-            CustomData = customData != null ? customData : CustomHealthCheckData.CreateEmpty();
-            CustomData.SetRefsManager(
-                new CustomMethodsReferenceManager(AddHeaderText, AddCellText, Add, AddGPOName, AddEncoded, AddCellNum, AddCellNumScore,
-                AddBeginModal, GenerateModalAdminGroupIdFromGroupName, AddEndModal, AddBeginTooltip, AddEndTooltip,
-                AddBeginTable, AddBeginTableData, AddBeginRow, AddEndRow, AddEndTable,
-                 GenerateSection, GenerateSubSection, GenerateSubIndicator, GenerateSubIndicator, GenerateAdvancedIndicatorPanel, AddParagraph, null));
-        }
-        #endregion
     }
 }

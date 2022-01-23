@@ -5,6 +5,7 @@ using PingCastle.Data;
 namespace PingCastle.Report
 {
     public delegate string GetUrlDelegate(DomainKey domainKey, string displayName);
+    public delegate string GetAdditionInfoDelegate(DomainKey domainKey);
 
 	public interface IPingCastleReportUser<T> where T : IPingCastleReport
 	{
