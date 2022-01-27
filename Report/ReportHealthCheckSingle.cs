@@ -299,16 +299,19 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 GenerateSection("Password Policies", GeneratePasswordPoliciesDetail);
                 GenerateSection("GPO", GenerateGPODetail);
             });
-            GenerateSection("Host", () =>
+            if (CustomData.Categories.Count > 0)
             {
-                GenerateSection("Hosts Checkes", () =>
+                GenerateSection("Host", () =>
                 {
-                    GenerateIndicators(Report, Report.AllRiskRules, AddBenchmarkSection, false);
-                    GenerateRiskModelPanel(Report.RiskRules, false);
-                });
+                    GenerateSection("Hosts Checkes", () =>
+                    {
+                        GenerateIndicators(Report, Report.AllRiskRules, AddBenchmarkSection, false);
+                        GenerateRiskModelPanel(Report.RiskRules, false);
+                    });
                 //CustomData.GenerateCustomCategoriesSections(Report.GlobalScore);
                 CustomData.GenerateCustomInformationSections();
-            });
+                });
+            }
         }
 
         protected override void GenerateFooterInformation()

@@ -349,9 +349,6 @@ namespace PingCastle.Healthcheck
 
             Version version = Assembly.GetExecutingAssembly().GetName().Version;
             healthcheckData.EngineVersion = version.ToString(4);
-#if DEBUG
-            healthcheckData.EngineVersion += " Beta";
-#endif
             healthcheckData.Level = PingCastleReportDataExportLevel.Full;
         }
 
