@@ -2110,7 +2110,6 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     GenerateSummary(i, line[i]);
                 }
                 AddEndTable();
-                CustomData.AddTableKeyCellIteration("Summary of group", line.Keys, item => line[item].Description);
             }
 
             for (int i = 0; i < Report.ControlPaths.Data.Count; i++)
