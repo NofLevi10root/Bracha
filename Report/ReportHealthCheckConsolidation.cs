@@ -244,7 +244,7 @@ $('table').not('.model_table').each(function( index ) {
             {
                 rules.AddRange(data.RiskRules);
             }
-            GenerateRiskModelPanel(rules, Report.Count);
+            GenerateRiskModelPanel(rules, true, Report.Count);
             GenerateIndicatorsTable();
         }
 

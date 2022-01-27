@@ -115,8 +115,10 @@
     <Compile Include="Addition\ReportEnteties\CustomDocumentationLine.cs" />
     <Compile Include="Addition\LogicEnteties\CustomHealthCheckData.cs" />
     <Compile Include="Addition\ReportEnteties\NestedColumn.cs" />
+    <Compile Include="Addition\StructuresEnteties\CustomColumnScore.cs" />
     <Compile Include="Addition\StructuresEnteties\CustomHealthCheckRiskRule.cs" />
     <Compile Include="Addition\ReportEnteties\CustomInformationSection.cs" />
+    <Compile Include="Addition\StructuresEnteties\CustomRulePoints.cs" />
     <Compile Include="Addition\StructuresEnteties\CustomTableKeyLink.cs" />
     <Compile Include="Addition\StructuresEnteties\CustomReportLocation.cs" />
     <Compile Include="Addition\ReportEnteties\CustomRiskModelCategory.cs" />

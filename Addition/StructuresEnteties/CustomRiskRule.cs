@@ -50,6 +50,11 @@ namespace PingCastle.Addition.StructureEnteties
         public string Description { get; set; }
 
         public string TechnicalExplanation { get; set; }
+       
+        public string SectionId { get; set; }
+
+        [XmlElement("RulePoints")]
+        public CustomRulePoints RulePoints { get; set; }
 
         public string Solution { get; set; }
 

@@ -1,248 +1,271 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified">
-  <xsd:element name="CustomHealthCheckData">
-    <xsd:complexType>
-      <xsd:sequence minOccurs="1">
-        <xsd:element name="Domain" type="xsd:string"/>
-        <xsd:element name="CustomDelimiter" type="xsd:string" minOccurs="0"/>
-        <xsd:element name="Categories" minOccurs="0">
-          <xsd:complexType>
-            <xsd:sequence>
-              <xsd:element maxOccurs="unbounded" name="Category" minOccurs="0">
-                <xsd:complexType>
-                  <xsd:sequence>
-                    <xsd:element name="Id">
-                      <xsd:simpleType>
-                        <xsd:restriction base="xs:string">
-                          <xs:minLength value="3"/>
-                        </xsd:restriction>
-                      </xsd:simpleType>
-                    </xsd:element>
-                    <xsd:element name="Name" type="xsd:string" />
-                    <xsd:element name="Explanation" type="xsd:string" />
-                  </xsd:sequence>
-                </xsd:complexType>
-              </xsd:element>
-            </xsd:sequence>
-          </xsd:complexType>
-        </xsd:element>
-        <xsd:element name="Models" minOccurs="0">
-          <xsd:complexType>
-            <xsd:sequence>
-              <xsd:element maxOccurs="unbounded" name="Model" minOccurs="0">
-                <xsd:complexType>
-                  <xsd:sequence>
-                    <xsd:element name="Id" type="xsd:string" />
-                    <xsd:element name="Description" type="xsd:string" />
-                    <xsd:element name="Category" type="xsd:string" />
-                  </xsd:sequence>
-                </xsd:complexType>
-              </xsd:element>
-            </xsd:sequence>
-          </xsd:complexType>
-        </xsd:element>
-        <xsd:element name="RiskRules"  minOccurs="0">
-          <xsd:complexType>
-            <xsd:sequence>
-              <xsd:element maxOccurs="unbounded" name="RiskRule" minOccurs="0">
-                <xsd:complexType>
-                  <xsd:sequence>
-                    <xsd:element name="Id" type="xsd:string" />
-                    <xsd:element name="Models">
-                      <xsd:complexType mixed="true">
-                        <xsd:sequence>
-                          <xsd:element maxOccurs="unbounded" name="Model" type="xsd:string" />
-                        </xsd:sequence>
-                      </xsd:complexType>
-                    </xsd:element>
-                    <xsd:element name="Maturity" type="xsd:unsignedByte" />
-                    <xsd:element name="Title" type="xsd:string" />
-                    <xsd:element name="Description" type="xsd:string" />
-                    <xsd:element name="TechnicalExplanation" type="xsd:string" />
-                    <xsd:element name="Solution" type="xsd:string" />
-                    <xsd:element name="ReportLocation" minOccurs="0">
-                      <xsd:complexType>
-                        <xsd:sequence>
-                          <xsd:element name="Target" type="xsd:string" />
-                          <xsd:element name="Text" type="xsd:string" />
-                        </xsd:sequence>
-                      </xsd:complexType>
-                    </xsd:element>
-                    <xsd:element minOccurs="0" name="Documentation">
-                      <xsd:complexType>
-                        <xsd:sequence>
-                          <xsd:element maxOccurs="unbounded" name="Line">
-                            <xsd:complexType>
-                              <xsd:sequence>
-                                <xsd:element name="Target" type="xsd:string" />
-                                <xsd:element name="Text" type="xsd:string" />
-                                <xsd:element minOccurs="0" name="SpanClass" type="xsd:string" />
-                                <xsd:element minOccurs="0" name="SpanText" type="xsd:string" />
-                              </xsd:sequence>
-                            </xsd:complexType>
-                          </xsd:element>
-                        </xsd:sequence>
-                      </xsd:complexType>
-                    </xsd:element>
-                    <xsd:element name="RuleComputations" minOccurs="0">
-                      <xsd:complexType>
-                        <xsd:sequence>
-                          <xsd:element name="Computation" minOccurs="0">
-                            <xsd:complexType>
-                              <xsd:sequence>
-                                <xsd:element name="Type" type="xsd:string" />
-                                <xsd:element name="Score" type="xsd:unsignedByte" />
-                                <xsd:element name="Threshold" type="xsd:unsignedByte" />
-                                <xsd:element name="Order" type="xsd:unsignedByte" />
-                              </xsd:sequence>
-                            </xsd:complexType>
-                          </xsd:element>
-                        </xsd:sequence>
-                      </xsd:complexType>
-                    </xsd:element>
-                  </xsd:sequence>
-                </xsd:complexType>
-              </xsd:element>
-            </xsd:sequence>
-          </xsd:complexType>
-        </xsd:element>
-        <xsd:element name="HealthcheckRiskRules" minOccurs="0">
-          <xsd:complexType>
-            <xsd:sequence>
-              <xsd:element maxOccurs="unbounded" name="HealthcheckRiskRule" minOccurs="0">
-                <xsd:complexType>
-                  <xsd:sequence>
-                    <xsd:element name="Points" type="xsd:unsignedByte" />
-                    <xsd:element name="RiskId" type="xsd:string" />
-                    <xsd:element name="Rationale" type="xsd:string" />
-                    <xsd:element name="Details">
-                      <xsd:complexType>
-                        <xsd:sequence>
-                          <xsd:element maxOccurs="unbounded" name="Detail">
-                            <xsd:complexType>
-                              <xsd:sequence>
-                                <xsd:choice maxOccurs="unbounded">
-                                  <xsd:element name="Type" type="xsd:string" />
-                                  <xsd:element name="FilePath" type="xsd:string" />
-                                  <xsd:element name="Id" type="xsd:string" />
-                                </xsd:choice>
-                              </xsd:sequence>
-                            </xsd:complexType>
-                          </xsd:element>
-                        </xsd:sequence>
-                      </xsd:complexType>
-                    </xsd:element>
-                  </xsd:sequence>
-                </xsd:complexType>
-              </xsd:element>
-            </xsd:sequence>
-          </xsd:complexType>
-        </xsd:element>
-        <xsd:element name="InformationSections" minOccurs="0">
-          <xsd:complexType>
-            <xsd:sequence>
-              <xsd:element maxOccurs="unbounded" name="InformationSection" minOccurs="0">
-                <xsd:complexType>
-                  <xsd:sequence>
-                    <xsd:element name="Id" type="xsd:string" />
-                    <xsd:element name="Name" type="xsd:string" />
-                    <xsd:element minOccurs="0" name="Show" type="xsd:boolean" />
-                    <xsd:element name="Children">
-                      <xsd:complexType>
-                        <xsd:sequence>
-                          <xsd:element maxOccurs="unbounded" name="Child">
-                            <xsd:complexType>
-                              <xsd:sequence>
-                                <xsd:element name="Type" type="xsd:string" />
-                                <xsd:element minOccurs="0" name="Id" type="xsd:string" />
-                                <xsd:element minOccurs="0" name="Value" type="xsd:string" />
-                              </xsd:sequence>
-                            </xsd:complexType>
-                          </xsd:element>
-                        </xsd:sequence>
-                      </xsd:complexType>
-                    </xsd:element>
-                  </xsd:sequence>
-                </xsd:complexType>
-              </xsd:element>
-            </xsd:sequence>
-          </xsd:complexType>
-        </xsd:element>
-        <xsd:element name="Tables">
-          <xsd:complexType>
-            <xsd:sequence>
-              <xsd:element maxOccurs="unbounded" name="Table">
-                <xsd:complexType>
-                  <xsd:sequence>
-                    <xsd:element name="Id" type="xsd:string" />
-                    <xsd:element minOccurs="0" name="NestedTablesDirectory" type="xsd:string" />
-                    <xsd:element minOccurs="0" name="KeyLinks">
-                      <xsd:complexType>
-                        <xsd:sequence>
-                          <xsd:element maxOccurs="unbounded" name="KeyLink">
-                            <xsd:complexType>
-                              <xsd:sequence>
-                                <xsd:element name="Value" type="xsd:string" />
-                                <xsd:element name="Target" type="xsd:string" />
-                              </xsd:sequence>
-                            </xsd:complexType>
-                          </xsd:element>
-                        </xsd:sequence>
-                      </xsd:complexType>
-                    </xsd:element>
-                    <xsd:element name="Columns" minOccurs="0">
-                      <xsd:complexType>
-                        <xsd:sequence>
-                          <xsd:element maxOccurs="unbounded" name="Column">
-                            <xsd:complexType>
-                              <xsd:sequence>
-                                <xsd:element name="Header" type="xsd:string" />
-                                <xsd:element name="Tooltip" type="xsd:string" />
-                              </xsd:sequence>
-                            </xsd:complexType>
-                          </xsd:element>
-                        </xsd:sequence>
-                      </xsd:complexType>
-                    </xsd:element>
-					  <xsd:element name="NestedColumns" minOccurs="0">
-						  <xsd:complexType>
-							  <xsd:sequence>
-								  <xsd:element maxOccurs="unbounded" name="NestedColumn">
-									  <xsd:complexType>
-										  <xsd:sequence>
-											  <xsd:element name="Column" type="xsd:string" />
-											  <xsd:element name="Delimiter" type="xsd:string" />
-											  <xsd:element name="NestedColumnPath" type="xsd:string" />
-										  </xsd:sequence>
-									  </xsd:complexType>
-								  </xsd:element>
-							  </xsd:sequence>
-						  </xsd:complexType>
-					  </xsd:element>
-                  </xsd:sequence>
-                </xsd:complexType>
-              </xsd:element>
-            </xsd:sequence>
-          </xsd:complexType>
-        </xsd:element>        <xsd:element name="Charts" minOccurs="0">
-          <xsd:complexType>
-            <xsd:sequence>
-              <xsd:element maxOccurs="unbounded" name="Chart" minOccurs="0">
-                <xsd:complexType>
-                  <xsd:sequence>
-                    <xsd:element name="Id" type="xsd:string" />
-                    <xsd:element name="ChartType" type="xsd:string" />
-                    <xsd:element name="Interval" type="xsd:unsignedByte" />
-                    <xsd:element name="Columns" type="xsd:unsignedByte" />
-                    <xsd:element minOccurs="0" name="Units" type="xsd:string" />
-                    <xsd:element minOccurs="0" name="BaseDate" type="xsd:string" />
-                  </xsd:sequence>
-                </xsd:complexType>
-              </xsd:element>
-            </xsd:sequence>
-          </xsd:complexType>
-        </xsd:element>
-      </xsd:sequence>
-    </xsd:complexType>
-  </xsd:element>
+	<xsd:element name="CustomHealthCheckData">
+		<xsd:complexType>
+			<xsd:sequence minOccurs="1">
+				<xsd:element name="Domain" type="xsd:string"/>
+				<xsd:element name="CustomDelimiter" type="xsd:string" minOccurs="0"/>
+				<xsd:element name="Categories" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element maxOccurs="unbounded" name="Category" minOccurs="0">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="Id">
+											<xsd:simpleType>
+												<xsd:restriction base="xs:string">
+													<xs:minLength value="3"/>
+												</xsd:restriction>
+											</xsd:simpleType>
+										</xsd:element>
+										<xsd:element name="Name" type="xsd:string" />
+										<xsd:element name="Explanation" type="xsd:string" />
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Models" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element maxOccurs="unbounded" name="Model" minOccurs="0">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="Id" type="xsd:string" />
+										<xsd:element name="Description" type="xsd:string" />
+										<xsd:element name="Category" type="xsd:string" />
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="RiskRules"  minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element maxOccurs="unbounded" name="RiskRule" minOccurs="0">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="Id" type="xsd:string" />
+										<xsd:element name="Models">
+											<xsd:complexType mixed="true">
+												<xsd:sequence>
+													<xsd:element maxOccurs="unbounded" name="Model" type="xsd:string" />
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+										<xsd:element name="Maturity" type="xsd:unsignedByte" />
+										<xsd:element name="Title" type="xsd:string" />
+										<xsd:element name="Description" type="xsd:string" />
+										<xsd:element name="TechnicalExplanation" type="xsd:string" />
+										<xsd:element name="SectionId" type="xsd:string" />
+										<xsd:element name="Solution" type="xsd:string" />
+										<xsd:element name="RulePoints" minOccurs="0">
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="Column" type="xsd:string" />
+													<xsd:element minOccurs="0" name="ColumnsScores">
+														<xsd:complexType>
+															<xsd:sequence>
+																<xsd:element maxOccurs="unbounded" name="ScoreType">
+																	<xsd:complexType>
+																		<xsd:sequence>
+																			<xsd:element name="Type" type="xsd:string" />
+																			<xsd:element name="Score" type="xsd:string" />
+																		</xsd:sequence>
+																	</xsd:complexType>
+																</xsd:element>
+															</xsd:sequence>
+														</xsd:complexType>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+										<xsd:element name="ReportLocation" minOccurs="0">
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="Target" type="xsd:string" />
+													<xsd:element name="Text" type="xsd:string" />
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+										<xsd:element minOccurs="0" name="Documentation">
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element maxOccurs="unbounded" name="Line">
+														<xsd:complexType>
+															<xsd:sequence>
+																<xsd:element name="Target" type="xsd:string" />
+																<xsd:element name="Text" type="xsd:string" />
+																<xsd:element minOccurs="0" name="SpanClass" type="xsd:string" />
+																<xsd:element minOccurs="0" name="SpanText" type="xsd:string" />
+															</xsd:sequence>
+														</xsd:complexType>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+										<xsd:element name="RuleComputations" minOccurs="0">
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="Computation" minOccurs="0">
+														<xsd:complexType>
+															<xsd:sequence>
+																<xsd:element name="Type" type="xsd:string" />
+																<xsd:element name="Score" type="xsd:unsignedByte" />
+																<xsd:element name="Threshold" type="xsd:unsignedByte" />
+																<xsd:element name="Order" type="xsd:unsignedByte" />
+															</xsd:sequence>
+														</xsd:complexType>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="HealthcheckRiskRules" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element maxOccurs="unbounded" name="HealthcheckRiskRule" minOccurs="0">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="Points" type="xsd:unsignedByte" />
+										<xsd:element name="RiskId" type="xsd:string" />
+										<xsd:element name="Rationale" type="xsd:string" />
+										<xsd:element name="Details">
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element maxOccurs="unbounded" name="Detail">
+														<xsd:complexType>
+															<xsd:sequence>
+																<xsd:choice maxOccurs="unbounded">
+																	<xsd:element name="Type" type="xsd:string" />
+																	<xsd:element name="FilePath" type="xsd:string" />
+																	<xsd:element name="Id" type="xsd:string" />
+																</xsd:choice>
+															</xsd:sequence>
+														</xsd:complexType>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="InformationSections" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element maxOccurs="unbounded" name="InformationSection" minOccurs="0">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="Id" type="xsd:string" />
+										<xsd:element name="Name" type="xsd:string" />
+										<xsd:element minOccurs="0" name="Show" type="xsd:boolean" />
+										<xsd:element name="Children">
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element maxOccurs="unbounded" name="Child">
+														<xsd:complexType>
+															<xsd:sequence>
+																<xsd:element name="Type" type="xsd:string" />
+																<xsd:element minOccurs="0" name="Id" type="xsd:string" />
+																<xsd:element minOccurs="0" name="Value" type="xsd:string" />
+															</xsd:sequence>
+														</xsd:complexType>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Tables">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element maxOccurs="unbounded" name="Table">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="Id" type="xsd:string" />
+										<xsd:element minOccurs="0" name="NestedTablesDirectory" type="xsd:string" />
+										<xsd:element minOccurs="0" name="KeyLinks">
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element maxOccurs="unbounded" name="KeyLink">
+														<xsd:complexType>
+															<xsd:sequence>
+																<xsd:element name="Value" type="xsd:string" />
+																<xsd:element name="Target" type="xsd:string" />
+															</xsd:sequence>
+														</xsd:complexType>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+										<xsd:element name="Columns" minOccurs="0">
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element maxOccurs="unbounded" name="Column">
+														<xsd:complexType>
+															<xsd:sequence>
+																<xsd:element name="Header" type="xsd:string" />
+																<xsd:element name="Tooltip" type="xsd:string" />
+															</xsd:sequence>
+														</xsd:complexType>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+										<xsd:element name="NestedColumns" minOccurs="0">
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element maxOccurs="unbounded" name="NestedColumn">
+														<xsd:complexType>
+															<xsd:sequence>
+																<xsd:element name="Column" type="xsd:string" />
+																<xsd:element name="Delimiter" type="xsd:string" />
+																<xsd:element name="NestedColumnPath" type="xsd:string" />
+															</xsd:sequence>
+														</xsd:complexType>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Charts" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element maxOccurs="unbounded" name="Chart" minOccurs="0">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="Id" type="xsd:string" />
+										<xsd:element name="ChartType" type="xsd:string" />
+										<xsd:element name="Interval" type="xsd:unsignedByte" />
+										<xsd:element name="Columns" type="xsd:unsignedByte" />
+										<xsd:element minOccurs="0" name="Units" type="xsd:string" />
+										<xsd:element minOccurs="0" name="BaseDate" type="xsd:string" />
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
 </xs:schema>

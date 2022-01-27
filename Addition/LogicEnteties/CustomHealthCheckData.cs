@@ -58,6 +58,9 @@ namespace PingCastle.Addition.LogicEnteties
 
         [XmlIgnore]
         public bool IsEmpty { get; set; }
+
+        [XmlIgnore]
+        public int GlobalScore { get; set; }
         #endregion
 
         #region Fields
@@ -245,7 +248,10 @@ namespace PingCastle.Addition.LogicEnteties
                                     if (string.IsNullOrEmpty(detail.Id))
                                         continue;
                                     if (dictTables.ContainsKey(detail.Id))
-                                        dictTables[detail.Id].AddDetail(detail, CustomDelimiter);
+                                    {
+                                        dictTables[detail.Id].AddDetail(detail, CustomDelimiter, rule.RulePoints);
+                                        healthRule.Points += dictTables[detail.Id].Scores;
+                                    }
 
                                 }
                             }
@@ -301,7 +307,7 @@ namespace PingCastle.Addition.LogicEnteties
                 healthData.GlobalScore = Math.Max(healthData.GlobalScore, healthData.TrustScore);
                 foreach (var category in Categories)
                 {
-                    healthData.GlobalScore = Math.Max(healthData.GlobalScore, category.Score);
+                    GlobalScore = Math.Max(GlobalScore, category.Score);
                 }
                 #endregion
             }
@@ -374,10 +380,25 @@ namespace PingCastle.Addition.LogicEnteties
         {
             try
             {
+
                 int output = 0;
                 foreach (var rule in HealthRules)
                 {
-                    if (rule.CheckIsInCategory(category))
+                    if (rule.Categories.Contains(category))
+                    {
+                        if (rule.RuleDetails != null)
+                        {
+                            foreach (var detail in rule.RuleDetails)
+                            {
+                                if (dictTables.ContainsKey(detail.Id))
+                                {
+                                    output += dictTables[detail.Id].Keys.Count;
+                                }
+                            }
+
+                        }
+                    }
+                    else if (rule.CheckIsInCategory(category))
                         output++;
                 }
                 return output;
@@ -900,7 +921,26 @@ namespace PingCastle.Addition.LogicEnteties
             foreach (var section in InformationSections)
             {
                 if (section.Show)
-                    refsManager.GenerateSectionRef(section.Id, section.Name, () => GenerateAdvancedCustomSection(section));
+                {
+                    refsManager.GenerateSectionRef(section.Id, section.Name, () =>
+                    {
+                        foreach (var riskRule in RiskRules)
+                        {
+                            if (riskRule.SectionId == section.Id)
+                            {
+                                foreach (var categoty in riskRule.Categories)
+                                {
+                                    var d = Categories.FirstOrDefault(c => c.Id == categoty);
+                                    if (d != null)
+                                    {
+                                        refsManager.GenerateSubIndicatorRef(d.Name, 5, d.Score, d.Explanation);
+                                    }
+                                }
+                            }
+                        }
+                        GenerateAdvancedCustomSection(section);
+                    });
+                }
             }
         }
 

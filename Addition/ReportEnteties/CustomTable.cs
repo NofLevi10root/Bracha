@@ -31,6 +31,9 @@ namespace PingCastle.Addition.ReportEnteties
 
         [XmlIgnore]
         public List<string> Keys { get; set; } = new List<string>();
+
+        [XmlIgnore]
+        public int Scores { get; set; } = 0;
         #endregion
 
         #region Fields
@@ -109,10 +112,11 @@ namespace PingCastle.Addition.ReportEnteties
                 Console.WriteLine(e);
             }
         }
-        public void AddDetail(CustomRuleDetails detail, string delimiter)
+        public void AddDetail(CustomRuleDetails detail, string delimiter, CustomRulePoints customRulePoints)
         {
             try
             {
+                Scores = 0;
                 if (!File.Exists(detail.FilePath))
                     return;
                 var lines = File.ReadAllLines(detail.FilePath);
@@ -120,6 +124,18 @@ namespace PingCastle.Addition.ReportEnteties
                     return;
 
                 var headers = lines[0].Split(new string[] { delimiter }, StringSplitOptions.None);
+                if(customRulePoints!= null && !string.IsNullOrEmpty(customRulePoints.Column))
+                {
+                    for (int i = 0; i < headers.Length; i++)
+                    {
+                        if(headers[i].ToLower() == customRulePoints.Column.ToLower())
+                        {
+                            customRulePoints.ColumnIndex = i;
+                        }
+                    }
+                    
+                }
+
                 var colsNum = headers.Length;
                 string[][] data = new string[lines.Length][];
                 for (int i = 0; i < lines.Length; i++) // build table 
@@ -130,6 +146,16 @@ namespace PingCastle.Addition.ReportEnteties
                     for (int q = 0; q < maxQ; q++)
                     {
                         data[i][q] = lineParts[q].Trim();
+                        if (customRulePoints != null && customRulePoints.ColumnIndex == q && customRulePoints.ColumnScore != null)
+                        {
+                            foreach (var scoreType in customRulePoints.ColumnScore)
+                            {
+                                if(data[i][q].ToLower() == scoreType.Type.ToLower())
+                                {
+                                    Scores += scoreType.Score;
+                                }
+                            }
+                        }
                     }
                 }
 

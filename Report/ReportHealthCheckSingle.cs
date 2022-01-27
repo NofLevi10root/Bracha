@@ -255,49 +255,60 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 
         protected void GenerateContent()
         {
-            GenerateSection("Active Directory Indicators", () =>
+            GenerateSection("Domain", () =>
             {
-                AddParagraph("This section focuses on the core security indicators.<br>Locate the sub-process determining the score and fix some rules in that area to get a score improvement.");
-                GenerateIndicators(Report, Report.AllRiskRules, AddBenchmarkSection);
-                GenerateRiskModelPanel(Report.RiskRules);
-            });
+                GenerateSection("Active Directory Indicators", () =>
+                {
+                    AddParagraph("This section focuses on the core security indicators.<br>Locate the sub-process determining the score and fix some rules in that area to get a score improvement.");
+                    GenerateIndicators(Report, Report.AllRiskRules, AddBenchmarkSection, true);
+                    GenerateRiskModelPanel(Report.RiskRules, true);
+                });
 
-            GenerateSection("Maturity Level", GenerateMaturityInformation);
-            GenerateSection("MITRE ATT&CK&#174;", GenerateMitreAttackInformation);
+                GenerateSection("Maturity Level", GenerateMaturityInformation);
+                GenerateSection("MITRE ATT&CK&#174;", GenerateMitreAttackInformation);
 
-            GenerateSection("Stale Objects", () =>
-            {
-                GenerateSubIndicator("Stale Objects", Report.GlobalScore, Report.StaleObjectsScore, "It is about operations related to user or computer objects");
-                GenerateIndicatorPanel("DetailStale", "Stale Objects rule details", RiskRuleCategory.StaleObjects, Report.RiskRules, Report.applicableRules);
+                GenerateSection("Stale Objects", () =>
+                {
+                    GenerateSubIndicator("Stale Objects", Report.GlobalScore, Report.StaleObjectsScore, "It is about operations related to user or computer objects");
+                    GenerateIndicatorPanel("DetailStale", "Stale Objects rule details", RiskRuleCategory.StaleObjects, Report.RiskRules, Report.applicableRules);
+                });
+                GenerateSection("Privileged Accounts", () =>
+                {
+                    GenerateSubIndicator("Privileged Accounts", Report.GlobalScore, Report.PrivilegiedGroupScore, "It is about administrators of the Active Directory");
+                    GenerateIndicatorPanel("DetailPrivileged", "Privileged Accounts rule details", RiskRuleCategory.PrivilegedAccounts, Report.RiskRules, Report.applicableRules);
+                });
+                GenerateSection("Trusts", () =>
+                {
+                    GenerateSubIndicator("Trusts", Report.GlobalScore, Report.TrustScore, "It is about links between two Active Directories");
+                    GenerateIndicatorPanel("DetailTrusts", "Trusts rule details", RiskRuleCategory.Trusts, Report.RiskRules, Report.applicableRules);
+                });
+                GenerateSection("Anomalies analysis", () =>
+                {
+                    GenerateSubIndicator("Anomalies", Report.GlobalScore, Report.AnomalyScore, "It is about specific security control points");
+                    GenerateIndicatorPanel("DetailAnomalies", "Anomalies rule details", RiskRuleCategory.Anomalies, Report.RiskRules, Report.applicableRules);
+                });
+                GenerateSection("Domain Information", GenerateDomainInformation);
+                GenerateSection("User Information", GenerateUserInformation);
+                GenerateSection("Computer Information", GenerateComputerInformation);
+                GenerateSection("Admin Groups", GenerateAdminGroupsInformation);
+                GenerateSection("Control Paths Analysis", GenerateCompromissionGraphInformation);
+                GenerateSection("Trusts details", GenerateTrustInformation);
+                GenerateSection("PKI", GeneratePKIDetail);
+                GenerateSection("Infrastructure", GenerateInfrastructureDetail);
+                GenerateSection("Anomalies", GenerateAnomalyDetail);
+                GenerateSection("Password Policies", GeneratePasswordPoliciesDetail);
+                GenerateSection("GPO", GenerateGPODetail);
             });
-            GenerateSection("Privileged Accounts", () =>
+            GenerateSection("Host", () =>
             {
-                GenerateSubIndicator("Privileged Accounts", Report.GlobalScore, Report.PrivilegiedGroupScore, "It is about administrators of the Active Directory");
-                GenerateIndicatorPanel("DetailPrivileged", "Privileged Accounts rule details", RiskRuleCategory.PrivilegedAccounts, Report.RiskRules, Report.applicableRules);
+                GenerateSection("Hosts Checkes", () =>
+                {
+                    GenerateIndicators(Report, Report.AllRiskRules, AddBenchmarkSection, false);
+                    GenerateRiskModelPanel(Report.RiskRules, false);
+                });
+                //CustomData.GenerateCustomCategoriesSections(Report.GlobalScore);
+                CustomData.GenerateCustomInformationSections();
             });
-            GenerateSection("Trusts", () =>
-            {
-                GenerateSubIndicator("Trusts", Report.GlobalScore, Report.TrustScore, "It is about links between two Active Directories");
-                GenerateIndicatorPanel("DetailTrusts", "Trusts rule details", RiskRuleCategory.Trusts, Report.RiskRules, Report.applicableRules);
-            });
-            GenerateSection("Anomalies analysis", () =>
-            {
-                GenerateSubIndicator("Anomalies", Report.GlobalScore, Report.AnomalyScore, "It is about specific security control points");
-                GenerateIndicatorPanel("DetailAnomalies", "Anomalies rule details", RiskRuleCategory.Anomalies, Report.RiskRules, Report.applicableRules);
-            });
-            CustomData.GenerateCustomCategoriesSections(Report.GlobalScore);
-            GenerateSection("Domain Information", GenerateDomainInformation);
-            GenerateSection("User Information", GenerateUserInformation);
-            GenerateSection("Computer Information", GenerateComputerInformation);
-            GenerateSection("Admin Groups", GenerateAdminGroupsInformation);
-            GenerateSection("Control Paths Analysis", GenerateCompromissionGraphInformation);
-            GenerateSection("Trusts details", GenerateTrustInformation);
-            GenerateSection("PKI", GeneratePKIDetail);
-            GenerateSection("Infrastructure", GenerateInfrastructureDetail);
-            GenerateSection("Anomalies", GenerateAnomalyDetail);
-            GenerateSection("Password Policies", GeneratePasswordPoliciesDetail);
-            GenerateSection("GPO", GenerateGPODetail);
-            CustomData.GenerateCustomInformationSections();
         }
 
         protected override void GenerateFooterInformation()
@@ -884,7 +895,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             AddBeginTableData();
             AddBeginRow();
             CustomData.AddTableKeyCell("Domain information", Report.DomainFQDN);
-           AddCellText(Report.NetBIOSName);
+            AddCellText(Report.NetBIOSName);
             AddCellText(ReportHelper.DecodeDomainFunctionalLevel(Report.DomainFunctionalLevel));
             AddCellText(ReportHelper.DecodeForestFunctionalLevel(Report.ForestFunctionalLevel));
             AddCellDate(Report.DomainCreation);
