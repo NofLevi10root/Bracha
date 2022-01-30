@@ -4097,5 +4097,119 @@ In this case, the vulnerability is exploitable even if Exchange has been uninsta
   </data>
   <data name="S_ADRegistrationSchema_Detail" xml:space="preserve">
     <value>Class: {0}  Vulnerability: {1}</value>
+      </data>
+        <data name="A_DsHeuristicsLDAPSecurity_Description" xml:space="preserve">
+    <value>The purpose is to identify domains having mitigation for CVE-2021-42291 not set to enabled</value>
+  </data>
+	<data name="A_DsHeuristicsLDAPSecurity_Documentation" xml:space="preserve">
+    <value>https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/e5899be4-862e-496f-9a38-33950617d2c5
+https://support.microsoft.com/en-au/topic/kb5008383-active-directory-permissions-updates-cve-2021-42291-536d5555-ffba-4248-a60e-d6cbc849cde1</value>
+  </data>
+	<data name="A_DsHeuristicsLDAPSecurity_Rationale" xml:space="preserve">
+    <value>DsHeuristics has not been set to enable the mitigation for CVE-2021-42291</value>
+  </data>
+	<data name="A_DsHeuristicsLDAPSecurity_Solution" xml:space="preserve">
+    <value>The easiest and fastest way to correct this issue is to &lt;b&gt;replace the 28th and 29th character of the DsHeuristics attribute&lt;/b&gt;.
+    The value of LDAPAddAutZVerifications and LDAPOwnerModify should be set to 1.
+    
+    Open the procedure embedded into the KB5008383 to apply this mitigation and change the DsHeuristics value.
+    
+    Note: you have to pay attention that there is control characters at the 10th and 20th position to avoid undesired changes of the DsHeuristics attribute.
+    Typically if the DsHeuristics is empty, the expected new value is 00000000010000000002000000011
+    </value>
+  </data>
+	<data name="A_DsHeuristicsLDAPSecurity_TechnicalExplanation" xml:space="preserve">
+    <value>The way an Active Directory behaves can be controlled via the attribute &lt;i&gt;DsHeuristics&lt;/i&gt; of &lt;i&gt;CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration&lt;/i&gt;.
+    A parameter stored in its attribute and whose value is &lt;i&gt;LDAPAddAutZVerifications&lt;/i&gt; and &lt;i&gt;LDAPOwnerModify&lt;/i&gt; can be set to modify the mitigatation of CVE-2021-42291.
+The KB5008383 has introduced changes to default security descriptor of Computer containers to add audit and limit computer creation without being admin.
+Indeed, it is recommended to not let anyone create computer accounts as they can be used to abuse kerberos or to perform relay attacks.
+
+Mitigations in CVE-2021-42291 consist of 3 choices to be set on 2 settings.
+They are named LDAPAddAutZVerifications and LDAPOwnerModify and are respectively the 28th and 29th character of this string.
+For the expected values:
+- With the value 0 (the default), it enables an additional audit mechanism
+- With the value 1 (recommended), it enforces new security permissions, especially to require an action of the domain admin when unusual actions are performed
+- With the value 2 (not recommended), it disables the audit mechanism that has been added by default and do not enable the new security permissions
+</value>
+  </data>
+  <data name="A_DsHeuristicsLDAPSecurity_Detail" xml:space="preserve">
+    <value>Setting: {0} Position: {1} Value: {2}</value>
+  </data>
+	<data name="A_DsHeuristicsLDAPSecurity_Title" xml:space="preserve">
+    <value>Check if the mitigation for CVE-2021-42291 has been enabled</value>
+  </data>
+         <data name="A_DnsZoneAUCreateChild_Description" xml:space="preserve">
+    <value>The purpose is to check if Authenticated Users has the right to create DNS records</value>
+  </data>
+  <data name="A_DnsZoneAUCreateChild_Documentation" xml:space="preserve">
+    <value>https://www.ws-its.de/gegenmassnahme-zum-angriff-dns-wildcard/
+https://www.netspi.com/blog/technical/network-penetration-testing/exploiting-adidns/</value>
+  </data>
+  <data name="A_DnsZoneAUCreateChild_Rationale" xml:space="preserve">
+    <value>Authenticated Users can create DNS records</value>
+  </data>
+  <data name="A_DnsZoneAUCreateChild_Solution" xml:space="preserve">
+    <value>As today this rule is considered as informative because the default configuration where Authenticated Users can create DNS records is considered safe.
+  The reason for this classification is that no exploitation of that vulnerability has been reported.
+    
+The proposed enhancement is to replace the identity who has been granted the right to create DNS Records (permission CreateChild) from Authenticated Users to Domain Computers.
+To perform this change, you have to edit the permission of the DNSZone whose object is located in the container CN=MicrosoftDNS,DC=DomainDnsZones.
+
+It should be noticed that if there is a privilege escalation on a computer, an attacker can impersonate the computer account and bypass this mitigation.
+
+The best mitigation is to create the DNS records manually as part as the domain join process and to revoke the permission granted to Authenticated Users.
+    </value>
+  </data>
+  <data name="A_DnsZoneAUCreateChild_TechnicalExplanation" xml:space="preserve">
+    <value>When a computer is joined to a domain, a DNS record is created in the DnsZone to allow the computer to update its DNS settings.
+    By design, Microsoft choose to grant to the group Authenticated Users (aka every computers and users) the right to create DNS records.
+    Once created, only the owner keep the right to edit the new object.
+    
+    The vulnerability is that specific DNS records can be created to perform man-in-the-middle attacks.
+    One example is to create a wildcard record (a record with the name "*"), a failover DNS record or anticipating the creation of a DNS record with the right permissions.
+</value>
+  </data>
+  <data name="A_DnsZoneAUCreateChild_Detail" xml:space="preserve">
+    <value>DNSZone: {0}</value>
+  </data>
+  <data name="A_DnsZoneAUCreateChild_Title" xml:space="preserve">
+    <value>Check if Authenticated Users can create DNS records</value>
+      </data>
+<data name="A_DnsZoneAUCreateChild_Description" xml:space="preserve">
+    <value>The purpose is to check if Authenticated Users has the right to create DNS records</value>
+  </data>
+  <data name="A_DnsZoneAUCreateChild_Documentation" xml:space="preserve">
+    <value>https://www.ws-its.de/gegenmassnahme-zum-angriff-dns-wildcard/
+https://www.netspi.com/blog/technical/network-penetration-testing/exploiting-adidns/</value>
+  </data>
+  <data name="A_DnsZoneAUCreateChild_Rationale" xml:space="preserve">
+    <value>Authenticated Users can create DNS records</value>
+  </data>
+  <data name="A_DnsZoneAUCreateChild_Solution" xml:space="preserve">
+    <value>As today this rule is considered as informative because the default configuration where Authenticated Users can create DNS records is considered safe.
+  The reason for this classification is that no exploitation of that vulnerability has been reported.
+    
+The proposed enhancement is to replace the identity who has been granted the right to create DNS Records (permission CreateChild) from Authenticated Users to Domain Computers.
+To perform this change, you have to edit the permission of the DNSZone whose object is located in the container CN=MicrosoftDNS,DC=DomainDnsZones.
+
+It should be noticed that if there is a privilege escalation on a computer, an attacker can impersonate the computer account and bypass this mitigation.
+
+The best mitigation is to create the DNS records manually as part as the domain join process and to revoke the permission granted to Authenticated Users.
+    </value>
+  </data>
+  <data name="A_DnsZoneAUCreateChild_TechnicalExplanation" xml:space="preserve">
+    <value>When a computer is joined to a domain, a DNS record is created in the DnsZone to allow the computer to update its DNS settings.
+    By design, Microsoft choose to grant to the group Authenticated Users (aka every computers and users) the right to create DNS records.
+    Once created, only the owner keep the right to edit the new object.
+    
+    The vulnerability is that specific DNS records can be created to perform man-in-the-middle attacks.
+    One example is to create a wildcard record (a record with the name "*"), a failover DNS record or anticipating the creation of a DNS record with the right permissions.
+</value>
+  </data>
+  <data name="A_DnsZoneAUCreateChild_Detail" xml:space="preserve">
+    <value>DNSZone: {0}</value>
+  </data>
+  <data name="A_DnsZoneAUCreateChild_Title" xml:space="preserve">
+    <value>Check if Authenticated Users can create DNS records</value>
   </data>
 </root>
