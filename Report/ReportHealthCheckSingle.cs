@@ -255,7 +255,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 
         protected void GenerateContent()
         {
-            GenerateSection("Domain", () =>
+            GenerateSection("Active Directory", () =>
             {
                 GenerateSection("Active Directory Indicators", () =>
                 {
@@ -301,9 +301,9 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             });
             if (CustomData.Categories.Count > 0)
             {
-                GenerateSection("Host", () =>
+                GenerateSection("End-Points", () =>
                 {
-                    GenerateSection("Hosts Checkes", () =>
+                    GenerateSection("End-Points Indicators", () =>
                     {
                         GenerateIndicators(Report, Report.AllRiskRules, AddBenchmarkSection, false);
                         GenerateRiskModelPanel(Report.RiskRules, false);
@@ -496,7 +496,6 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                                 levelRules[rule.Points].Add(rule);
                             }
                         }
-                        CustomData.AddHealthRulesToCurrentMaturityLevel(l, levelRules);
 
                         foreach (var listRule in levelRules)
                         {
@@ -536,7 +535,6 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     output[level] = new List<string>();
                 output[level].Add(hcrule.RiskId);
             }
-            CustomData.AddToMaturityLevelsDict(output);
             return output;
         }
         #endregion

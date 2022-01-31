@@ -5,8 +5,13 @@
     <Categories>
         <Category>
             <Id>compliance_category_id</Id>
-            <Name>Host Checks</Name>
+            <Name>Windows hardening</Name>
             <Explanation>Windows Hardening</Explanation>
+        </Category>
+        <Category>
+            <Id>zircolite_category_id</Id>
+            <Name>Threat hunting</Name>
+            <Explanation>SIGMA RULES</Explanation>
         </Category>
     </Categories>
     <Models>
@@ -18,7 +23,7 @@
         <Model>
             <Id>zircolite_model_id</Id>
             <Description>Threat Hunting</Description>
-            <Category>compliance_category_id</Category>
+            <Category>zircolite_category_id</Category>
         </Model>
     </Models>
     <RiskRules>
@@ -31,7 +36,25 @@
             <Title>Windows Hardening</Title>
             <Description>Desc</Description>
             <TechnicalExplanation>TechExplanation</TechnicalExplanation>
+	<SectionId>compliance_section_id</SectionId>
             <Solution>Solution</Solution>
+		<RulePoints>
+<Column>severity</Column>
+<ColumnsScores>
+<ScoreType>
+<Type>High</Type>
+<Score>3</Score>
+</ScoreType>
+<ScoreType>
+<Type>Medium</Type>
+<Score>2</Score>
+</ScoreType>
+<ScoreType>
+<Type>Low</Type>
+<Score>1</Score>
+</ScoreType>
+</ColumnsScores>
+</RulePoints>
 	    <ReportLocation>
 		<Target>panelsectioncompliance_section_id</Target>
 		<Text>Windows Hardening</Text>
@@ -46,10 +69,28 @@
             <Title>zircolite logs</Title>
             <Description>Desc</Description>
             <TechnicalExplanation>TechExplanation</TechnicalExplanation>
+<SectionId>zircolite_section_id</SectionId>
             <Solution>Solution</Solution>
+		<RulePoints>
+<Column>rule_level</Column>
+<ColumnsScores>
+<ScoreType>
+<Type>Critical</Type>
+<Score>3</Score>
+</ScoreType>
+<ScoreType>
+<Type>High</Type>
+<Score>2</Score>
+</ScoreType>
+<ScoreType>
+<Type>Medium</Type>
+<Score>1</Score>
+</ScoreType>
+</ColumnsScores>
+</RulePoints>
 	    <ReportLocation>
 		<Target>panelsectionzircolite_section_id</Target>
-		<Text>sigma rules section</Text>
+		<Text>sigma rules</Text>
 	    </ReportLocation>
         </RiskRule>
     </RiskRules>
@@ -93,7 +134,7 @@
         </InformationSection>
         <InformationSection>
             <Id>zircolite_section_id</Id>
-            <Name>Sigma Rules Section</Name>
+            <Name>Sigma Rules</Name>
             <Children>
                 <Child>
                     <Type>Table</Type>
@@ -118,27 +159,5 @@
 		</NestedColumn>
 	   </NestedColumns>
         </Table>
-    </Tables>
-    <Charts>
-        <Chart>
-            <Id>ChartCalendarExample</Id>
-            <ChartType>Calendar</ChartType>
-            <Interval>1</Interval>
-            <Columns>30</Columns>
-            <BaseDate>01/12/2021</BaseDate>
-        </Chart>
-        <Chart>
-            <Id>ChartNumeric</Id>
-            <ChartType>Numeric</ChartType>
-            <Interval>10</Interval>
-            <Columns>20</Columns>
-            <Units>Years</Units>
-        </Chart>
-        <Chart>
-            <Id>ChartNominal</Id>
-            <ChartType>Nominal</ChartType>
-            <Interval>1</Interval>
-            <Columns>3</Columns>
-        </Chart>
-    </Charts>
+    </Tables>   
 </CustomHealthCheckData>
