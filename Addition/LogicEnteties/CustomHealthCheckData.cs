@@ -977,7 +977,7 @@ namespace PingCastle.Addition.LogicEnteties
                                     var d = Categories.FirstOrDefault(c => c.Id == categoty);
                                     if (d != null)
                                     {
-                                        refsManager.GenerateSubIndicatorRef(d.Name, 5, d.Score, d.Explanation);
+                                        AddCustomCategoriesCharts(d);
                                     }
                                 }
                             }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
 namespace PingCastle.Addition.ReportEnteties
@@ -409,19 +410,28 @@ namespace PingCastle.Addition.ReportEnteties
                     }
                     if (customTableScore is ThreatHuntingScores threatHunting)
                     {
+                        var computerList = new List<string>();
+                        foreach (var tableRow in targetTable)
+                        {
+                            var computrName = Regex.Match(tableRow, @"(?<=Computer:)(.*?)(?=Channel:)").Value;
+                            if(!computerList.Contains(computrName))
+                            {
+                                computerList.Add(computrName);
+                            }
+                        }
                         switch (value.ToLower())
                         {
                             case "critical":
-                                threatHunting.Critical += targetTable.Count;
+                                threatHunting.Critical += computerList.Count;
                                 break;
                             case "high":
-                                threatHunting.High += targetTable.Count;
+                                threatHunting.High += computerList.Count;
                                 break;
                             case "medium":
-                                threatHunting.Medium += targetTable.Count;
+                                threatHunting.Medium += computerList.Count;
                                 break;
                             case "low":
-                                threatHunting.Low += targetTable.Count;
+                                threatHunting.Low += computerList.Count;
                                 break;
                             default:
                                 break;
