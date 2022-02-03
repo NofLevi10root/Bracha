@@ -274,11 +274,11 @@ namespace PingCastle.Addition.LogicEnteties
                                         var customTableScores = dictTables[detail.Id].AddDetail(detail, CustomDelimiter);
                                         if (customTableScores != null)
                                         {
-                                            if(customTableScores is ComplinceScores complince)
+                                            if (customTableScores is ComplinceScores complince)
                                             {
                                                 ComplinceScores = complince;
                                             }
-                                            if(customTableScores is ThreatHuntingScores zircolite)
+                                            if (customTableScores is ThreatHuntingScores zircolite)
                                             {
                                                 ThreatHuntingScores = zircolite;
                                             }
@@ -1074,7 +1074,7 @@ namespace PingCastle.Addition.LogicEnteties
             var data = new SortedDictionary<int, int>();
             int highest = 0;
             int max = 0;
-             int division = 0;
+            int division = 0;
             var columns = new List<string>();
             values = new Dictionary<int, int>();
             switch (category.Id)
@@ -1144,23 +1144,33 @@ namespace PingCastle.Addition.LogicEnteties
                 max = 50;
             else
                 max = 10;
-          
+
             for (int i = 0; i < division; i++)
             {
                 if (!data.ContainsKey(i))
                     data[i] = 0;
             }
-   //         refsManager.AddRef(@"
-			//<div class=""col-xs-12 col-md-6 col-sm-6"">
-			//	<div class=""row"">
-			//		<div class=""col-md-4 col-xs-8 col-sm-9"">");
-            refsManager.AddRef(@" <div id='pdwdistchart'");
+            //         refsManager.AddRef(@"
+            //<div class=""col-xs-12 col-md-6 col-sm-6"">
+            //	<div class=""row"">
+            //		<div class=""col-md-4 col-xs-8 col-sm-9"">");
+            refsManager.AddRef(@"<div id='pdwdistchart' class=""catgoryChart""");
             refsManager.AddRef(id);
-            refsManager.AddRef(@"'><svg viewBox='0 0 1000 400'>");
+            refsManager.AddRef(@"<p class= ""categoryName"">");
+            refsManager.AddRef(category.Name);
+            refsManager.AddRef(@"<p class=""categoryExplanation"">");
+            refsManager.AddEncodedRef(category.Explanation);
+            refsManager.AddRef(@"</p>");
+            refsManager.AddRef(@"</p>");
+            refsManager.AddRef(@"<svg width= ""100%""; viewBox='0 0 1000 400'>");
             refsManager.AddRef(@"<g transform=""translate(40,20)"">");
             // horizontal scale
-            refsManager.AddRef(@"<g transform=""translate(0,290)"" fill=""none"" font-size=""13"" font-family=""sans-serif"" text-anchor=""middle"">");
-            refsManager.AddRef(@"<path class=""domain"" stroke=""#000"" d=""M0.5,0V0.5H950V0""></path>");
+            refsManager.AddRef(@"<g transform=""translate(0,290)"" fill=""none"" font-size=""19"" font-family=""sans-serif"" text-anchor=""middle"">");
+            refsManager.AddRef(@"<path  class=""domain"" stroke=""#000"" d=""M 0, 0 h250"" pathLength=""90""></path>");
+
+
+           
+
             for (int i = 0; i < columns.Count; i++)
             {
                 double v = 13.06 + (i) * horizontalStep;
@@ -1171,7 +1181,7 @@ namespace PingCastle.Addition.LogicEnteties
             refsManager.AddRef(@"</g>");
             // vertical scale
             refsManager.AddRef(@"<g fill=""none"" font-size=""13"" font-family=""sans-serif"" text-anchor=""end"">");
-            refsManager.AddRef(@"<path class=""domain"" stroke=""#000"" d=""M-6,290.5H0.5V0.5H-6""></path>");
+            refsManager.AddRef(@"<path class=""domain"" pathLength=""40"" stroke=""#000"" d=""M-6,290.5H0.5V0.5H-6""></path>");
             for (int i = 0; i < 6; i++)
             {
                 double v = 290 - i * 55;
@@ -1200,7 +1210,7 @@ namespace PingCastle.Addition.LogicEnteties
                 double size = 290 * value / max;
                 if (size > 290) size = 290;
                 double w = horizontalStep - 3;
-                string tooltip = string.Empty;               
+                string tooltip = string.Empty;
                 if (string.IsNullOrEmpty(tooltip))
                     tooltip = value.ToString();
                 refsManager.AddRef(@"<rect class=""bar"" fill=""#Fa9C1A"" x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
@@ -1208,14 +1218,6 @@ namespace PingCastle.Addition.LogicEnteties
                 refsManager.AddRef(@"""></rect>");
             }
             refsManager.AddRef(@"</g></svg></div>");
-            //refsManager.AddRef(@"<div class=""col-md-6 col-xs-8 col-sm-9"">");
-            refsManager.AddRef(@"<p>");
-            refsManager.AddRef(category.Name);
-            refsManager.AddRef(@"<p class=""small"">");
-            refsManager.AddEncodedRef(category.Explanation);
-            refsManager.AddRef(@"</p>");
-            refsManager.AddRef(@"</p>");
-            //refsManager.AddRef(@"</div></div>");
         }
         #endregion
 
