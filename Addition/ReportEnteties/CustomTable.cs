@@ -1,5 +1,6 @@
 ﻿using PingCastle.Addition.ReportEnteties;
 using PingCastle.Addition.StructureEnteties;
+using PingCastle.Addition.StructuresEnteties;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,8 +33,6 @@ namespace PingCastle.Addition.ReportEnteties
         [XmlIgnore]
         public List<string> Keys { get; set; } = new List<string>();
 
-        [XmlIgnore]
-        public int Scores { get; set; } = 0;
         #endregion
 
         #region Fields
@@ -54,28 +53,28 @@ namespace PingCastle.Addition.ReportEnteties
             {
                 foreach (var col in Columns)
                     dictCols[col.Header] = col;
-                if(!string.IsNullOrEmpty(NestedTablesDirectory))
+                if (!string.IsNullOrEmpty(NestedTablesDirectory))
                 {
                     if (NestedTablesDirectory.StartsWith(@".\"))
                         NestedTablesDirectory = baseDataDirectory + "\\" + NestedTablesDirectory.Substring(2);
-                    if(Directory.Exists(NestedTablesDirectory))
+                    if (Directory.Exists(NestedTablesDirectory))
                     {
-                        foreach(var file in Directory.GetFiles(NestedTablesDirectory))
+                        foreach (var file in Directory.GetFiles(NestedTablesDirectory))
                         {
                             string fileName = Path.GetFileNameWithoutExtension(file);
                             dictNestedTables[fileName] = true;
                         }
 
-                        if(NestedColumns != null && NestedColumns.Count > 0)
+                        if (NestedColumns != null && NestedColumns.Count > 0)
                         {
                             foreach (var nestedColumn in NestedColumns)
                             {
-                                if(!string.IsNullOrEmpty(nestedColumn.NestedColumnPath))
+                                if (!string.IsNullOrEmpty(nestedColumn.NestedColumnPath))
                                 {
                                     dictNestedColumnFile[nestedColumn] = new Dictionary<string, bool>();
                                     if (nestedColumn.NestedColumnPath.StartsWith(@".\"))
                                         nestedColumn.NestedColumnPath = baseDataDirectory + "\\" + nestedColumn.NestedColumnPath.Substring(2);
-                                    if(Directory.Exists(nestedColumn.NestedColumnPath))
+                                    if (Directory.Exists(nestedColumn.NestedColumnPath))
                                     {
                                         foreach (var file in Directory.GetFiles(nestedColumn.NestedColumnPath))
                                         {
@@ -112,28 +111,52 @@ namespace PingCastle.Addition.ReportEnteties
                 Console.WriteLine(e);
             }
         }
-        public void AddDetail(CustomRuleDetails detail, string delimiter, CustomRulePoints customRulePoints)
+        public CustomTableScores AddDetail(CustomRuleDetails detail, string delimiter)
         {
+            CustomTableScores customTableScore = null;
             try
             {
-                Scores = 0;
                 if (!File.Exists(detail.FilePath))
-                    return;
+                    return null;
                 var lines = File.ReadAllLines(detail.FilePath);
                 if (lines.Length == 0)
-                    return;
+                    return null;
 
+                var column = string.Empty;
+                var columnIndex = -1;
+                switch (detail.Id)
+                {
+                    case "compliance_table_id":
+                        customTableScore = new ComplinceScores();
+                        column = "Severity";
+                        break;
+                    case "zircolite_table_id":
+                        customTableScore = new ThreatHuntingScores();
+                        column = "rule_level";
+                        break;
+                    case "yara_table_id":
+                        customTableScore = new YaraScores();
+                        break;
+                    case "wesng_table_id":
+                        customTableScore = new WesngScores();
+                        break;
+                    case "snaffler_table_id":
+                        customTableScore = new SnafflerScores();
+                        break;
+                    default:
+                        break;
+                }
                 var headers = lines[0].Split(new string[] { delimiter }, StringSplitOptions.None);
-                if(customRulePoints!= null && !string.IsNullOrEmpty(customRulePoints.Column))
+                if (!string.IsNullOrEmpty(column))
                 {
                     for (int i = 0; i < headers.Length; i++)
                     {
-                        if(headers[i].ToLower() == customRulePoints.Column.ToLower())
+                        if (headers[i].ToLower() == column.ToLower())
                         {
-                            customRulePoints.ColumnIndex = i;
+                            columnIndex = i;
+                            break;
                         }
                     }
-                    
                 }
 
                 var colsNum = headers.Length;
@@ -146,14 +169,65 @@ namespace PingCastle.Addition.ReportEnteties
                     for (int q = 0; q < maxQ; q++)
                     {
                         data[i][q] = lineParts[q].Trim();
-                        if (customRulePoints != null && customRulePoints.ColumnIndex == q && customRulePoints.ColumnScore != null)
+                        if (columnIndex == q)
                         {
-                            foreach (var scoreType in customRulePoints.ColumnScore)
+                            customTableScore = FillCustomTableScores(customTableScore, data[i][0], data[i][q], delimiter);
+                        }
+                        if (customTableScore is WesngScores wesngScores)
+                        {
+                            if (q == 3)
                             {
-                                if(data[i][q].ToLower() == scoreType.Type.ToLower())
+                                if (Int32.TryParse(data[i][q], out int value))
+                                    wesngScores.Critical += value;
+                            }
+                            if (q == 4)
+                            {
+                                if (Int32.TryParse(data[i][q], out int value))
+                                    wesngScores.Important += value;
+                            }
+                            if (q == 5)
+                            {
+                                if (Int32.TryParse(data[i][q], out int value))
+                                    wesngScores.Low += value;
+                            }
+                            if (q == 6)
+                            {
+                                if (Int32.TryParse(data[i][q], out int value))
+                                    wesngScores.Moderate += value;
+                            }
+                        }
+                        if (customTableScore is SnafflerScores snafflerScores)
+                        {
+                            if (q == 2)
+                            {
+                                if (Int32.TryParse(data[i][q], out int value))
                                 {
-                                    Scores += scoreType.Score;
+                                    snafflerScores.Black += value;
                                 }
+                            }
+                            if (q == 3)
+                            {
+                                if (Int32.TryParse(data[i][q], out int value))
+                                    snafflerScores.Red += value;
+                            }
+                            if (q == 4)
+                            {
+                                if (Int32.TryParse(data[i][q], out int value))
+                                    snafflerScores.Yellow += value;
+                            }
+                            if (q == 5)
+                            {
+                                if (Int32.TryParse(data[i][q], out int value))
+                                    snafflerScores.Green += value;
+                            }
+
+                        }
+                        if (customTableScore is YaraScores yaraScores)
+                        {
+                            if (q == 2)
+                            {
+                                if (Int32.TryParse(data[i][q], out int value))
+                                    yaraScores.NumOfResults += value;
                             }
                         }
                     }
@@ -189,7 +263,9 @@ namespace PingCastle.Addition.ReportEnteties
                 Console.WriteLine("Problem on 'AddDetail' method on 'CustomTable':");
                 Console.WriteLine(e);
             }
-            
+
+            return customTableScore;
+
         }
         public static List<string> GetTable(string filePath, string delimiter)
         {
@@ -205,7 +281,7 @@ namespace PingCastle.Addition.ReportEnteties
 
                 List<string> headers = new List<string>();
 
-                for(int i = 0; i < lines.Length; i++)
+                for (int i = 0; i < lines.Length; i++)
                 {
                     lines[i] = lines[i].Replace(": ", "#$%:%$#");
                 }
@@ -298,12 +374,64 @@ namespace PingCastle.Addition.ReportEnteties
                 if (nestedColumn.Value.ContainsKey(value))
                 {
                     var path = $"{nestedColumn.Key.NestedColumnPath}\\{value}.json";
-                    if (File.Exists(path)){
+                    if (File.Exists(path))
+                    {
                         result.Add(new KeyValuePair<string, string>(value, path));
                     }
                 }
             }
             return true;
+        }
+
+        private CustomTableScores FillCustomTableScores(CustomTableScores customTableScore, string key, string value, string delimiter)
+        {
+            if (customTableScore != null)
+            {
+                if (GetNestedTable(key, delimiter, out var targetTable))
+                {
+                    if (customTableScore is ComplinceScores complince)
+                    {
+                        switch (value.ToLower())
+                        {
+                            case "high":
+                                complince.High += targetTable.Count;
+                                break;
+                            case "medium":
+                                complince.Medium += targetTable.Count;
+                                break;
+                            case "low":
+                                complince.Low += targetTable.Count;
+                                break;
+                            default:
+                                break;
+                        }
+                        return complince;
+                    }
+                    if (customTableScore is ThreatHuntingScores threatHunting)
+                    {
+                        switch (value.ToLower())
+                        {
+                            case "critical":
+                                threatHunting.Critical += targetTable.Count;
+                                break;
+                            case "high":
+                                threatHunting.High += targetTable.Count;
+                                break;
+                            case "medium":
+                                threatHunting.Medium += targetTable.Count;
+                                break;
+                            case "low":
+                                threatHunting.Low += targetTable.Count;
+                                break;
+                            default:
+                                break;
+                        }
+                        return threatHunting;
+                    }
+                }
+            }
+
+            return customTableScore;
         }
 
         #endregion

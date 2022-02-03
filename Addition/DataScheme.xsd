@@ -60,28 +60,7 @@
 										<xsd:element name="Description" type="xsd:string" />
 										<xsd:element name="TechnicalExplanation" type="xsd:string" />
 										<xsd:element name="SectionId" type="xsd:string" />
-										<xsd:element name="Solution" type="xsd:string" />
-										<xsd:element name="RulePoints" minOccurs="0">
-											<xsd:complexType>
-												<xsd:sequence>
-													<xsd:element name="Column" type="xsd:string" />
-													<xsd:element minOccurs="0" name="ColumnsScores">
-														<xsd:complexType>
-															<xsd:sequence>
-																<xsd:element maxOccurs="unbounded" name="ScoreType">
-																	<xsd:complexType>
-																		<xsd:sequence>
-																			<xsd:element name="Type" type="xsd:string" />
-																			<xsd:element name="Score" type="xsd:string" />
-																		</xsd:sequence>
-																	</xsd:complexType>
-																</xsd:element>
-															</xsd:sequence>
-														</xsd:complexType>
-													</xsd:element>
-												</xsd:sequence>
-											</xsd:complexType>
-										</xsd:element>
+										<xsd:element name="Solution" type="xsd:string" />									
 										<xsd:element name="ReportLocation" minOccurs="0">
 											<xsd:complexType>
 												<xsd:sequence>
