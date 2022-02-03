@@ -633,7 +633,7 @@ namespace PingCastle.Addition.LogicEnteties
                 else if (custTable.GetNestedTable(value, CustomDelimiter, out var targetTable))
                 {
                     refsManager.AddBeginModalRef(refsManager.GenerateModalAdminGroupIdFromGroupNameRef($"table_{value}"), value, ShowModalType.XL);
-                    AddCustomTableHtml(targetTable, custTable);
+                    AddCustomTableHtml(cellValue,targetTable, custTable);
                     refsManager.AddEndModalRef(ShowModalType.XL);
                 }
             }
@@ -725,7 +725,7 @@ namespace PingCastle.Addition.LogicEnteties
             }
         }
 
-        private void AddCustomTableHtml(List<string> data, CustomTable custTable)
+        private void AddCustomTableHtml(object cellValue,List<string> data, CustomTable custTable)
         {
             try
             {
@@ -802,6 +802,13 @@ namespace PingCastle.Addition.LogicEnteties
                         refsManager.AddRef("</td>");
                         refsManager.AddRef("</tr>");
                     }
+                    if (custTable.Id == "snaffler_table_id")
+                    {
+                        string cellValueStr = (string)cellValue;
+                        string computersFile=Path.Combine(custTable.MoreDetails, cellValue + ".csv");
+                        refsManager.AddRef($@"</tbody></table><a target=""_blank"" href=""{computersFile}""><b>More details</b></a></div></div>");
+                    }
+                    else
                     refsManager.AddRef("</tbody></table></div></div>");
 
                 }

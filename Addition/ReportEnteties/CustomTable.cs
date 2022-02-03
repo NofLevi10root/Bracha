@@ -15,8 +15,8 @@ namespace PingCastle.Addition.ReportEnteties
     {
         #region Properties
         public string Id { get; set; }
-
         public string NestedTablesDirectory { get; set; }
+        public string MoreDetails { get; set; }
 
         [XmlArray("NestedColumns")]
         [XmlArrayItem("NestedColumn")]
