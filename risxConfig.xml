@@ -280,6 +280,7 @@
  	<Table>
             <Id>snaffler_table_id</Id>
             <NestedTablesDirectory>.\Reports\snaffler\lastReport\settings</NestedTablesDirectory>
+	<MoreDetails>.\Reports\snaffler\lastReport\computers</MoreDetails>
         </Table>
     </Tables>   
 </CustomHealthCheckData>

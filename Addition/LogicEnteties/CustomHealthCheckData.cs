@@ -802,7 +802,7 @@ namespace PingCastle.Addition.LogicEnteties
                         refsManager.AddRef("</td>");
                         refsManager.AddRef("</tr>");
                     }
-                    if (custTable.Id == "snaffler_table_id")
+                    if (!string.IsNullOrEmpty(custTable.MoreDetails))
                     {
                         string cellValueStr = (string)cellValue;
                         string computersFile=Path.Combine(custTable.MoreDetails, cellValue + ".csv");
