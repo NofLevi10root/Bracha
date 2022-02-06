@@ -237,6 +237,21 @@ html
  background-color:#28a745
 }
 
+
+.customCategoryChart {
+	display:inline-table;
+}
+.catgoryChart {
+	width: 50%;
+	display: inherit;
+}
+.categoryExplanation {
+	font-size: 50%;
+}
+.categoryName {
+	font-size: 60%;
+}
+
 .moreDetailsLink {
 	position: absolute;
 	right: 15px;

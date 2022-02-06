@@ -1,5 +1,6 @@
 ﻿using PingCastle.Addition.ReportEnteties;
 using PingCastle.Addition.StructureEnteties;
+using PingCastle.Addition.StructuresEnteties;
 using PingCastle.Data;
 using PingCastle.Healthcheck;
 using PingCastle.Properties;
@@ -8,6 +9,7 @@ using PingCastle.Rules;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -61,6 +63,21 @@ namespace PingCastle.Addition.LogicEnteties
 
         [XmlIgnore]
         public int GlobalScore { get; set; }
+
+        [XmlIgnore]
+        public ComplinceScores ComplinceScores { get; set; }
+
+        [XmlIgnore]
+        public ThreatHuntingScores ThreatHuntingScores { get; set; }
+
+        [XmlIgnore]
+        public YaraScores YaraScores { get; set; }
+
+        [XmlIgnore]
+        public WesngScores WesngScores { get; set; }
+
+        [XmlIgnore]
+        public SnafflerScores SnafflerScores { get; set; }
         #endregion
 
         #region Fields
@@ -214,6 +231,11 @@ namespace PingCastle.Addition.LogicEnteties
                 }
                 #endregion
                 #region Fill Health Risk Rules Data
+                ComplinceScores = new ComplinceScores();
+                ThreatHuntingScores = new ThreatHuntingScores();
+                YaraScores = new YaraScores();
+                WesngScores = new WesngScores();
+                SnafflerScores = new SnafflerScores();
                 foreach (var healthRule in HealthRules)
                 {
                     if (GetRiskRule(healthRule.RiskId, out var rule))
@@ -249,8 +271,30 @@ namespace PingCastle.Addition.LogicEnteties
                                         continue;
                                     if (dictTables.ContainsKey(detail.Id))
                                     {
-                                        dictTables[detail.Id].AddDetail(detail, CustomDelimiter, rule.RulePoints);
-                                        healthRule.Points += dictTables[detail.Id].Scores;
+                                        var customTableScores = dictTables[detail.Id].AddDetail(detail, CustomDelimiter);
+                                        if (customTableScores != null)
+                                        {
+                                            if (customTableScores is ComplinceScores complince)
+                                            {
+                                                ComplinceScores = complince;
+                                            }
+                                            if (customTableScores is ThreatHuntingScores zircolite)
+                                            {
+                                                ThreatHuntingScores = zircolite;
+                                            }
+                                            if (customTableScores is YaraScores yara)
+                                            {
+                                                YaraScores = yara;
+                                            }
+                                            if (customTableScores is WesngScores wesng)
+                                            {
+                                                WesngScores = wesng;
+                                            }
+                                            if (customTableScores is SnafflerScores snaffler)
+                                            {
+                                                SnafflerScores = snaffler;
+                                            }
+                                        }
                                     }
 
                                 }
@@ -758,7 +802,7 @@ namespace PingCastle.Addition.LogicEnteties
                         refsManager.AddRef("</td>");
                         refsManager.AddRef("</tr>");
                     }
-                    if (custTable.Id == "snaffler_table_id")
+                    if (!string.IsNullOrEmpty(custTable.MoreDetails))
                     {
                         string cellValueStr = (string)cellValue;
                         string computersFile=Path.Combine(custTable.MoreDetails, cellValue + ".csv");
@@ -940,7 +984,7 @@ namespace PingCastle.Addition.LogicEnteties
                                     var d = Categories.FirstOrDefault(c => c.Id == categoty);
                                     if (d != null)
                                     {
-                                        refsManager.GenerateSubIndicatorRef(d.Name, 5, d.Score, d.Explanation);
+                                        AddCustomCategoriesCharts(d);
                                     }
                                 }
                             }
@@ -1026,6 +1070,161 @@ namespace PingCastle.Addition.LogicEnteties
                         break;
                 }
             }
+        }
+
+        public void AddCustomCategoriesCharts(CustomRiskRuleCategory category)
+        {
+            var values = new Dictionary<int, int>();
+            var id = category.Id;
+            NumberFormatInfo nfi = new NumberFormatInfo();
+            nfi.NumberDecimalSeparator = ".";
+            var data = new SortedDictionary<int, int>();
+            int highest = 0;
+            int max = 0;
+            int division = 0;
+            var columns = new List<string>();
+            values = new Dictionary<int, int>();
+            switch (category.Id)
+            {
+                case "compliance_category_id":
+                    division = 3;
+                    columns = new List<string>() { "High", "Medium", "Low" };
+                    values.Add(0, ComplinceScores.High);
+                    values.Add(1, ComplinceScores.Medium);
+                    values.Add(2, ComplinceScores.Low);
+                    break;
+                case "zircolite_category_id":
+                    division = 4;
+                    columns = new List<string>() { "Critical", "High", "Medium", "Low" };
+                    values.Add(0, ThreatHuntingScores.Critical);
+                    values.Add(1, ThreatHuntingScores.High);
+                    values.Add(2, ThreatHuntingScores.Medium);
+                    values.Add(3, ThreatHuntingScores.Low);
+                    break;
+                case "yara_category_id":
+                    division = 1;
+                    columns = new List<string>() { "numOfFiles" };
+                    values.Add(0, YaraScores.NumOfResults);
+                    break;
+                case "wesng_category_id":
+                    division = 4;
+                    columns = new List<string>() { "Critical", "Important", "Low", "Moderate" };
+                    values.Add(0, WesngScores.Critical);
+                    values.Add(1, WesngScores.Important);
+                    values.Add(2, WesngScores.Low);
+                    values.Add(3, WesngScores.Moderate);
+                    break;
+                case "snaffler_category_id":
+                    division = 4;
+                    columns = new List<string>() { "Black", "Red", "Yellow", "Green" };
+                    values.Add(0, SnafflerScores.Black);
+                    values.Add(1, SnafflerScores.Red);
+                    values.Add(2, SnafflerScores.Yellow);
+                    values.Add(3, SnafflerScores.Green);
+                    break;
+                default:
+                    break;
+            }
+            const double horizontalStep = 50;
+            foreach (var entry in values)
+            {
+                data.Add(entry.Key, entry.Value);
+                if (highest < entry.Key)
+                    highest = entry.Key;
+                if (max < entry.Value)
+                    max = entry.Value;
+            }
+            // add missing data
+            if (max > 10000)
+                max = 10000;
+            else if (max >= 5000)
+                max = 10000;
+            else if (max >= 1000)
+                max = 5000;
+            else if (max >= 500)
+                max = 1000;
+            else if (max >= 100)
+                max = 500;
+            else if (max >= 50)
+                max = 100;
+            else if (max >= 10)
+                max = 50;
+            else
+                max = 10;
+
+            for (int i = 0; i < division; i++)
+            {
+                if (!data.ContainsKey(i))
+                    data[i] = 0;
+            }
+            //         refsManager.AddRef(@"
+            //<div class=""col-xs-12 col-md-6 col-sm-6"">
+            //	<div class=""row"">
+            //		<div class=""col-md-4 col-xs-8 col-sm-9"">");
+            refsManager.AddRef(@"<div id='pdwdistchart' class=""catgoryChart""");
+            refsManager.AddRef(id);
+            refsManager.AddRef(@"<p class= ""categoryName"">");
+            refsManager.AddRef(category.Name);
+            refsManager.AddRef(@"<p class=""categoryExplanation"">");
+            refsManager.AddEncodedRef(category.Explanation);
+            refsManager.AddRef(@"</p>");
+            refsManager.AddRef(@"</p>");
+            refsManager.AddRef(@"<svg width= ""100%""; viewBox='0 0 1000 400'>");
+            refsManager.AddRef(@"<g transform=""translate(40,20)"">");
+            // horizontal scale
+            refsManager.AddRef(@"<g transform=""translate(0,290)"" fill=""none"" font-size=""19"" font-family=""sans-serif"" text-anchor=""middle"">");
+            refsManager.AddRef(@"<path  class=""domain"" stroke=""#000"" d=""M 0, 0 h250"" pathLength=""90""></path>");
+
+
+           
+
+            for (int i = 0; i < columns.Count; i++)
+            {
+                double v = 13.06 + (i) * horizontalStep;
+                refsManager.AddRef(@"<g class=""tick"" opacity=""1"" transform=""translate(" + v.ToString(nfi) + @",30)""><line stroke=""#000"" y2=""0""></line><text fill=""#000"" y=""3"" dy="".15em"" dx=""-.8em"" transform=""rotate(-65)"">" +
+                    columns[i] + @"</text></g>");
+            }
+
+            refsManager.AddRef(@"</g>");
+            // vertical scale
+            refsManager.AddRef(@"<g fill=""none"" font-size=""13"" font-family=""sans-serif"" text-anchor=""end"">");
+            refsManager.AddRef(@"<path class=""domain"" pathLength=""40"" stroke=""#000"" d=""M-6,290.5H0.5V0.5H-6""></path>");
+            for (int i = 0; i < 6; i++)
+            {
+                double v = 290 - i * 55;
+                refsManager.AddRef(@"<g class=""tick"" opacity=""1"" transform=""translate(0," + v.ToString(nfi) + @")""><line stroke=""#000"" x2=""-6""></line><text fill=""#000"" x=""-9"" dy=""0.32em"">" +
+                    (max / 5 * i) + @"</text></g>");
+            }
+            refsManager.AddRef(@"</g>");
+            // bars
+            for (int i = 0; i < division; i++)
+            {
+                double v = 3.28 + horizontalStep * (i);
+                int value = 0;
+                if (data.ContainsKey(i))
+                    value = data[i];
+                double size = 290 * value / max;
+                if (size > 290) size = 290;
+                double w = horizontalStep - 3;
+                string tooltip = columns[i] + " " + value.ToString();
+                refsManager.AddRef(@"<rect class=""bar"" fill=""#Fa9C1A"" x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
+                refsManager.AddEncodedRef(tooltip);
+                refsManager.AddRef(@"""></rect>");
+            }
+            {
+                double v = 3.28 + horizontalStep * (division);
+                int value = 0;
+                double size = 290 * value / max;
+                if (size > 290) size = 290;
+                double w = horizontalStep - 3;
+                string tooltip = string.Empty;
+                if (string.IsNullOrEmpty(tooltip))
+                    tooltip = value.ToString();
+                refsManager.AddRef(@"<rect class=""bar"" fill=""#Fa9C1A"" x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
+                refsManager.AddEncodedRef(tooltip);
+                refsManager.AddRef(@"""></rect>");
+            }
+            refsManager.AddRef(@"</g></svg></div>");
         }
         #endregion
 

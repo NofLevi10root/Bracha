@@ -305,12 +305,15 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 {
                     GenerateSection("End-Points Indicators", () =>
                     {
-                        GenerateIndicators(Report, Report.AllRiskRules, AddBenchmarkSection, false);
-                        GenerateRiskModelPanel(Report.RiskRules, false);
+                        Add(@"<div class=""customCategoryChart"">");
+                        foreach (var category in CustomData.Categories)
+                        {
+                            CustomData.AddCustomCategoriesCharts(category);
+                        }
+                        Add(@"</div>");
                     });
-                //CustomData.GenerateCustomCategoriesSections(Report.GlobalScore);
-                CustomData.GenerateCustomInformationSections();
-                });
+                    CustomData.GenerateCustomInformationSections();
+                });               
             }
         }
 
@@ -324,7 +327,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
 
         protected void GenerateMaturityInformation()
         {
-            Add(@"<p>This section represents the maturity score (inspired from <a class=""hyperlink"" href='https://www.cert.ssi.gouv.fr/dur/CERTFR-2020-DUR-001/'>ANSSI</a>).</p>");
+            Add(@" < p>This section represents the maturity score (inspired from <a class=""hyperlink"" href='https://www.cert.ssi.gouv.fr/dur/CERTFR-2020-DUR-001/'>ANSSI</a>).</p>");
             if (string.IsNullOrEmpty(_license.Edition))
             {
                 AddParagraph("This feature is reserved for customers who have <a class=\"hyperlink\" href='https://www.pingcastle.com/services/'>purchased a license</a>");

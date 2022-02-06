@@ -115,10 +115,9 @@
     <Compile Include="Addition\ReportEnteties\CustomDocumentationLine.cs" />
     <Compile Include="Addition\LogicEnteties\CustomHealthCheckData.cs" />
     <Compile Include="Addition\ReportEnteties\NestedColumn.cs" />
-    <Compile Include="Addition\StructuresEnteties\CustomColumnScore.cs" />
+    <Compile Include="Addition\StructuresEnteties\ComplinceScores.cs" />
     <Compile Include="Addition\StructuresEnteties\CustomHealthCheckRiskRule.cs" />
     <Compile Include="Addition\ReportEnteties\CustomInformationSection.cs" />
-    <Compile Include="Addition\StructuresEnteties\CustomRulePoints.cs" />
     <Compile Include="Addition\StructuresEnteties\CustomTableKeyLink.cs" />
     <Compile Include="Addition\StructuresEnteties\CustomReportLocation.cs" />
     <Compile Include="Addition\ReportEnteties\CustomRiskModelCategory.cs" />
@@ -129,6 +128,11 @@
     <Compile Include="Addition\StructuresEnteties\CustomInformationSectionChild.cs" />
     <Compile Include="Addition\ReportEnteties\CustomTable.cs" />
     <Compile Include="Addition\StructuresEnteties\CustomTableColumn.cs" />
+    <Compile Include="Addition\StructuresEnteties\CustomTableScores.cs" />
+    <Compile Include="Addition\StructuresEnteties\SnafflerScores.cs" />
+    <Compile Include="Addition\StructuresEnteties\ThreatHuntingScores.cs" />
+    <Compile Include="Addition\StructuresEnteties\WesngScores.cs" />
+    <Compile Include="Addition\StructuresEnteties\YaraScores.cs" />
     <Compile Include="ADWS\IADConnection.cs" />
     <Compile Include="ADWS\LinuxConnection.cs" />
     <Compile Include="ADWS\LinuxFileConnection.cs" />
