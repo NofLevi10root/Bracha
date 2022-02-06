@@ -19,13 +19,17 @@ html
 		color: #000000;
 	}
 	.hyperlink {
-		color: #007bff;
+		color: #fa9c1a;
 	}
 	a {
-		color: #000000;
-	}
-	a[data-toggle="modal"]{
 		color: #fa9c1a;
+	}
+	a[data-toggle="modal"] {
+		color: #fa9c1a;
+	}
+
+	a[data-toggle="collapse"] {
+		color: #000000;
 	}
 /*	a:hover {
 		color: #58595b;
