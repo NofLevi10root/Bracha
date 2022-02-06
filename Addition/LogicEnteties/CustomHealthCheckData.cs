@@ -762,7 +762,7 @@ namespace PingCastle.Addition.LogicEnteties
                     {
                         string cellValueStr = (string)cellValue;
                         string computersFile=Path.Combine(custTable.MoreDetails, cellValue + ".csv");
-                        refsManager.AddRef($@"</tbody></table><a target=""_blank"" href=""{computersFile}""><b>More details</b></a></div></div>");
+                        refsManager.AddRef($@"</tbody></table><a class='moreDetailsLink' target=""_blank"" href=""{computersFile}""><b>More details</b></a></div></div>");
                     }
                     else
                     refsManager.AddRef("</tbody></table></div></div>");

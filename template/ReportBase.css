@@ -236,3 +236,8 @@ html
  color:#fff;
  background-color:#28a745
 }
+
+.moreDetailsLink {
+	position: absolute;
+	right: 15px;
+}
