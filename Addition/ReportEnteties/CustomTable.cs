@@ -228,7 +228,7 @@ namespace PingCastle.Addition.ReportEnteties
                             if (q == 2)
                             {
                                 if (Int32.TryParse(data[i][q], out int value))
-                                    yaraScores.NumOfResults += value;
+                                    yaraScores.Count += value;
                             }
                         }
                     }

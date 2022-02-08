@@ -19,7 +19,7 @@ html
 		color: #000000;
 	}
 	.hyperlink {
-		color: #fa9c1a;
+		color: #007bff;
 	}
 	a {
 		color: #fa9c1a;
@@ -259,4 +259,12 @@ html
 .moreDetailsLink {
 	position: absolute;
 	right: 15px;
+}
+
+.customTableColumn {
+	max-width: 200px;
+}
+
+#textId {
+	font-size: 1.2rem;
 }

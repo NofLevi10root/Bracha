@@ -300,6 +300,7 @@ namespace PingCastle.Report
 
         protected void AddHeaderText(string text, string tooltip = null, int rowspan = 0, int colspan = 0, bool widetooltip = false)
         {
+            
             Add("<th");
             if (rowspan != 0)
             {
@@ -327,6 +328,7 @@ namespace PingCastle.Report
 
         protected void AddCellText(string text, bool highlight = false, bool IsGood = false, string tooltip = null)
 	{
+            
             try
             {
 	    	Add("<td class='text'>");
@@ -363,6 +365,7 @@ namespace PingCastle.Report
 
         protected void AddCellTextNoWrap(string text)
         {
+          
             Add(@"<td class='text text-nowrap'>");
             if (footerMode)
                 Add("<b>");
@@ -714,8 +717,17 @@ namespace PingCastle.Report
         }
 
 		protected virtual void GenerateSection(string sectionId, string title, GenerateContentDelegate generateContent) // custom method
-		{
-			string id = "section" + sectionId;
+        {
+            switch (sectionId)
+            {
+                case "wesng_section_id":
+                    title = "Host-Based Vulnerability Scanner"; 
+                    break;
+                case "snaffler_section_id": 
+                    title = "Content Analyzer & Classifier"; 
+                    break;
+            }
+            string id = "section" + sectionId;
 			Add(@"
 <!-- Section " + title + @" -->
 <div id=""" + id + @""">
@@ -728,7 +740,25 @@ namespace PingCastle.Report
 					</div>
 					<div class=""card-body collapse show"" id=""panel" + id + @""">
 ");
-			generateContent();
+            switch (sectionId)
+            {
+                case "compliance_section_id":
+                    AddParagraph(@"<p>End-Point OS compliance check. Each End point is checked against a dedicated security authority baseline according to the OS version & Role.</p>");
+                    break;
+                case "zircolite_section_id":
+                    AddParagraph(@"<p>Checking the Eventlog against the Sigma rules public repository & custom rules created by 10Root experts.</p>");
+                    break;
+                case "yara_section_id":
+                    AddParagraph(@"<p>Scanning the End-point for Yara rules matched files.</p>");
+                    break;
+                case "wesng_section_id":
+                    AddParagraph(@"<p>Authenticated host vulnerability scanner based on OS patch level & MSRC DB.</p>");
+                    break;
+                case "snaffler_section_id":
+                    AddParagraph(@"<p>Analyzing file's content and classify them according to data sensitivity</p>");
+                    break;
+            }
+            generateContent();
 			Add(@"
 					</div>
 				</div>

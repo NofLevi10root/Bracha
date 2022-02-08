@@ -747,7 +747,7 @@ namespace PingCastle.Addition.LogicEnteties
                     var headers = new List<string>();
                     foreach (var token in tokens)
                     {
-                        refsManager.AddRef("<th>");
+                        refsManager.AddRef($"<th class='customTableColumn'>");
                         string parsedToken = token.Replace("#$%%$#", " ").Replace("#$%:%$#", ": ");
                         var header = parsedToken.Substring(0, parsedToken.Length - 1);
                         headers.Add(header);
@@ -771,7 +771,7 @@ namespace PingCastle.Addition.LogicEnteties
                                     refsManager.AddRef("</td>");
                                 }
                                 j++;
-                                refsManager.AddRef("<td>");
+                                refsManager.AddRef($"<td class='customTableColumn'>");
                             }
                             else
                             {
@@ -984,7 +984,7 @@ namespace PingCastle.Addition.LogicEnteties
                                     var d = Categories.FirstOrDefault(c => c.Id == categoty);
                                     if (d != null)
                                     {
-                                        AddCustomCategoriesCharts(d);
+                                        AddCustomCategoriesCharts(false,d);
                                     }
                                 }
                             }
@@ -1072,7 +1072,7 @@ namespace PingCastle.Addition.LogicEnteties
             }
         }
 
-        public void AddCustomCategoriesCharts(CustomRiskRuleCategory category)
+        public void AddCustomCategoriesCharts(bool viewTitles, CustomRiskRuleCategory category)
         {
             var values = new Dictionary<int, int>();
             var id = category.Id;
@@ -1083,15 +1083,22 @@ namespace PingCastle.Addition.LogicEnteties
             int max = 0;
             int division = 0;
             var columns = new List<string>();
+            var colors=new List<string>();
+            string uniqueColor = "#Fa9C1A";
             values = new Dictionary<int, int>();
+            string axisX="", axisY="";
             switch (category.Id)
             {
                 case "compliance_category_id":
                     division = 3;
                     columns = new List<string>() { "High", "Medium", "Low" };
+                    //colors = new List<string>() { "orange", "yellow", "green" };
+                    //uniqueColor=
                     values.Add(0, ComplinceScores.High);
                     values.Add(1, ComplinceScores.Medium);
                     values.Add(2, ComplinceScores.Low);
+                    axisX = "Severity";
+                    axisY = "Configurations";
                     break;
                 case "zircolite_category_id":
                     division = 4;
@@ -1100,11 +1107,15 @@ namespace PingCastle.Addition.LogicEnteties
                     values.Add(1, ThreatHuntingScores.High);
                     values.Add(2, ThreatHuntingScores.Medium);
                     values.Add(3, ThreatHuntingScores.Low);
+                    axisX = "Severity";
+                    axisY = "Rules";
                     break;
                 case "yara_category_id":
                     division = 1;
-                    columns = new List<string>() { "numOfFiles" };
-                    values.Add(0, YaraScores.NumOfResults);
+                    columns = new List<string>() { "count" };
+                    values.Add(0, YaraScores.Count);
+                    axisX = "Total";
+                    axisY = "Rules";
                     break;
                 case "wesng_category_id":
                     division = 4;
@@ -1113,6 +1124,8 @@ namespace PingCastle.Addition.LogicEnteties
                     values.Add(1, WesngScores.Important);
                     values.Add(2, WesngScores.Low);
                     values.Add(3, WesngScores.Moderate);
+                    axisX = "Severity";
+                    axisY = "CVE’s";
                     break;
                 case "snaffler_category_id":
                     division = 4;
@@ -1121,6 +1134,8 @@ namespace PingCastle.Addition.LogicEnteties
                     values.Add(1, SnafflerScores.Red);
                     values.Add(2, SnafflerScores.Yellow);
                     values.Add(3, SnafflerScores.Green);
+                    axisX = "Severity";
+                    axisY = "Findings";
                     break;
                 default:
                     break;
@@ -1157,19 +1172,41 @@ namespace PingCastle.Addition.LogicEnteties
                 if (!data.ContainsKey(i))
                     data[i] = 0;
             }
-            //         refsManager.AddRef(@"
+            //refsManager.AddRef(@"
             //<div class=""col-xs-12 col-md-6 col-sm-6"">
             //	<div class=""row"">
             //		<div class=""col-md-4 col-xs-8 col-sm-9"">");
+            string categoryName = category.Name;
+            string categoryExplanation = category.Explanation;
+            if (viewTitles)
+            {
+                switch (category.Id)
+                {
+                    case "wesng_category_id":
+                        categoryName = "Host-Based Vulnerability Scanner";
+                        categoryExplanation = "Host-Based Vulnerability Scanner";
+                        break;
+                    case "snaffler_category_id":
+                        categoryName = "Content Analyzer & Classifier";
+                        categoryExplanation = "Content Analyzer & Classifier";
+                        break;
+                }
+            }
+
             refsManager.AddRef(@"<div id='pdwdistchart' class=""catgoryChart""");
             refsManager.AddRef(id);
             refsManager.AddRef(@"<p class= ""categoryName"">");
-            refsManager.AddRef(category.Name);
-            refsManager.AddRef(@"<p class=""categoryExplanation"">");
-            refsManager.AddEncodedRef(category.Explanation);
-            refsManager.AddRef(@"</p>");
+            if (viewTitles)
+            {
+                refsManager.AddRef(categoryName);
+                refsManager.AddRef(@"<p class=""categoryExplanation"">");
+                refsManager.AddEncodedRef(categoryExplanation);
+                refsManager.AddRef(@"</p>");
+            }
+
             refsManager.AddRef(@"</p>");
             refsManager.AddRef(@"<svg width= ""100%""; viewBox='0 0 1000 400'>");
+            
             refsManager.AddRef(@"<g transform=""translate(40,20)"">");
             // horizontal scale
             refsManager.AddRef(@"<g transform=""translate(0,290)"" fill=""none"" font-size=""19"" font-family=""sans-serif"" text-anchor=""middle"">");
@@ -1207,7 +1244,18 @@ namespace PingCastle.Addition.LogicEnteties
                 if (size > 290) size = 290;
                 double w = horizontalStep - 3;
                 string tooltip = columns[i] + " " + value.ToString();
-                refsManager.AddRef(@"<rect class=""bar"" fill=""#Fa9C1A"" x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
+                string fillColor= "#Fa9C1A";
+                switch (columns[i])
+                {
+                    case "Critical": case "Red": fillColor = "#e32c1e"; break;
+                    case "High": fillColor = "#Fa9C1A"; break;
+                    case "Medium": case "Yellow": fillColor = "#f2fa1a"; break;
+                    case "Low": case "Green": fillColor = "#7cfa1a"; break;
+                    case "Important": fillColor = "#Fa9C1A"; break;
+                    case "Moderate": fillColor = "#1b57f5"; break;
+                    case "Black": fillColor = "#000000"; break;
+                }
+                refsManager.AddRef($@"<rect class=""bar"" fill={fillColor} x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
                 refsManager.AddEncodedRef(tooltip);
                 refsManager.AddRef(@"""></rect>");
             }
@@ -1224,6 +1272,7 @@ namespace PingCastle.Addition.LogicEnteties
                 refsManager.AddEncodedRef(tooltip);
                 refsManager.AddRef(@"""></rect>");
             }
+            refsManager.AddRef($@"<text x=""-12"" y=""-7"" id=""textId"">{axisY}</text><text x=""255"" y=""295"" id=""textId"">{axisX}</text></g>");
             refsManager.AddRef(@"</g></svg></div>");
         }
         #endregion

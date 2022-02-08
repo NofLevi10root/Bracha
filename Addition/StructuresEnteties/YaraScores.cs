@@ -8,6 +8,6 @@ namespace PingCastle.Addition.StructuresEnteties
 {
     public  class YaraScores: CustomTableScores
     {
-        public int NumOfResults { get; set; }
+        public int Count { get; set; }
     }
 }
