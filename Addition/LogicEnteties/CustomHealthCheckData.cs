@@ -1161,8 +1161,9 @@ namespace PingCastle.Addition.LogicEnteties
             //<div class=""col-xs-12 col-md-6 col-sm-6"">
             //	<div class=""row"">
             //		<div class=""col-md-4 col-xs-8 col-sm-9"">");
-            refsManager.AddRef(@"<div id='pdwdistchart' class=""catgoryChart""");
+            refsManager.AddRef(@"<div id='pdwdistchart' id=""catgoryChart ""class=""catgoryChart""");
             refsManager.AddRef(id);
+            
             refsManager.AddRef(@"<p class= ""categoryName"">");
             refsManager.AddRef(category.Name);
             refsManager.AddRef(@"<p class=""categoryExplanation"">");
@@ -1175,8 +1176,6 @@ namespace PingCastle.Addition.LogicEnteties
             refsManager.AddRef(@"<g transform=""translate(0,290)"" fill=""none"" font-size=""19"" font-family=""sans-serif"" text-anchor=""middle"">");
             refsManager.AddRef(@"<path  class=""domain"" stroke=""#000"" d=""M 0, 0 h250"" pathLength=""90""></path>");
 
-
-           
 
             for (int i = 0; i < columns.Count; i++)
             {
@@ -1224,6 +1223,7 @@ namespace PingCastle.Addition.LogicEnteties
                 refsManager.AddEncodedRef(tooltip);
                 refsManager.AddRef(@"""></rect>");
             }
+            
             refsManager.AddRef(@"</g></svg></div>");
         }
         #endregion
