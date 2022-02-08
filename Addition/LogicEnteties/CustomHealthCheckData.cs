@@ -1087,22 +1087,20 @@ namespace PingCastle.Addition.LogicEnteties
             string uniqueColor = "#Fa9C1A";
             values = new Dictionary<int, int>();
             string axisX="", axisY="";
+            columns = new List<string>() { "Critical", "High", "Medium", "Low" };
             switch (category.Id)
             {
                 case "compliance_category_id":
                     division = 3;
-                    columns = new List<string>() { "High", "Medium", "Low" };
-                    //colors = new List<string>() { "orange", "yellow", "green" };
-                    //uniqueColor=
-                    values.Add(0, ComplinceScores.High);
-                    values.Add(1, ComplinceScores.Medium);
-                    values.Add(2, ComplinceScores.Low);
+                    
+                    values.Add(1, ComplinceScores.High);
+                    values.Add(2, ComplinceScores.Medium);
+                    values.Add(3, ComplinceScores.Low);
                     axisX = "Severity";
                     axisY = "Configurations";
                     break;
                 case "zircolite_category_id":
                     division = 4;
-                    columns = new List<string>() { "Critical", "High", "Medium", "Low" };
                     values.Add(0, ThreatHuntingScores.Critical);
                     values.Add(1, ThreatHuntingScores.High);
                     values.Add(2, ThreatHuntingScores.Medium);
@@ -1119,21 +1117,21 @@ namespace PingCastle.Addition.LogicEnteties
                     break;
                 case "wesng_category_id":
                     division = 4;
-                    columns = new List<string>() { "Critical", "Important", "Low", "Moderate" };
+                    //columns = new List<string>() { "Critical", "Important", "Low", "Moderate" };
                     values.Add(0, WesngScores.Critical);
-                    values.Add(1, WesngScores.Important);
-                    values.Add(2, WesngScores.Low);
-                    values.Add(3, WesngScores.Moderate);
+                    values.Add(1, WesngScores.High);
+                    values.Add(2, WesngScores.Medium);
+                    values.Add(3, WesngScores.Low);
                     axisX = "Severity";
                     axisY = "CVE’s";
                     break;
                 case "snaffler_category_id":
                     division = 4;
-                    columns = new List<string>() { "Black", "Red", "Yellow", "Green" };
-                    values.Add(0, SnafflerScores.Black);
-                    values.Add(1, SnafflerScores.Red);
-                    values.Add(2, SnafflerScores.Yellow);
-                    values.Add(3, SnafflerScores.Green);
+                    //columns = new List<string>() { "Black", "Red", "Yellow", "Green" };
+                    values.Add(0, SnafflerScores.Critical);
+                    values.Add(1, SnafflerScores.High);
+                    values.Add(2, SnafflerScores.Medium);
+                    values.Add(3, SnafflerScores.Low);
                     axisX = "Severity";
                     axisY = "Findings";
                     break;

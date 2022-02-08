@@ -184,17 +184,18 @@ namespace PingCastle.Addition.ReportEnteties
                             if (q == 4)
                             {
                                 if (Int32.TryParse(data[i][q], out int value))
-                                    wesngScores.Important += value;
+                                    wesngScores.High += value;
                             }
                             if (q == 5)
                             {
                                 if (Int32.TryParse(data[i][q], out int value))
-                                    wesngScores.Low += value;
+                                    wesngScores.Medium += value;
+
                             }
                             if (q == 6)
                             {
                                 if (Int32.TryParse(data[i][q], out int value))
-                                    wesngScores.Moderate += value;
+                                    wesngScores.Low += value;
                             }
                         }
                         if (customTableScore is SnafflerScores snafflerScores)
@@ -203,23 +204,23 @@ namespace PingCastle.Addition.ReportEnteties
                             {
                                 if (Int32.TryParse(data[i][q], out int value))
                                 {
-                                    snafflerScores.Black += value;
+                                    snafflerScores.Critical += value;
                                 }
                             }
                             if (q == 3)
                             {
                                 if (Int32.TryParse(data[i][q], out int value))
-                                    snafflerScores.Red += value;
+                                    snafflerScores.High += value;
                             }
                             if (q == 4)
                             {
                                 if (Int32.TryParse(data[i][q], out int value))
-                                    snafflerScores.Yellow += value;
+                                    snafflerScores.Medium += value;
                             }
                             if (q == 5)
                             {
                                 if (Int32.TryParse(data[i][q], out int value))
-                                    snafflerScores.Green += value;
+                                    snafflerScores.Low += value;
                             }
 
                         }

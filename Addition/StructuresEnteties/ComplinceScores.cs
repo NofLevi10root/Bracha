@@ -13,5 +13,6 @@ namespace PingCastle.Addition.StructuresEnteties
         public int Medium { get; set; }
 
         public int High { get; set; }
+
     }
 }
