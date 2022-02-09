@@ -305,12 +305,14 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 {
                     GenerateSection("End-Points Indicators", () =>
                     {
+                        Add(@"<div  class=""row indicators-border"">");
                         Add(@"<div class=""customCategoryChart"">");
                         foreach (var category in CustomData.Categories)
                         {
-                            CustomData.AddCustomCategoriesCharts(category);
+                            CustomData.AddCustomCategoriesCharts(true,category);
                         }
-                        Add(@"</div>");
+                        Add(@" </div></div>");
+
                     });
                     CustomData.GenerateCustomInformationSections();
                 });               
