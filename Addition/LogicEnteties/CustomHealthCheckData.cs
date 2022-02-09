@@ -1245,13 +1245,10 @@ namespace PingCastle.Addition.LogicEnteties
                 string fillColor= "#Fa9C1A";
                 switch (columns[i])
                 {
-                    case "Critical": case "Red": fillColor = "#e32c1e"; break;
+                    case "Critical": fillColor = "#e32c1e"; break;
                     case "High": fillColor = "#Fa9C1A"; break;
-                    case "Medium": case "Yellow": fillColor = "#f2fa1a"; break;
-                    case "Low": case "Green": fillColor = "#7cfa1a"; break;
-                    case "Important": fillColor = "#Fa9C1A"; break;
-                    case "Moderate": fillColor = "#1b57f5"; break;
-                    case "Black": fillColor = "#000000"; break;
+                    case "Medium": fillColor = "#f2fa1a"; break;
+                    case "Low": fillColor = "#7cfa1a"; break;
                 }
                 refsManager.AddRef($@"<rect class=""bar"" fill={fillColor} x=""" + v.ToString(nfi) + @""" width=""" + w.ToString(nfi) + @""" y=""" + (290 - size).ToString(nfi) + @""" height=""" + (size).ToString(nfi) + @""" data-toggle=""tooltip"" title=""");
                 refsManager.AddEncodedRef(tooltip);
