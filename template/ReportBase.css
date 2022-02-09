@@ -243,14 +243,17 @@ html
 
 
 .customCategoryChart {
-	display:inline-table;
+	width:100%;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
 }
 .catgoryChart {
 	width: 50%;
 	display: inherit;
 }
 .categoryExplanation {
-	font-size: 50%;
+	font-size: 70%;
+	width: 100%;
 }
 .categoryName {
 	font-size: 60%;

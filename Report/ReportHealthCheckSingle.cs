@@ -307,12 +307,14 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                     {
                         AddParagraph(@"This section focuses on the core End-Point security indicators.<br>Locate the sub-process
                             determining the score and fix some rules in that area to get a score improvement.");
+                        Add(@"<div  class=""row indicators-border"">");
                         Add(@"<div class=""customCategoryChart"">");
                         foreach (var category in CustomData.Categories)
                         {
                             CustomData.AddCustomCategoriesCharts(true,category);
                         }
-                        Add(@"</div>");
+                        Add(@" </div></div>");
+
                     });
                     CustomData.GenerateCustomInformationSections();
                 });               

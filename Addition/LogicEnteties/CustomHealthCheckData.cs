@@ -729,6 +729,10 @@ namespace PingCastle.Addition.LogicEnteties
         {
             try
             {
+                if(data.Count==0)
+                {
+                    return;
+                }
                 var firstLineParts = data[0].Split(' ');
                 if (firstLineParts.Length > 1 && firstLineParts[0].EndsWith(":"))
                 {
@@ -1072,7 +1076,7 @@ namespace PingCastle.Addition.LogicEnteties
             }
         }
 
-        public void AddCustomCategoriesCharts(bool viewTitles, CustomRiskRuleCategory category)
+        public void AddCustomCategoriesCharts(bool viewTitles,CustomRiskRuleCategory category)
         {
             var values = new Dictionary<int, int>();
             var id = category.Id;
@@ -1193,6 +1197,7 @@ namespace PingCastle.Addition.LogicEnteties
 
             refsManager.AddRef(@"<div id='pdwdistchart' class=""catgoryChart""");
             refsManager.AddRef(id);
+            
             refsManager.AddRef(@"<p class= ""categoryName"">");
             if (viewTitles)
             {
@@ -1203,15 +1208,16 @@ namespace PingCastle.Addition.LogicEnteties
             }
 
             refsManager.AddRef(@"</p>");
-            refsManager.AddRef(@"<svg width= ""100%""; viewBox='0 0 1000 400'>");
+            if(viewTitles)
+            refsManager.AddRef(@"<svg width= ""300%""; viewBox='0 0 1000 400'>");
+            else
+                refsManager.AddRef(@"<svg width= ""100%""; viewBox='0 0 1000 400'>");
             
             refsManager.AddRef(@"<g transform=""translate(40,20)"">");
             // horizontal scale
             refsManager.AddRef(@"<g transform=""translate(0,290)"" fill=""none"" font-size=""19"" font-family=""sans-serif"" text-anchor=""middle"">");
             refsManager.AddRef(@"<path  class=""domain"" stroke=""#000"" d=""M 0, 0 h250"" pathLength=""90""></path>");
 
-
-           
 
             for (int i = 0; i < columns.Count; i++)
             {
