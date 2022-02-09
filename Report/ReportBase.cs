@@ -740,24 +740,6 @@ namespace PingCastle.Report
 					</div>
 					<div class=""card-body collapse show"" id=""panel" + id + @""">
 ");
-            switch (sectionId)
-            {
-                case "compliance_section_id":
-                    AddParagraph(@"<p>End-Point OS compliance check. Each End point is checked against a dedicated security authority baseline according to the OS version & Role.</p>");
-                    break;
-                case "zircolite_section_id":
-                    AddParagraph(@"<p>Checking the Eventlog against the Sigma rules public repository & custom rules created by 10Root experts.</p>");
-                    break;
-                case "yara_section_id":
-                    AddParagraph(@"<p>Scanning the End-point for Yara rules matched files.</p>");
-                    break;
-                case "wesng_section_id":
-                    AddParagraph(@"<p>Authenticated host vulnerability scanner based on OS patch level & MSRC DB.</p>");
-                    break;
-                case "snaffler_section_id":
-                    AddParagraph(@"<p>Analyzing file's content and classify them according to data sensitivity</p>");
-                    break;
-            }
             generateContent();
 			Add(@"
 					</div>
