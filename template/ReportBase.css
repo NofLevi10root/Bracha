@@ -244,12 +244,12 @@ html
 	grid-template-columns: 1fr 1fr 1fr;
 }
 .catgoryChart {
-	width: 200%;
+	width: 50%;
 	display: inherit;
 }
 .categoryExplanation {
 	font-size: 70%;
-	width: 45%;
+	width: 100%;
 }
 .categoryName {
 	font-size: 60%;

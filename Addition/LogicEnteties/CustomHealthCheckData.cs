@@ -984,7 +984,7 @@ namespace PingCastle.Addition.LogicEnteties
                                     var d = Categories.FirstOrDefault(c => c.Id == categoty);
                                     if (d != null)
                                     {
-                                        AddCustomCategoriesCharts(d);
+                                        AddCustomCategoriesCharts(false,d);
                                     }
                                 }
                             }
@@ -1072,7 +1072,7 @@ namespace PingCastle.Addition.LogicEnteties
             }
         }
 
-        public void AddCustomCategoriesCharts(CustomRiskRuleCategory category)
+        public void AddCustomCategoriesCharts(bool viewTitles,CustomRiskRuleCategory category)
         {
             var values = new Dictionary<int, int>();
             var id = category.Id;
@@ -1170,7 +1170,10 @@ namespace PingCastle.Addition.LogicEnteties
             refsManager.AddEncodedRef(category.Explanation);
             refsManager.AddRef(@"</p>");
             refsManager.AddRef(@"</p>");
-            refsManager.AddRef(@"<svg width= ""100%""; viewBox='0 0 1000 400'>");
+            if(viewTitles)
+            refsManager.AddRef(@"<svg width= ""300%""; viewBox='0 0 1000 400'>");
+            else
+                refsManager.AddRef(@"<svg width= ""100%""; viewBox='0 0 1000 400'>");
             refsManager.AddRef(@"<g transform=""translate(40,20)"">");
             // horizontal scale
             refsManager.AddRef(@"<g transform=""translate(0,290)"" fill=""none"" font-size=""19"" font-family=""sans-serif"" text-anchor=""middle"">");
