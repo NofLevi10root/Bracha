@@ -1161,7 +1161,7 @@ namespace PingCastle.Addition.LogicEnteties
             //<div class=""col-xs-12 col-md-6 col-sm-6"">
             //	<div class=""row"">
             //		<div class=""col-md-4 col-xs-8 col-sm-9"">");
-            refsManager.AddRef(@"<div id='pdwdistchart' id=""catgoryChart ""class=""catgoryChart""");
+            refsManager.AddRef(@"<div id='pdwdistchart' class=""catgoryChart""");
             refsManager.AddRef(id);
             
             refsManager.AddRef(@"<p class= ""categoryName"">");
