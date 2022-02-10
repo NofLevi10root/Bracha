@@ -234,7 +234,7 @@
         </InformationSection>
 	<InformationSection>
             <Id>wesng_section_id</Id>
-            <Name>Wesng</Name>
+            <Name>Host-Based Vulnerability Scanner</Name>
             <Children>
                 <Child>
                     <Type>Table</Type>
@@ -244,7 +244,7 @@
         </InformationSection>
 	<InformationSection>
             <Id>snaffler_section_id</Id>
-            <Name>Snaffler</Name>
+            <Name>Content Analyzer &amp; Classifier</Name>
             <Children>
                 <Child>
                     <Type>Table</Type>

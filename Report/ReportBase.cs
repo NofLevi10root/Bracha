@@ -718,15 +718,6 @@ namespace PingCastle.Report
 
 		protected virtual void GenerateSection(string sectionId, string title, GenerateContentDelegate generateContent) // custom method
         {
-            switch (sectionId)
-            {
-                case "wesng_section_id":
-                    title = "Host-Based Vulnerability Scanner"; 
-                    break;
-                case "snaffler_section_id": 
-                    title = "Content Analyzer & Classifier"; 
-                    break;
-            }
             string id = "section" + sectionId;
 			Add(@"
 <!-- Section " + title + @" -->
