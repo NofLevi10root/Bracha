@@ -18,15 +18,30 @@ html
 		/*color: #Fa9C1A;*/
 		color: #000000;
 	}
+
 	.hyperlink {
 		color: #007bff;
+		text-decoration: underline;
 	}
+
 	a {
-		color: #000000;
+		color: #007bff;
+		text-decoration: underline;
 	}
-	a[data-toggle="modal"]{
-		color: #fa9c1a;
+		/*	a[data-toggle="modal"] {
+		color: #007bff;
+		text-decoration: underline;
+	}*/
+
+		a[data-toggle="collapse"]{
+			color: #000000;
+			text-decoration: none;
+		}
+	a[data-toggle="collapse"]:hover {
+		text-decoration: underline;
 	}
+
+			
 /*	a:hover {
 		color: #58595b;
 	}*/
@@ -256,5 +271,26 @@ html
 }
 .categoryName {
 	font-size: 60%;
+}
+
+.moreDetailsLink {
+	position: absolute;
+	right: 15px;
+}
+
+.customTableColumn {
+	max-width: 200px;
+}
+
+#textId {
+	font-size: 1.2rem;
+}
+
+.navbar-custom .navbar-nav .nav-link, .page-link {
+	text-decoration: none;
+}
+
+.navbar-custom .navbar-nav > .active > a, .navbar-custom .navbar-nav > .active > a:hover, .navbar-custom .navbar-nav > .active > a:focus {
+	background-color: #007bff;
 }
 

@@ -300,6 +300,7 @@ namespace PingCastle.Report
 
         protected void AddHeaderText(string text, string tooltip = null, int rowspan = 0, int colspan = 0, bool widetooltip = false)
         {
+            
             Add("<th");
             if (rowspan != 0)
             {
@@ -327,6 +328,7 @@ namespace PingCastle.Report
 
         protected void AddCellText(string text, bool highlight = false, bool IsGood = false, string tooltip = null)
 	{
+            
             try
             {
 	    	Add("<td class='text'>");
@@ -363,6 +365,7 @@ namespace PingCastle.Report
 
         protected void AddCellTextNoWrap(string text)
         {
+          
             Add(@"<td class='text text-nowrap'>");
             if (footerMode)
                 Add("<b>");
@@ -714,8 +717,8 @@ namespace PingCastle.Report
         }
 
 		protected virtual void GenerateSection(string sectionId, string title, GenerateContentDelegate generateContent) // custom method
-		{
-			string id = "section" + sectionId;
+        {
+            string id = "section" + sectionId;
 			Add(@"
 <!-- Section " + title + @" -->
 <div id=""" + id + @""">
@@ -728,7 +731,7 @@ namespace PingCastle.Report
 					</div>
 					<div class=""card-body collapse show"" id=""panel" + id + @""">
 ");
-			generateContent();
+            generateContent();
 			Add(@"
 					</div>
 				</div>

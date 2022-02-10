@@ -6,27 +6,27 @@
         <Category>
             <Id>compliance_category_id</Id>
             <Name>Windows hardening</Name>
-            <Explanation>Windows Hardening</Explanation>
+            <Explanation>Each End point is checked against a dedicated security authority baseline according to the OS version &amp; Role</Explanation>
         </Category>
         <Category>
             <Id>zircolite_category_id</Id>
             <Name>Threat hunting</Name>
-            <Explanation>SIGMA RULES</Explanation>
+            <Explanation>Checking the Eventlog against the Sigma rules public repository &amp; custom rules created by 10Root experts</Explanation>
         </Category>
 	<Category>
             <Id>yara_category_id</Id>
             <Name>Yara scanner</Name>
-            <Explanation>Yara scanner</Explanation>
+            <Explanation>Scanning the End-point for Yara rules matched files</Explanation>
         </Category>
 	<Category>
             <Id>wesng_category_id</Id>
-            <Name>Wesng</Name>
-            <Explanation>Wesng</Explanation>
+            <Name>Host-Based Vulnerability Scanner</Name>
+            <Explanation>Authenticated host vulnerability scanner based on OS patch level &amp; MSRC DB</Explanation>
         </Category>
 	<Category>
             <Id>snaffler_category_id</Id>
-            <Name>Snaffler</Name>
-            <Explanation>Snaffler</Explanation>
+            <Name>Content Analyzer &amp; Classifier</Name>
+            <Explanation>Analyzing file's content and classify them according to data sensitivity</Explanation>
         </Category>
     </Categories>
     <Models>
@@ -234,7 +234,7 @@
         </InformationSection>
 	<InformationSection>
             <Id>wesng_section_id</Id>
-            <Name>Wesng</Name>
+            <Name>Host-Based Vulnerability Scanner</Name>
             <Children>
                 <Child>
                     <Type>Table</Type>
@@ -244,7 +244,7 @@
         </InformationSection>
 	<InformationSection>
             <Id>snaffler_section_id</Id>
-            <Name>Snaffler</Name>
+            <Name>Content Analyzer &amp; Classifier</Name>
             <Children>
                 <Child>
                     <Type>Table</Type>
