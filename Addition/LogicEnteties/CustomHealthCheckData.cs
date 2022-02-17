@@ -991,13 +991,13 @@ namespace PingCastle.Addition.LogicEnteties
                                         switch (d.Id)
                                         {
                                             case "compliance_category_id":
-                                                refsManager.AddParagraphRef(@"<p>End-Point OS compliance check. Each End point is checked against a dedicated security authority baseline according to the OS version & Role.</p>");
+                                                refsManager.AddParagraphRef(@"<p>endpoint OS compliance check. Each endpoint is checked against a dedicated security authority baseline according to the OS version & Role.</p>");
                                                 break;
                                             case "zircolite_category_id":
                                                 refsManager.AddParagraphRef(@"<p>Checking the Eventlog against the Sigma rules public repository & custom rules created by 10Root experts.</p>");
                                                 break;
                                             case "yara_category_id":
-                                                refsManager.AddParagraphRef(@"<p>Scanning the End-point for Yara rules matched files.</p>");
+                                                refsManager.AddParagraphRef(@"<p>Scanning the endpoint for Yara rules matched files.</p>");
                                                 break;
                                             case "wesng_category_id":
                                                 refsManager.AddParagraphRef(@"<p>Authenticated host vulnerability scanner based on OS patch level & MSRC DB.</p>");

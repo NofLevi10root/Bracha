@@ -305,7 +305,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 {
                     GenerateSection("End-Points Indicators", () =>
                     {
-                        AddParagraph(@"This section focuses on the core End-Point security indicators.<br>Locate the sub-process
+                        AddParagraph(@"This section focuses on the core endPoint security indicators.<br>Locate the sub-process
                             determining the score and fix some rules in that area to get a score improvement.");
                         Add(@"<div  class=""row indicators-border"">");
                         Add(@"<div class=""customCategoryChart"">");
