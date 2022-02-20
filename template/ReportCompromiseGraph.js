@@ -316,6 +316,11 @@ $( document ).ready(function() {
         $('#' + hash).modal('show');
     }
 });
+$(".line-clamp").on('mouseover', function () {
+    if ($(this)[0].offsetHeight < $(this)[0].scrollHeight ) {
+        $(this)[0].style["cursor"] = "pointer";
+    }
+});
 
 $(".line-clamp").on('click', function () {
     $(this).toggleClass('line-clamp')
