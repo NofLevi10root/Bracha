@@ -6,7 +6,7 @@
         <Category>
             <Id>compliance_category_id</Id>
             <Name>Windows hardening</Name>
-            <Explanation>Each End point is checked against a dedicated security authority baseline according to the OS version &amp; Role</Explanation>
+            <Explanation>Each endpoint is checked against a dedicated security authority baseline according to the OS version &amp; Role</Explanation>
         </Category>
         <Category>
             <Id>zircolite_category_id</Id>
@@ -16,7 +16,7 @@
 	<Category>
             <Id>yara_category_id</Id>
             <Name>Yara scanner</Name>
-            <Explanation>Scanning the End-point for Yara rules matched files</Explanation>
+            <Explanation>Scanning the endpoint for Yara rules matched files</Explanation>
         </Category>
 	<Category>
             <Id>wesng_category_id</Id>
@@ -147,7 +147,7 @@
             <Details>
                 <Detail>
                     <Type>SharedTable</Type>
-                    <FilePath>.\Reports\windows_hardening\LastReport\Master.csv</FilePath>
+                    <FilePath>.\Reports\compliance\LastReport\Master.csv</FilePath>
                     <Id>compliance_table_id</Id>
                 </Detail>
             </Details>
@@ -159,7 +159,7 @@
             <Details>
                 <Detail>
                     <Type>SharedTable</Type>
-                    <FilePath>.\Reports\zircolite\LastReport\Master.csv</FilePath>
+                    <FilePath>.\Reports\threat hunting\LastReport\Master.csv</FilePath>
                     <Id>zircolite_table_id</Id>
                 </Detail>
             </Details>
@@ -183,7 +183,7 @@
             <Details>
                 <Detail>
                     <Type>SharedTable</Type>
-                    <FilePath>.\Reports\wesng\lastReport\Master.csv</FilePath>
+                    <FilePath>.\Reports\vulnerability scanner\lastReport\Master.csv</FilePath>
                     <Id>wesng_table_id</Id>
                 </Detail>
             </Details>
@@ -195,7 +195,7 @@
             <Details>
                 <Detail>
                     <Type>SharedTable</Type>
-                    <FilePath>.\Reports\snaffler\lastReport\Master.csv</FilePath>
+                    <FilePath>.\Reports\analyzer and classifier\lastReport\Master.csv</FilePath>
                     <Id>snaffler_table_id</Id>
                 </Detail>
             </Details>
@@ -256,16 +256,16 @@
     <Tables>
         <Table>
             <Id>compliance_table_id</Id>
-            <NestedTablesDirectory>.\Reports\windows_hardening\lastReport\settings</NestedTablesDirectory>
+            <NestedTablesDirectory>.\Reports\compliance\lastReport\settings</NestedTablesDirectory>
         </Table>
         <Table>
            <Id>zircolite_table_id</Id>
-           <NestedTablesDirectory>.\Reports\zircolite\lastReport\settings</NestedTablesDirectory>
+           <NestedTablesDirectory>.\Reports\threat hunting\lastReport\settings</NestedTablesDirectory>
 	   <NestedColumns>
 		<NestedColumn>
 			<Column>EventRecordID</Column>
 			<Delimiter>,</Delimiter>
-			<NestedColumnPath>.\Reports\zircolite\lastReport\eventRecords</NestedColumnPath>
+			<NestedColumnPath>.\Reports\threat hunting\lastReport\eventRecords</NestedColumnPath>
 		</NestedColumn>
 	   </NestedColumns>
         </Table>
@@ -275,12 +275,12 @@
         </Table>
 	  <Table>
             <Id>wesng_table_id</Id>
-            <NestedTablesDirectory>.\Reports\wesng\lastReport\settings</NestedTablesDirectory>
+            <NestedTablesDirectory>.\Reports\vulnerability scanner\lastReport\settings</NestedTablesDirectory>
         </Table>
  	<Table>
             <Id>snaffler_table_id</Id>
-            <NestedTablesDirectory>.\Reports\snaffler\lastReport\settings</NestedTablesDirectory>
-	<MoreDetails>.\Reports\snaffler\lastReport\computers</MoreDetails>
+            <NestedTablesDirectory>.\Reports\analyzer and classifier\lastReport\settings</NestedTablesDirectory>
+	<MoreDetails>.\Reports\analyzer and classifier\lastReport\computers</MoreDetails>
         </Table>
     </Tables>   
 </CustomHealthCheckData>
