@@ -991,7 +991,7 @@ namespace PingCastle.Addition.LogicEnteties
                                         switch (d.Id)
                                         {
                                             case "compliance_category_id":
-                                                refsManager.AddParagraphRef(@"<p>endpoint OS compliance check. Each endpoint is checked against a dedicated security authority baseline according to the OS version & Role.</p>");
+                                                refsManager.AddParagraphRef(@"<p>Endpoint OS compliance check. Each endpoint is checked against a dedicated security authority baseline according to the OS version & Role.</p>");
                                                 break;
                                             case "zircolite_category_id":
                                                 refsManager.AddParagraphRef(@"<p>Checking the Eventlog against the Sigma rules public repository & custom rules created by 10Root experts.</p>");
