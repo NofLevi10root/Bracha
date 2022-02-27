@@ -633,7 +633,7 @@ namespace PingCastle.Addition.LogicEnteties
                 else if (custTable.GetNestedTable(value, CustomDelimiter, out var targetTable))
                 {
                     refsManager.AddBeginModalRef(refsManager.GenerateModalAdminGroupIdFromGroupNameRef($"table_{value}"), value, ShowModalType.XL);
-                    AddCustomTableHtml(cellValue,targetTable, custTable);
+                    AddCustomTableHtml(cellValue, targetTable, custTable);
                     refsManager.AddEndModalRef(ShowModalType.XL);
                 }
             }
@@ -725,11 +725,11 @@ namespace PingCastle.Addition.LogicEnteties
             }
         }
 
-        private void AddCustomTableHtml(object cellValue,List<string> data, CustomTable custTable)
+        private void AddCustomTableHtml(object cellValue, List<string> data, CustomTable custTable)
         {
             try
             {
-                if(data.Count==0)
+                if (data.Count == 0)
                 {
                     return;
                 }
@@ -809,11 +809,11 @@ namespace PingCastle.Addition.LogicEnteties
                     if (!string.IsNullOrEmpty(custTable.MoreDetails))
                     {
                         string cellValueStr = (string)cellValue;
-                        string computersFile=Path.Combine(custTable.MoreDetails, cellValue + ".csv");
+                        string computersFile = Path.Combine(custTable.MoreDetails, cellValue + ".csv");
                         refsManager.AddRef($@"</tbody></table><a class='moreDetailsLink' target=""_blank"" href=""{computersFile}""><b>More details</b></a></div></div>");
                     }
                     else
-                    refsManager.AddRef("</tbody></table></div></div>");
+                        refsManager.AddRef("</tbody></table></div></div>");
 
                 }
                 else
@@ -977,42 +977,47 @@ namespace PingCastle.Addition.LogicEnteties
             {
                 if (section.Show)
                 {
-                    refsManager.GenerateSectionRef(section.Id, section.Name, () =>
+                    CustomRiskRuleCategory sectionCategory = null;
+                    foreach (var riskRule in RiskRules)
                     {
-                        foreach (var riskRule in RiskRules)
+                        if (riskRule.SectionId == section.Id)
                         {
-                            if (riskRule.SectionId == section.Id)
+                            foreach (var categoty in riskRule.Categories)
                             {
-                                foreach (var categoty in riskRule.Categories)
+                                var d = Categories.FirstOrDefault(c => c.Id == categoty);
+                                if (d != null)
                                 {
-                                    var d = Categories.FirstOrDefault(c => c.Id == categoty);
-                                    if (d != null)
-                                    {
-                                        switch (d.Id)
-                                        {
-                                            case "compliance_category_id":
-                                                refsManager.AddParagraphRef(@"<p>Endpoint OS compliance check. Each endpoint is checked against a dedicated security authority baseline according to the OS version & Role.</p>");
-                                                break;
-                                            case "zircolite_category_id":
-                                                refsManager.AddParagraphRef(@"<p>Checking the Eventlog against the Sigma rules public repository & custom rules created by 10Root experts.</p>");
-                                                break;
-                                            case "yara_category_id":
-                                                refsManager.AddParagraphRef(@"<p>Scanning the endpoint for Yara rules matched files.</p>");
-                                                break;
-                                            case "wesng_category_id":
-                                                refsManager.AddParagraphRef(@"<p>Authenticated host vulnerability scanner based on OS patch level & MSRC DB.</p>");
-                                                break;
-                                            case "snaffler_category_id":
-                                                refsManager.AddParagraphRef(@"<p>Analyzing file's content and classify them according to data sensitivity</p>");
-                                                break;
-                                        }
-                                        AddCustomCategoriesCharts(false,d);
-                                    }
+                                    sectionCategory = d;
                                 }
                             }
                         }
-                        GenerateAdvancedCustomSection(section);
-                    });
+                    }
+                    if (sectionCategory != null)
+                    {
+                        refsManager.GenerateSectionRef(section.Id, section.Name, () =>
+                        {
+                            switch (sectionCategory.Id)
+                            {
+                                case "compliance_category_id":
+                                    refsManager.AddParagraphRef(@"<p>Endpoint OS compliance check. Each endpoint is checked against a dedicated security authority baseline according to the OS version & Role.</p>");
+                                    break;
+                                case "zircolite_category_id":
+                                    refsManager.AddParagraphRef(@"<p>Checking the Eventlog against the Sigma rules public repository & custom rules created by 10Root experts.</p>");
+                                    break;
+                                case "yara_category_id":
+                                    refsManager.AddParagraphRef(@"<p>Scanning the endpoint for Yara rules matched files.</p>");
+                                    break;
+                                case "wesng_category_id":
+                                    refsManager.AddParagraphRef(@"<p>Authenticated host vulnerability scanner based on OS patch level & MSRC DB.</p>");
+                                    break;
+                                case "snaffler_category_id":
+                                    refsManager.AddParagraphRef(@"<p>Analyzing file's content and classify them according to data sensitivity</p>");
+                                    break;
+                            }
+                            AddCustomCategoriesCharts(false, sectionCategory);
+                            GenerateAdvancedCustomSection(section);
+                        });
+                    }
                 }
             }
         }
@@ -1094,7 +1099,7 @@ namespace PingCastle.Addition.LogicEnteties
             }
         }
 
-        public void AddCustomCategoriesCharts(bool viewTitles,CustomRiskRuleCategory category)
+        public void AddCustomCategoriesCharts(bool viewTitles, CustomRiskRuleCategory category)
         {
             var values = new Dictionary<int, int>();
             var id = category.Id;
@@ -1105,16 +1110,16 @@ namespace PingCastle.Addition.LogicEnteties
             int max = 0;
             int division = 0;
             var columns = new List<string>();
-            var colors=new List<string>();
+            var colors = new List<string>();
             string uniqueColor = "#Fa9C1A";
             values = new Dictionary<int, int>();
-            string axisX="", axisY="";
+            string axisX = "", axisY = "";
             columns = new List<string>() { "Critical", "High", "Medium", "Low" };
             switch (category.Id)
             {
                 case "compliance_category_id":
                     division = 3;
-                    
+
                     values.Add(1, ComplinceScores.High);
                     values.Add(2, ComplinceScores.Medium);
                     values.Add(3, ComplinceScores.Low);
@@ -1197,7 +1202,7 @@ namespace PingCastle.Addition.LogicEnteties
 
             refsManager.AddRef(@"<div id='pdwdistchart' class=""catgoryChart""");
             refsManager.AddRef(id);
-            
+
             refsManager.AddRef(@"<p class= ""categoryName"">");
             if (viewTitles)
             {
@@ -1208,11 +1213,11 @@ namespace PingCastle.Addition.LogicEnteties
             }
 
             refsManager.AddRef(@"</p>");
-            if(viewTitles)
-            refsManager.AddRef(@"<svg width= ""300%""; viewBox='0 0 1000 400'>");
+            if (viewTitles)
+                refsManager.AddRef(@"<svg width= ""300%""; viewBox='0 0 1000 400'>");
             else
                 refsManager.AddRef(@"<svg width= ""100%""; viewBox='0 0 1000 400'>");
-            
+
             refsManager.AddRef(@"<g transform=""translate(40,20)"">");
             // horizontal scale
             refsManager.AddRef(@"<g transform=""translate(0,290)"" fill=""none"" font-size=""19"" font-family=""sans-serif"" text-anchor=""middle"">");
@@ -1248,7 +1253,7 @@ namespace PingCastle.Addition.LogicEnteties
                 if (size > 290) size = 290;
                 double w = horizontalStep - 3;
                 string tooltip = columns[i] + " " + value.ToString();
-                string fillColor= "#Fa9C1A";
+                string fillColor = "#Fa9C1A";
                 switch (columns[i])
                 {
                     case "Critical": fillColor = "#e32c1e"; break;
@@ -1275,6 +1280,17 @@ namespace PingCastle.Addition.LogicEnteties
             }
             refsManager.AddRef($@"<text x=""-12"" y=""-6"" id=""textId"">{axisY}</text><text x=""255"" y=""295"" id=""textId"">{axisX}</text></g>");
             refsManager.AddRef(@"</g></svg></div>");
+        }
+
+        public void GeneratePAWNEDPasswordsScection()
+        {
+            foreach (var section in InformationSections)
+            {
+                if(section.Id == "PAWNED_PASSWORDS_section_id")
+                {
+                    GenerateAdvancedCustomSection(section);                    
+                }
+            }
         }
         #endregion
 

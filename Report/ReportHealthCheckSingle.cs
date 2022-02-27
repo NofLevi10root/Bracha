@@ -296,6 +296,7 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
                 GenerateSection("PKI", GeneratePKIDetail);
                 GenerateSection("Infrastructure", GenerateInfrastructureDetail);
                 GenerateSection("Anomalies", GenerateAnomalyDetail);
+                GenerateSection("PAWNED PASSWORDS", CustomData.GeneratePAWNEDPasswordsScection);
                 GenerateSection("Password Policies", GeneratePasswordPoliciesDetail);
                 GenerateSection("GPO", GenerateGPODetail);
             });

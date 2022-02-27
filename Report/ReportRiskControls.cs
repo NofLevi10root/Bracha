@@ -6,6 +6,7 @@ using PingCastle.Healthcheck;
 using PingCastle.Rules;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PingCastle.Report
 {
@@ -155,15 +156,26 @@ namespace PingCastle.Report
 
                 for (int j = 1; j <= 4; j++)
                 {
+                    var categoryName = ((RiskRuleCategory)j).ToString();
                     for (int i = 0; ; i++)
                     {
                         int id = (1000 * j + i);
                         if (Enum.IsDefined(typeof(RiskModelCategory), id))
                         {
-                            riskmodel[((RiskRuleCategory)j).ToString()].Add(new CustomRiskModelCategory((RiskModelCategory)id));
+                            
+                            riskmodel[categoryName].Add(new CustomRiskModelCategory((RiskModelCategory)id));
+                            
                         }
                         else
                             break;
+                    }
+                    var customModels = customData.Models.Where(m => m.Category == categoryName);
+                    if (customModels.Any())
+                    {
+                        foreach (var customModel in customModels)
+                        {
+                            riskmodel[categoryName].Add(customModel);
+                        }
                     }
                 }
             }
@@ -208,6 +220,16 @@ namespace PingCastle.Report
                                     rulematched.Add(rule);
                                 }
                             }
+                            foreach (CustomHealthCheckRiskRule rule in customData.HealthRules)
+                            {
+                                if (rule.CheckIsInModel(model.Id))
+                                {
+                                    numrules++;
+                                    score += rule.Points;
+                                    rulematched.Add(CustomHealthCheckRiskRule.ParseToHealthcheckRiskRule(rule));
+                                }
+                            }
+
                         }
                         else
                         {
