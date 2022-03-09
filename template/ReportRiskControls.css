@@ -84,9 +84,7 @@ svg {
 	-webkit-box-orient: vertical;
 }
 
-.line-clamp-new {
-	overflow: hidden;
-	display: -webkit-box;
-	-webkit-line-clamp: initial;
-	-webkit-box-orient: vertical;
+[aria-label="compliance_table_id"] .line-clamp {
+	width:95px;
+}
 }

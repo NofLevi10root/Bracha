@@ -112,7 +112,7 @@ function cartocp(data, id) {
     }
     for (var j= 0; j < data.links.length; j++) {
         var l = data.links[j];
-			
+
         if (ignoredNode[l.source] !== undefined)
         {
             ignoredNode[l.source].to.push(l.target);
@@ -228,10 +228,10 @@ function cartocp(data, id) {
 
     if (hierarchical) {
         options.layout =
-            {
-                //improvedLayout: false,
-                hierarchical: { enabled: true, sortMethod: 'directed', direction: 'LR' }
-            };
+        {
+            //improvedLayout: false,
+            hierarchical: { enabled: true, sortMethod: 'directed', direction: 'LR' }
+        };
     }
 
     options.physics = {
@@ -247,7 +247,7 @@ function cartocp(data, id) {
         },
         enabled: true
     };
-                        
+
     var network = new vis.Network(container, networkData, options);
     network.data = networkData;
 
@@ -264,14 +264,14 @@ function RefreshMap(id) {
         progressBar.removeClass('d-none');
 
     network = cartocp(data,id);
-	
-	var hierarchical = $('#switch-2-' + id).is(':checked');
-	if (hierarchical)
-	{
-		network.on('stabilizationIterationsDone', function(){
-			network.setOptions( { physics: false } );
-		});
-	}
+
+    var hierarchical = $('#switch-2-' + id).is(':checked');
+    if (hierarchical)
+    {
+        network.on('stabilizationIterationsDone', function(){
+            network.setOptions( { physics: false } );
+        });
+    }
     network.on('stabilizationProgress', function (params) {
         var percentVal = 100 * params.iterations / params.total;
         progressBar.find('.progress-bar').css('width', percentVal + '%').attr('aria-valuenow', percentVal + '%').text(percentVal + '%');
@@ -321,8 +321,151 @@ $(".line-clamp").on('mouseover', function () {
         $(this)[0].style["cursor"] = "pointer";
     }
 });
-
-$(".line-clamp").on('click', function () {
+/*$(".line-clamp").on('click', function () {
     $(this).toggleClass('line-clamp')
         .trigger('line-clamp-new');
+});*/
+
+//$('.line-clamp').tooltip({
+//    position: { my: 'center bottom', at: 'center top-10' },
+//    tooltipClass: "myclass",
+//    disabled: true,
+//    close: function (event, ui) {
+//        $(event.target).tooltip('disable');
+//        /* instead of $(this) you could also use $(event.target) */
+//    }
+//});
+
+//$('.line-clamp').on({
+//    "click": function () {
+//        $(this).tooltip({ items: '.line-clamp', content: "Displaying on click" });
+//        $(this).tooltip("open");
+//    },
+//    "mouseout": function () {
+//        $(this).tooltip("disable");
+//    }
+//});
+
+
+//$('.line-clamp').tooltip({
+//    disabled: true,
+//    close: function (event, ui) { $(this).tooltip('disable'); }
+//});
+//$('.line-clamp').on('focusout', function () {
+//    $(this).removeAttr('title');
+//});
+
+//$('.line-clamp').on('mouseleave', function () {
+//    $(this).removeAttr('title');
+//});
+
+
+//$('.line-clamp').on('click', function () {
+//    debugger;
+//    //if ($(this).data('show')) {
+//    //    $(this).removeAttr('title');
+//    //} else {
+//        //$(this).data('show', 1);
+//        $(this).attr('title', $(this).data('title'));
+//        $(this).tooltip().trigger('mouseover');
+//    //}
+//    //$(this).tooltip({
+//    //    close: function (event, ui) {
+//    //        debugger;
+//    //    }
+//    //}).trigger('mouseover');
+//    //$(this).on("tooltipclose", function (event, ui) {
+//    //    debugger;
+//    //});
+//});
+$(document).on('click', '.line-clamp', function () {
+    $(this).addClass("on");
+    $(this).tooltip({
+        items: '.line-clamp.on',
+    });
+    $(this).trigger('mouseenter');
 });
+//hide
+$(document).on('click', '.line-clamp.on', function () {
+    //$(this).tooltip('close');
+    $(this).data('close', true);
+    $(this).removeClass("on");
+    $(this).trigger('mouseout');
+});
+//prevent mouseout and other related events from firing their handlers
+$(".line-clamp").on('mouseout', function (e) {
+    if ($(this).data('close')) {
+        $(this).data('close', false);
+    } else {
+        e.stopImmediatePropagation();
+    }
+});
+
+$(".line-clamp").on('mouseenter', function (e) {
+    if (!$(this).hasClass('on')) {
+        e.stopImmediatePropagation();
+    }
+});
+
+//$('.line-clamp').on({
+//    "click": function () {
+//        $(this).tooltip();
+//        $(this).tooltip("enable"); // this line added
+//        $(this).tooltip("open");
+//    },
+//    "mouseout": function () {
+//        $(this).tooltip("disable");
+//    }
+//});
+
+//$('.line-clamp').on('click', function (e) {
+//    if (e.target == $(this)[0]) {
+//        $('.adina-tooltip-outer').addClass('active');
+//    }
+//});
+
+//$('.adina-tooltip-outer').on('click', function (e) {
+//   // if (e.target == $(this)[0]) {
+//        $(this).removeClass('active');
+//    //}
+//});
+
+//$('.line-clamp').on('click', function () {
+//    $(this).tooltip('enable').tooltip('open');
+//});
+
+/*$('.line-clamp').on({
+    "click": function () {
+        $(this).tooltip({ items: ".line-clamp" });
+        $(this).tooltip("open");
+    },
+    "mouseout": function () {
+        $(this).tooltip("disable");
+    }
+});
+
+$(".line-clamp").tooltip({
+    disabled: false,
+    //close: function(event, ui){ $(this).tooltip('disable'); }
+});
+
+$(".line-clamp").on('click', function () {
+    $(this).tooltip('enable').tooltip('open');
+
+});
+
+$(".line-clamp").tooltip().click(function () {
+    if ($(this)[0].offsetHeight < $(this)[0].scrollHeight) {
+        var $this = $(this);
+        var isOpen = $this.data('tooltip');
+        var method = isOpen ? 'close' : 'open';
+        $this.tooltip(method);
+        //verbosity for clarity sake, yes you could just use !isOpen or clicked = (method === 'open')
+        if (method === 'open') {
+            clicked = true;
+        } else {
+            clicked = false;
+        }
+        $this.data('tooltip', !isOpen);
+    }
+});*/

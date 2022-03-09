@@ -1052,6 +1052,7 @@ namespace PingCastle.Addition.LogicEnteties
                                     }
                                     else
                                     {
+                                        /////////////////////////
                                         if (table.Columns[i].Values.ContainsKey(key))
                                             refsManager.AddCellTextRef(table.Columns[i].Values[key]);
                                         else
