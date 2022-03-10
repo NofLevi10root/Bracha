@@ -303,7 +303,7 @@ $("[id^='mcg-']").on('hide.bs.modal', function (event) {
     var hash = location.hash.replace('#','');
 
     if(hash != ''){
-        // Clear the hash in the URL
+       // Clear the hash in the URL
         location.hash = '';
     }
 });
