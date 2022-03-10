@@ -694,6 +694,15 @@ namespace PingCastle.Report
         {
             Regex rgx = new Regex("[^a-zA-Z0-9-]");
             string id = "section" + rgx.Replace(title, "");
+            var classStyle = "";
+            if (id == "sectionActiveDirectory" || id == "sectionEnd-Points")
+            {
+                classStyle = "collapse";
+            }
+            else
+            {
+                classStyle = "card-body collapse show";
+            }
             Add(@"
 <!-- Section " + title + @" -->
 <div id=""" + id + @""">
@@ -702,9 +711,9 @@ namespace PingCastle.Report
 			<div class=""starter-template"">
 				<div class=""card mb-4"">
 					<div class=""card-header"">
-						<h1 class=""card-title""><a data-toggle=""collapse"" aria-expanded=""true"" href=""#panel" + id + @""">" + title + @"</a></h1>
+						<h1 class=""card-title""><a data-toggle=""collapse"" aria-expanded=""true"" href=""#panel" + id + @""" >" + title + @"</a></h1>
 					</div>
-					<div class=""card-body collapse show"" id=""panel" + id + @""">
+					<div class=""" + classStyle + @""" id=""panel" + id + @""">                
 ");
             generateContent();
             Add(@"
@@ -730,7 +739,7 @@ namespace PingCastle.Report
 			<div class=""starter-template"">
 				<div class=""card mb-4"">
 					<div class=""card-header"">
-						<h1 class=""card-title""><a data-toggle=""collapse"" aria-expanded=""true"" href=""#panel" + id + @""">" + title + @"</a></h1>
+						<h1 class=""card-title""><a data-toggle=""collapse""  aria-expanded=""true"" href=""#panel" + id + @""">" + title + @"</a></h1>
 					</div>
 					<div class=""card-body collapse show"" id=""panel" + id + @""">
 ");
