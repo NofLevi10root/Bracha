@@ -321,78 +321,28 @@ $(".line-clamp").on('mouseover', function () {
         $(this)[0].style["cursor"] = "pointer";
     }
 });
-/*$(".line-clamp").on('click', function () {
-    $(this).toggleClass('line-clamp')
-        .trigger('line-clamp-new');
-});*/
 
-//$('.line-clamp').tooltip({
-//    position: { my: 'center bottom', at: 'center top-10' },
-//    tooltipClass: "myclass",
-//    disabled: true,
-//    close: function (event, ui) {
-//        $(event.target).tooltip('disable');
-//        /* instead of $(this) you could also use $(event.target) */
-//    }
-//});
-
-//$('.line-clamp').on({
-//    "click": function () {
-//        $(this).tooltip({ items: '.line-clamp', content: "Displaying on click" });
-//        $(this).tooltip("open");
-//    },
-//    "mouseout": function () {
-//        $(this).tooltip("disable");
-//    }
-//});
-
-
-//$('.line-clamp').tooltip({
-//    disabled: true,
-//    close: function (event, ui) { $(this).tooltip('disable'); }
-//});
-//$('.line-clamp').on('focusout', function () {
-//    $(this).removeAttr('title');
-//});
-
-//$('.line-clamp').on('mouseleave', function () {
-//    $(this).removeAttr('title');
-//});
-
-
-//$('.line-clamp').on('click', function () {
-//    debugger;
-//    //if ($(this).data('show')) {
-//    //    $(this).removeAttr('title');
-//    //} else {
-//        //$(this).data('show', 1);
-//        $(this).attr('title', $(this).data('title'));
-//        $(this).tooltip().trigger('mouseover');
-//    //}
-//    //$(this).tooltip({
-//    //    close: function (event, ui) {
-//    //        debugger;
-//    //    }
-//    //}).trigger('mouseover');
-//    //$(this).on("tooltipclose", function (event, ui) {
-//    //    debugger;
-//    //});
-//});
 $(document).on('click', '.line-clamp', function () {
+    $(".tooltip").removeClass("show");
+    $(".line-clamp").removeClass("on")
     $(this).addClass("on");
     $(this).tooltip({
         items: '.line-clamp.on',
     });
     $(this).trigger('mouseenter');
 });
-//hide
-$(document).on('click', '.line-clamp.on', function () {
-    //$(this).tooltip('close');
+
+$(document).on('click', '.line-clamp.on', function (e) {
     $(this).data('close', true);
     $(this).removeClass("on");
     $(this).trigger('mouseout');
 });
-//prevent mouseout and other related events from firing their handlers
+$(document).on('keydown', function (e) {
+    if (e.keyCode == 27) {
+        $(".tooltip").removeClass("show");
+    }
+})
+
 $(".line-clamp").on('mouseout', function (e) {
     if ($(this).data('close')) {
         $(this).data('close', false);
@@ -406,66 +356,3 @@ $(".line-clamp").on('mouseenter', function (e) {
         e.stopImmediatePropagation();
     }
 });
-
-//$('.line-clamp').on({
-//    "click": function () {
-//        $(this).tooltip();
-//        $(this).tooltip("enable"); // this line added
-//        $(this).tooltip("open");
-//    },
-//    "mouseout": function () {
-//        $(this).tooltip("disable");
-//    }
-//});
-
-//$('.line-clamp').on('click', function (e) {
-//    if (e.target == $(this)[0]) {
-//        $('.adina-tooltip-outer').addClass('active');
-//    }
-//});
-
-//$('.adina-tooltip-outer').on('click', function (e) {
-//   // if (e.target == $(this)[0]) {
-//        $(this).removeClass('active');
-//    //}
-//});
-
-//$('.line-clamp').on('click', function () {
-//    $(this).tooltip('enable').tooltip('open');
-//});
-
-/*$('.line-clamp').on({
-    "click": function () {
-        $(this).tooltip({ items: ".line-clamp" });
-        $(this).tooltip("open");
-    },
-    "mouseout": function () {
-        $(this).tooltip("disable");
-    }
-});
-
-$(".line-clamp").tooltip({
-    disabled: false,
-    //close: function(event, ui){ $(this).tooltip('disable'); }
-});
-
-$(".line-clamp").on('click', function () {
-    $(this).tooltip('enable').tooltip('open');
-
-});
-
-$(".line-clamp").tooltip().click(function () {
-    if ($(this)[0].offsetHeight < $(this)[0].scrollHeight) {
-        var $this = $(this);
-        var isOpen = $this.data('tooltip');
-        var method = isOpen ? 'close' : 'open';
-        $this.tooltip(method);
-        //verbosity for clarity sake, yes you could just use !isOpen or clicked = (method === 'open')
-        if (method === 'open') {
-            clicked = true;
-        } else {
-            clicked = false;
-        }
-        $this.data('tooltip', !isOpen);
-    }
-});*/
