@@ -56,8 +56,8 @@
             <Category>snaffler_category_id</Category>
         </Model>
         <Model>
-            <Id>pawned_passwords_model_id</Id>
-            <Description>PAWNED PASSWORDS</Description>
+            <Id>Pawned_Passwords_model_id</Id>
+            <Description>Pawned Passwords</Description>
             <Category>Anomalies</Category>
         </Model>
     </Models>
@@ -143,19 +143,19 @@
             </ReportLocation>
         </RiskRule>
         <RiskRule>
-            <Id>PAWNED_PASSWORDS_table</Id>
+            <Id>Pawned_Passwords_table</Id>
             <Models>
-                <Model>pawned_passwords_model_id</Model>
+                <Model>Pawned_Passwords_model_id</Model>
             </Models>
             <Maturity>2</Maturity>
-            <Title>PAWNED PASSWORDS</Title>
+            <Title>Pawned Passwords</Title>
             <Description>Desc</Description>
             <TechnicalExplanation>TechExplanation</TechnicalExplanation>
-            <SectionId>PAWNED_PASSWORDS_section_id</SectionId>
+            <SectionId>Pawned_Passwords_section_id</SectionId>
             <Solution>Solution</Solution>
             <ReportLocation>
-                <Target>panelsectionPAWNEDPASSWORDS</Target>
-                <Text>PAWNED PASSWORDS</Text>
+                <Target>panelsectionPawnedPasswords</Target>
+                <Text>Pawned Passwords</Text>
             </ReportLocation>
         </RiskRule>
     </RiskRules>
@@ -163,13 +163,13 @@
         <!-- Risks Found In Scan-->
         <HealthcheckRiskRule>
             <Points>20</Points>
-            <RiskId>PAWNED_PASSWORDS_table</RiskId>
-            <Rationale>PAWNED PASSWORDS</Rationale>
+            <RiskId>Pawned_Passwords_table</RiskId>
+            <Rationale>Pawned Passwords</Rationale>
             <Details>
                 <Detail>
                     <Type>SharedTable</Type>
-                    <FilePath>.\Reports\PAWNED PASSWORDS\LastReport\Master.csv</FilePath>
-                    <Id>PAWNED_PASSWORDS_table_id</Id>
+                    <FilePath>.\Reports\pawned passwords\lastReport\Master.csv</FilePath>
+                    <Id>Pawned_Passwords_table_id</Id>
                 </Detail>
             </Details>
         </HealthcheckRiskRule>
@@ -236,12 +236,12 @@
     </HealthcheckRiskRules>
     <InformationSections>
         <InformationSection>
-            <Id>PAWNED_PASSWORDS_section_id</Id>
-            <Name>PAWNED PASSWORDS</Name>
+            <Id>Pawned_Passwords_section_id</Id>
+            <Name>Pawned Passwords</Name>
             <Children>
                 <Child>
                     <Type>Table</Type>
-                    <Id>PAWNED_PASSWORDS_table_id</Id>
+                    <Id>Pawned_Passwords_table_id</Id>
                 </Child>
             </Children>
         </InformationSection>
@@ -326,7 +326,7 @@
             <MoreDetails>.\Reports\analyzer and classifier\lastReport\computers</MoreDetails>
         </Table>
         <Table>
-            <Id>PAWNED_PASSWORDS_table_id</Id>           
+            <Id>Pawned_Passwords_table_id</Id>           
         </Table>
     </Tables>
 </CustomHealthCheckData>

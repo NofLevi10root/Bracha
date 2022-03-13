@@ -1287,7 +1287,7 @@ namespace PingCastle.Addition.LogicEnteties
         {
             foreach (var section in InformationSections)
             {
-                if(section.Id == "PAWNED_PASSWORDS_section_id")
+                if(section.Id.ToLower() == "pawned_passwords_section_id")
                 {
                     GenerateAdvancedCustomSection(section);                    
                 }
