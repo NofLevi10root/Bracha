@@ -24,9 +24,16 @@
             <Explanation>Authenticated host vulnerability scanner based on OS patch level &amp; MSRC DB</Explanation>
         </Category>
         <Category>
-            <Id>snaffler_category_id</Id>
+            <Id>content_analyzer_category_id</Id>
             <Name>Content Analyzer &amp; Classifier</Name>
             <Explanation>Analyzing file's content and classify them according to data sensitivity</Explanation>
+        </Category>
+        <Category>
+            <Id>fuzzy_hashing_category_id</Id>
+            <Name>Fuzzy Hashing</Name>
+            <Explanation>Fuzzy hashing technic is used to find similar files, given a Source file and reference file or the proximity threshold.
+                The outcome is all the files which are at list the same level of similarity as the reference . 
+                </Explanation>
         </Category>
     </Categories>
     <Models>
@@ -53,7 +60,12 @@
         <Model>
             <Id>snaffler_model_id</Id>
             <Description>Snaffler</Description>
-            <Category>snaffler_category_id</Category>
+            <Category>content_analyzer_category_id</Category>
+        </Model>
+        <Model>
+            <Id>fuzzy_hashing_model_id</Id>
+            <Description>Fuzzy Hashing</Description>
+            <Category>fuzzy_hashing_category_id</Category>
         </Model>
         <Model>
             <Id>Pawned_Passwords_model_id</Id>
@@ -140,6 +152,22 @@
             <ReportLocation>
                 <Target>panelsectionsnaffler_section_id</Target>
                 <Text>Snaffler</Text>
+            </ReportLocation>
+        </RiskRule>
+        <RiskRule>
+            <Id>fuzzy_hashing_table</Id>
+            <Models>
+                <Model>fuzzy_hashing_model_id</Model>
+            </Models>
+            <Maturity>2</Maturity>
+            <Title>Fuzzy Hashing</Title>
+            <Description>Desc</Description>
+            <TechnicalExplanation>TechExplanation</TechnicalExplanation>
+            <SectionId>fuzzy_hashing_section_id</SectionId>
+            <Solution>Solution</Solution>
+            <ReportLocation>
+                <Target>panelsectionfuzzy_hashing_section_id</Target>
+                <Text>Fuzzy Hashing</Text>
             </ReportLocation>
         </RiskRule>
         <RiskRule>
@@ -233,6 +261,23 @@
                 </Detail>
             </Details>
         </HealthcheckRiskRule>
+        <HealthcheckRiskRule>
+            <Points>0</Points>
+            <RiskId>fuzzy_hashing_table</RiskId>
+            <Rationale>Fuzzy Hashing</Rationale>
+            <Details>
+                <Detail>
+                    <Type>SharedTable</Type>
+                    <FilePath>.\reports\fuzzy hashing\lastReport\information.csv</FilePath>
+                    <Id>fuzzy_hashing_information_table_id</Id>
+                </Detail>
+                <Detail>
+                    <Type>SharedTable</Type>
+                    <FilePath>.\reports\fuzzy hashing\lastReport\master.csv</FilePath>
+                    <Id>fuzzy_hashing_master_table_id</Id>
+                </Detail>
+            </Details>
+        </HealthcheckRiskRule>
     </HealthcheckRiskRules>
     <InformationSections>
         <InformationSection>
@@ -295,6 +340,28 @@
                 </Child>
             </Children>
         </InformationSection>
+        <InformationSection>
+            <Id>fuzzy_hashing_section_id</Id>
+            <Name>Fuzzy Hashing</Name>
+            <Children>
+                <Child>
+                    <Type>Paragraph</Type>
+                    <Value>Fuzzy hashing technic is used to find similar files, given a Source file and reference file or the proximity threshold.</Value>
+                </Child>
+                <Child>
+                    <Type>Table</Type>
+                    <Id>fuzzy_hashing_information_table_id</Id>
+                </Child>
+                <Child>
+                    <Type>Paragraph</Type>
+                    <Value>The outcome is all the files which are at list the same level of similarity as the reference</Value>
+                </Child>
+                <Child>
+                    <Type>Table</Type>
+                    <Id>fuzzy_hashing_master_table_id</Id>
+                </Child>
+            </Children>
+        </InformationSection>
     </InformationSections>
     <Tables>
         <Table>
@@ -324,6 +391,13 @@
             <Id>snaffler_table_id</Id>
             <NestedTablesDirectory>.\Reports\analyzer and classifier\lastReport\settings</NestedTablesDirectory>
             <MoreDetails>.\Reports\analyzer and classifier\lastReport\computers</MoreDetails>
+        </Table>
+        <Table>
+            <Id>fuzzy_hashing_information_table_id</Id>   
+        </Table>
+        <Table>
+            <Id>fuzzy_hashing_master_table_id</Id>  
+            <NestedTablesDirectory>.\reports\fuzzy hashing\lastReport\settings</NestedTablesDirectory> 
         </Table>
         <Table>
             <Id>Pawned_Passwords_table_id</Id>           

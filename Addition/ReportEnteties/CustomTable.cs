@@ -144,6 +144,9 @@ namespace PingCastle.Addition.ReportEnteties
                     case "snaffler_table_id":
                         customTableScore = new SnafflerScores();
                         break;
+                    case "fuzzy_hashing_master_table_id":
+                        customTableScore = new FuzzyHashingScores();
+                        break;
                     default:
                         break;
                 }
@@ -173,6 +176,58 @@ namespace PingCastle.Addition.ReportEnteties
                         if (columnIndex == q)
                         {
                             customTableScore = FillCustomTableScores(customTableScore, data[i][0], data[i][q], delimiter);
+                        }
+                        if (customTableScore is FuzzyHashingScores fuzzyHashing)
+                        {
+                            if (i == 1)
+                            {
+                                if (q == 0)
+                                    fuzzyHashing.FirstName = data[i][q];
+                                else
+                                {
+                                    if (Int32.TryParse(data[i][q], out int value))
+                                    {
+                                        fuzzyHashing.First = value;
+                                    }
+                                }
+                            }
+                            if (i == 2)
+                            {
+                                if (q == 0)
+                                    fuzzyHashing.SecondName = data[i][q];
+                                else
+                                {
+                                    if (Int32.TryParse(data[i][q], out int value))
+                                    {
+                                        fuzzyHashing.Second = value;
+                                    }
+                                }
+                            }
+                            if (i == 3)
+                            {
+                                if (q == 0)
+                                    fuzzyHashing.ThirdName = data[i][q];
+                                else
+                                {
+                                    if (Int32.TryParse(data[i][q], out int value))
+                                    {
+                                        fuzzyHashing.Third = value;
+                                    }
+                                }
+                            }
+                            if (i == 4)
+                            {
+                                if (q == 0)
+                                    fuzzyHashing.FourthName = data[i][q];
+                                else
+                                {
+                                    if (Int32.TryParse(data[i][q], out int value))
+                                    {
+                                        fuzzyHashing.Fourth = value;
+                                    }
+                                }
+                            }
+
                         }
                         if (customTableScore is WesngScores wesngScores)
                         {
@@ -415,7 +470,7 @@ namespace PingCastle.Addition.ReportEnteties
                         foreach (var tableRow in targetTable)
                         {
                             var computrName = Regex.Match(tableRow, @"(?<=Computer:)(.*?)(?=Channel:)").Value;
-                            if(!computerList.Contains(computrName))
+                            if (!computerList.Contains(computrName))
                             {
                                 computerList.Add(computrName);
                             }

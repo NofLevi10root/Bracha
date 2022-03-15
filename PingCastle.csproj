@@ -129,6 +129,7 @@
     <Compile Include="Addition\ReportEnteties\CustomTable.cs" />
     <Compile Include="Addition\StructuresEnteties\CustomTableColumn.cs" />
     <Compile Include="Addition\StructuresEnteties\CustomTableScores.cs" />
+    <Compile Include="Addition\StructuresEnteties\FuzzyHashingScores.cs" />
     <Compile Include="Addition\StructuresEnteties\SnafflerScores.cs" />
     <Compile Include="Addition\StructuresEnteties\ThreatHuntingScores.cs" />
     <Compile Include="Addition\StructuresEnteties\WesngScores.cs" />

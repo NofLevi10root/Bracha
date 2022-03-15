@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PingCastle.Addition.ReportEnteties;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,7 +13,7 @@ namespace PingCastle.Addition.StructureEnteties
         public string Value { get; set; }
         #endregion
 
-        
+
     }
     #region Enums
     public enum CustomSectionChildType
@@ -21,7 +22,8 @@ namespace PingCastle.Addition.StructureEnteties
         Table,
         Paragraph,
         SubSectionTitle,
-        Modal
+        Modal,
+        Section
     }
     #endregion
 }

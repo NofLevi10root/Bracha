@@ -302,9 +302,9 @@ If you are an auditor, you MUST purchase an Auditor license to share the develop
             });
             if (CustomData.Categories.Count > 0)
             {
-                GenerateSection("End-Points", () =>
+                GenerateSection("Endpoints", () =>
                 {
-                    GenerateSection("End-Points Indicators", () =>
+                    GenerateSection("Endpoints Indicators", () =>
                     {
                         AddParagraph(@"This section focuses on the core endpoint security indicators.<br>Locate the sub-process
                             determining the score and fix some rules in that area to get a score improvement.");

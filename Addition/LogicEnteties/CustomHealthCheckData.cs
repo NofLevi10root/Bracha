@@ -78,6 +78,9 @@ namespace PingCastle.Addition.LogicEnteties
 
         [XmlIgnore]
         public SnafflerScores SnafflerScores { get; set; }
+
+        [XmlIgnore]
+        public FuzzyHashingScores FuzzyHashingScores { get; set; }
         #endregion
 
         #region Fields
@@ -236,6 +239,7 @@ namespace PingCastle.Addition.LogicEnteties
                 YaraScores = new YaraScores();
                 WesngScores = new WesngScores();
                 SnafflerScores = new SnafflerScores();
+                FuzzyHashingScores = new FuzzyHashingScores();
                 foreach (var healthRule in HealthRules)
                 {
                     if (GetRiskRule(healthRule.RiskId, out var rule))
@@ -293,6 +297,10 @@ namespace PingCastle.Addition.LogicEnteties
                                             if (customTableScores is SnafflerScores snaffler)
                                             {
                                                 SnafflerScores = snaffler;
+                                            }
+                                            if (customTableScores is FuzzyHashingScores fuzzyHashing)
+                                            {
+                                                FuzzyHashingScores = fuzzyHashing;
                                             }
                                         }
                                     }
@@ -1010,7 +1018,7 @@ namespace PingCastle.Addition.LogicEnteties
                                 case "wesng_category_id":
                                     refsManager.AddParagraphRef(@"<p>Authenticated host vulnerability scanner based on OS patch level & MSRC DB.</p>");
                                     break;
-                                case "snaffler_category_id":
+                                case "content_analyzer_category_id":
                                     refsManager.AddParagraphRef(@"<p>Analyzing file's content and classify them according to data sensitivity</p>");
                                     break;
                             }
@@ -1096,6 +1104,14 @@ namespace PingCastle.Addition.LogicEnteties
                             refsManager.AddEndModalRef();
                         }
                         break;
+                    //case CustomSectionChildType.Section:
+                    //    {
+                    //        if (!string.IsNullOrEmpty(child.Id))
+                    //        {
+                    //            GenerateAdvancedSection(child.Id);
+                    //        }
+                    //        break;
+                    //    }
                 }
             }
         }
@@ -1152,7 +1168,7 @@ namespace PingCastle.Addition.LogicEnteties
                     axisX = "Severity";
                     axisY = "CVE’s";
                     break;
-                case "snaffler_category_id":
+                case "content_analyzer_category_id":
                     division = 4;
                     values.Add(0, SnafflerScores.Critical);
                     values.Add(1, SnafflerScores.High);
@@ -1160,6 +1176,16 @@ namespace PingCastle.Addition.LogicEnteties
                     values.Add(3, SnafflerScores.Low);
                     axisX = "Severity";
                     axisY = "Findings";
+                    break;
+                case "fuzzy_hashing_category_id":
+                    division = 4;
+                    columns = new List<string>() { FuzzyHashingScores.FirstName, FuzzyHashingScores.SecondName, FuzzyHashingScores.ThirdName, FuzzyHashingScores.FourthName };
+                    values.Add(0, FuzzyHashingScores.First);
+                    values.Add(1, FuzzyHashingScores.Second);
+                    values.Add(2, FuzzyHashingScores.Third);
+                    values.Add(3, FuzzyHashingScores.Fourth);
+                    axisX = "Threshold";
+                    axisY = "File count";
                     break;
                 default:
                     break;
@@ -1287,9 +1313,9 @@ namespace PingCastle.Addition.LogicEnteties
         {
             foreach (var section in InformationSections)
             {
-                if(section.Id.ToLower() == "pawned_passwords_section_id")
+                if (section.Id.ToLower() == "pawned_passwords_section_id")
                 {
-                    GenerateAdvancedCustomSection(section);                    
+                    GenerateAdvancedCustomSection(section);
                 }
             }
         }
