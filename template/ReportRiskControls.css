@@ -87,4 +87,11 @@ svg {
 [aria-label="compliance_table_id"] .line-clamp {
 	width:95px;
 }
+
+[aria-label="fuzzy_hashing_information_table_id"] .line-clamp {
+	width: 95px;
+}
+[aria-label="fuzzy_hashing_master_table_id"] .line-clamp {
+	width: 95px;
+}
 }
