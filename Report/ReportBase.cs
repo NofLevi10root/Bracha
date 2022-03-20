@@ -467,7 +467,7 @@ namespace PingCastle.Report
 	<div class=""modal-dialog");
             if (modalType == ShowModalType.XL)
             {
-                Add(" modal-xl");
+                Add(" modal-xl modal-fit");
             }
             else if (modalType == ShowModalType.FullScreen)
             {
