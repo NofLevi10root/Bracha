@@ -695,7 +695,7 @@ namespace PingCastle.Report
             Regex rgx = new Regex("[^a-zA-Z0-9-]");
             string id = "section" + rgx.Replace(title, "");
             var classStyle = "";
-            if (id == "sectionActiveDirectory" || id == "sectionEnd-Points")
+            if (id == "sectionActiveDirectory" || id == "sectionEndpoints")
             {
                 classStyle = "collapse";
             }
