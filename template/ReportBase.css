@@ -285,3 +285,10 @@ html
 	background-color: #00B0D2;
 }
 
+@media (min-width: 1200px) {
+	.modal-xl.modal-fit {
+		max-width: 1192px;
+	}
+}
+
+

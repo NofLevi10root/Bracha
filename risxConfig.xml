@@ -5,7 +5,7 @@
     <Categories>
         <Category>
             <Id>compliance_category_id</Id>
-            <Name>Windows hardening</Name>
+            <Name>Microsoft OS Compliance</Name>
             <Explanation>Each endpoint is checked against a dedicated security authority baseline according to the OS version &amp; Role</Explanation>
         </Category>
         <Category>
@@ -25,12 +25,12 @@
         </Category>
         <Category>
             <Id>content_analyzer_category_id</Id>
-            <Name>Content Analyzer &amp; Classifier</Name>
+            <Name>Content Classification</Name>
             <Explanation>Analyzing file's content and classify them according to data sensitivity</Explanation>
         </Category>
         <Category>
             <Id>fuzzy_hashing_category_id</Id>
-            <Name>Fuzzy Hashing</Name>
+            <Name>Data Discovery</Name>
             <Explanation>Fuzzy hashing technic is used to find similar files, given a Source file and reference file or the proximity threshold.
                 The outcome is all the files which are at list the same level of similarity as the reference . 
                 </Explanation>
@@ -64,7 +64,7 @@
         </Model>
         <Model>
             <Id>fuzzy_hashing_model_id</Id>
-            <Description>Fuzzy Hashing</Description>
+            <Description>Data Discovery</Description>
             <Category>fuzzy_hashing_category_id</Category>
         </Model>
         <Model>
@@ -80,7 +80,7 @@
                 <Model>compliance_model_id</Model>
             </Models>
             <Maturity>2</Maturity>
-            <Title>Windows Hardening</Title>
+            <Title>Microsoft OS Compliance</Title>
             <Description>Desc</Description>
             <TechnicalExplanation>TechExplanation</TechnicalExplanation>
             <SectionId>compliance_section_id</SectionId>
@@ -160,14 +160,14 @@
                 <Model>fuzzy_hashing_model_id</Model>
             </Models>
             <Maturity>2</Maturity>
-            <Title>Fuzzy Hashing</Title>
+            <Title>Data Discovery</Title>
             <Description>Desc</Description>
             <TechnicalExplanation>TechExplanation</TechnicalExplanation>
             <SectionId>fuzzy_hashing_section_id</SectionId>
             <Solution>Solution</Solution>
             <ReportLocation>
                 <Target>panelsectionfuzzy_hashing_section_id</Target>
-                <Text>Fuzzy Hashing</Text>
+                <Text>Data Discovery</Text>
             </ReportLocation>
         </RiskRule>
         <RiskRule>
@@ -332,7 +332,7 @@
         </InformationSection>
         <InformationSection>
             <Id>snaffler_section_id</Id>
-            <Name>Content Analyzer &amp; Classifier</Name>
+            <Name>Content Classification</Name>
             <Children>
                 <Child>
                     <Type>Table</Type>
@@ -342,7 +342,7 @@
         </InformationSection>
         <InformationSection>
             <Id>fuzzy_hashing_section_id</Id>
-            <Name>Fuzzy Hashing</Name>
+            <Name>Data Discovery</Name>
             <Children>
                 <Child>
                     <Type>Paragraph</Type>
