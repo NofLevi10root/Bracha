@@ -204,7 +204,7 @@
         <HealthcheckRiskRule>
             <Points>0</Points>
             <RiskId>compliance_table</RiskId>
-            <Rationale>Windows Hardening</Rationale>
+            <Rationale>Microsoft OS Compliance</Rationale>
             <Details>
                 <Detail>
                     <Type>SharedTable</Type>
