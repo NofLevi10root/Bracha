@@ -400,7 +400,8 @@
             <NestedTablesDirectory>.\reports\fuzzy hashing\lastReport\settings</NestedTablesDirectory> 
         </Table>
         <Table>
-            <Id>Pawned_Passwords_table_id</Id>           
+            <Id>Pawned_Passwords_table_id</Id>   
+            <NestedTablesDirectory>.\reports\pawned passwords\lastReport\settings</NestedTablesDirectory>         
         </Table>
     </Tables>
 </CustomHealthCheckData>
