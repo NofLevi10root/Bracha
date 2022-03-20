@@ -87,7 +87,7 @@
             <Solution>Solution</Solution>
             <ReportLocation>
                 <Target>panelsectioncompliance_section_id</Target>
-                <Text>Windows Hardening</Text>
+                <Text>Microsoft OS Compliance</Text>
             </ReportLocation>
         </RiskRule>
         <RiskRule>
@@ -204,7 +204,7 @@
         <HealthcheckRiskRule>
             <Points>0</Points>
             <RiskId>compliance_table</RiskId>
-            <Rationale>Windows Hardening</Rationale>
+            <Rationale>Microsoft OS Compliance</Rationale>
             <Details>
                 <Detail>
                     <Type>SharedTable</Type>
@@ -292,7 +292,7 @@
         </InformationSection>
         <InformationSection>
             <Id>compliance_section_id</Id>
-            <Name>Windows Hardening</Name>
+            <Name>Microsoft OS Compliance</Name>
             <Children>
                 <Child>
                     <Type>Table</Type>
