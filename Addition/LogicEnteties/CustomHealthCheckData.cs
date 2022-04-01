@@ -1060,7 +1060,6 @@ namespace PingCastle.Addition.LogicEnteties
                                     }
                                     else
                                     {
-                                        /////////////////////////
                                         if (table.Columns[i].Values.ContainsKey(key))
                                             refsManager.AddCellTextRef(table.Columns[i].Values[key]);
                                         else
@@ -1074,12 +1073,12 @@ namespace PingCastle.Addition.LogicEnteties
                         }
                         break;
                     case CustomSectionChildType.Chart:
-                        if (GetChart(child.Id, out var chart))
-                            refsManager.AddRef(chart.GetChartString());
+                        if (GetChart(child.Id, out var chart)) 
+                           refsManager.AddRef(chart.GetChartString());
                         break;
                     case CustomSectionChildType.Paragraph:
-                        if (!string.IsNullOrEmpty(child.Value))
-                            refsManager.AddParagraphRef(child.Value);
+                        if (!string.IsNullOrEmpty(child.Value)) 
+                           /*the line I need*/refsManager.AddParagraphRef(child.Value);
                         break;
                     case CustomSectionChildType.SubSectionTitle:
                         if (!string.IsNullOrEmpty(child.Value))
