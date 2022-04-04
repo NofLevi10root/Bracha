@@ -1021,6 +1021,10 @@ namespace PingCastle.Addition.LogicEnteties
                                 case "content_analyzer_category_id":
                                     refsManager.AddParagraphRef(@"<p>Analyzing file's content and classify them according to data sensitivity</p>");
                                     break;
+                                case "fuzzy_hashing_category_id":
+                                    refsManager.AddParagraphRef(@"Fuzzy hashing technic is used to find similar files, given a Source file and reference file or the proximity threshold.
+                The outcome is all the files which are at least the same level of similarity as the reference.");
+                                    break;
                             }
                             AddCustomCategoriesCharts(false, sectionCategory);
                             GenerateAdvancedCustomSection(section);
