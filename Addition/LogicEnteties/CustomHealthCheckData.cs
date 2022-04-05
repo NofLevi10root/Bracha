@@ -1082,7 +1082,7 @@ namespace PingCastle.Addition.LogicEnteties
                         break;
                     case CustomSectionChildType.Paragraph:
                         if (!string.IsNullOrEmpty(child.Value)) 
-                           /*the line I need*/refsManager.AddParagraphRef(child.Value);
+                           refsManager.AddParagraphRef(child.Value);
                         break;
                     case CustomSectionChildType.SubSectionTitle:
                         if (!string.IsNullOrEmpty(child.Value))
