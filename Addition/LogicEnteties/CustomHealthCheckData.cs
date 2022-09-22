@@ -673,12 +673,35 @@ namespace PingCastle.Addition.LogicEnteties
                     AddCustomTooltip(tooltip);
                     refsManager.AddRef("</td>");
                 }
+                //04-08-2022  Change ID
+                //07-08-2022 Order tlsh output
                 else if (custTable != null && custTable.GetNestedTable(value, CustomDelimiter, out var targetTable))
                 {
                     refsManager.AddRef(@"<td class='text'><a data-toggle=""modal"" href=""#");
                     refsManager.AddRef(refsManager.GenerateModalAdminGroupIdFromGroupNameRef($"table_{value}"));
                     refsManager.AddRef(@""">");
-                    refsManager.AddEncodedRef(value);
+                    if (value.Contains("0-"))
+                    {
+                        Globals.tlshFlag = 3;
+                        refsManager.AddEncodedRef("    " + value);
+                    }
+                    else if(Globals.tlshFlag > 0 && Globals.tlshFlag < 4)
+                    {
+                        for(int i = Globals.tlshFlag; i > 0; i--)
+                        {
+                            value = " " + value;
+                        }
+                        refsManager.AddEncodedRef(value);
+                        Globals.tlshFlag -= 1;
+                    }
+                    else
+                    {
+                        refsManager.AddEncodedRef(value);
+                    }
+                    //refsManager.AddRef(@"<td class='text'><a data-toggle=""modal"" href=""#");
+                    //refsManager.AddRef(refsManager.GenerateModalAdminGroupIdFromGroupNameRef($"table_{value}"));
+                    //refsManager.AddRef(@""">");
+                    //refsManager.AddEncodedRef(value);
                     refsManager.AddRef("</a>");
                     AddCustomTooltip(tooltip);
                     refsManager.AddRef("</td>");
@@ -735,107 +758,244 @@ namespace PingCastle.Addition.LogicEnteties
 
         private void AddCustomTableHtml(object cellValue, List<string> data, CustomTable custTable)
         {
-            try
+            //foreach (string st in data)
+                //Console.WriteLine(st);
+            //Edited here
+            int intCellValue =  0;
+            bool index = Int32.TryParse(cellValue.ToString(), out intCellValue);
+            if (index = true && intCellValue > 1000000 && intCellValue < 2000000)
             {
-                if (data.Count == 0)
+                try
                 {
-                    return;
-                }
-                var firstLineParts = data[0].Split(' ');
-                if (firstLineParts.Length > 1 && firstLineParts[0].EndsWith(":"))
-                {
-                    var tokens = new List<string>();
-                    for (int i = 0; i < firstLineParts.Length; i++)
+                    if (data.Count == 0)
                     {
-                        if (!string.IsNullOrEmpty(firstLineParts[i]) && firstLineParts[i].EndsWith(":"))
-                        {
-                            tokens.Add(firstLineParts[i]);
-                        }
+                        return;
                     }
-                    refsManager.AddRef(@"<div class=""row"">
-			<div class=""col-md-12 table-responsive"">
-				<table class=""table table-striped table-bordered"">
-					<thead><tr>");
-                    var headers = new List<string>();
-                    foreach (var token in tokens)
+                    var firstLineParts = data[0].Split(' ');
+                    if (firstLineParts.Length > 1 && firstLineParts[0].EndsWith(":"))
                     {
-                        refsManager.AddRef($"<th class='customTableColumn'>");
-                        string parsedToken = token.Replace("#$%%$#", " ").Replace("#$%:%$#", ": ");
-                        var header = parsedToken.Substring(0, parsedToken.Length - 1);
-                        headers.Add(header);
-                        refsManager.AddEncodedRef(header);
-                        refsManager.AddRef("</th>");
-                    }
-                    refsManager.AddRef("</tr></thead><tbody>");
-                    foreach (var d in data)
-                    {
-                        if (string.IsNullOrEmpty(d))
-                            continue;
-                        refsManager.AddRef("<tr>");
-                        var t = d.Split(' ');
-                        t = t.Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                        for (int i = 0, j = 0; i < t.Length && j <= tokens.Count; i++)
+                        var tokens = new List<string>();
+                        for (int i = 0; i < firstLineParts.Length; i++)
                         {
-                            if (j < tokens.Count && t[i] == tokens[j])
+                            if (!string.IsNullOrEmpty(firstLineParts[i]) && firstLineParts[i].EndsWith(":"))
                             {
-                                if (j != 0)
-                                {
-                                    refsManager.AddRef("</td>");
-                                }
-                                j++;
-                                refsManager.AddRef($"<td class='customTableColumn'>");
+                                tokens.Add(firstLineParts[i]);
                             }
-                            else
+                        }
+                        refsManager.AddRef(@"<div class=""row"">
+			<div class=""col-md-12 table-responsive"">
+				<table class=""table table-striped table-bordered"" aria-label=""compliance_table_id"">
+                    <thead><tr>");
+                        var headers = new List<string>();
+                        foreach (var token in tokens)
+                        {
+                            refsManager.AddRef($"<th class='customTableColumn'>");
+                            string parsedToken = token.Replace("#$%%$#", " ").Replace("#$%:%$#", ": ");
+                            var header = parsedToken.Substring(0, parsedToken.Length - 1);
+                            headers.Add(header);
+                            refsManager.AddEncodedRef(header);
+                            refsManager.AddRef("</th>");
+                        }
+                        refsManager.AddRef("</tr></thead><tbody>");
+                        foreach (var d in data)
+                        {
+                            if (string.IsNullOrEmpty(d))
+                                continue;
+                            refsManager.AddRef("<tr>");
+                            var t = d.Split(' ');
+                            t = t.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                            string value = "";
+                            for (int i = 0, j = 0; i < t.Length && j <= tokens.Count; i++)
                             {
-                                var value = t[i].Replace("#$%:%$#", ": ");
-                                var resualt = string.Empty;
-                                if (custTable != null)
+                                if (j < tokens.Count && t[i] == tokens[j])
                                 {
-                                    if (custTable.GetNestedColumnPath(headers[j - 1], value, out var spcialColumnValue))
+                                    if (j != 0)
                                     {
-                                        foreach (var v in spcialColumnValue)
+                                        //add value change to here 25/07/2022
+                                        refsManager.AddRef(@"<p class=""line-clamp"" title="""" style=""cursor: pointer; "" data-original-title=" + '"' + value +'"' + ">");
+                                        refsManager.AddRef(value);
+                                        refsManager.AddRef("</p>");
+                                        refsManager.AddRef("</td>");
+                                        value = "";
+                                    }
+                                    j++;
+
+                                    refsManager.AddRef($"<td class='customTableColumn'>");
+
+                                }
+                                else
+                                {
+                                    string tempvalue = t[i].Replace("#$%:%$#", ": ");
+                                    var resualt = string.Empty;
+                                    if (custTable != null)
+                                    {
+                                        if (custTable.GetNestedColumnPath(headers[j - 1], value, out var spcialColumnValue))
                                         {
-                                            resualt += $@"<a target=""_blank"" href=""{v.Value}"">{v.Key}</a>";
-                                            if (!(i == t.Length - 1))
+                                            foreach (var v in spcialColumnValue)
                                             {
-                                                resualt += ",";
+                                                resualt += $@"<a target=""_blank"" href=""{v.Value}"">{v.Key}</a>";
+                                                if (!(i == t.Length - 1))
+                                                {
+                                                    resualt += ",";
+                                                }
                                             }
                                         }
                                     }
+                                    if (!string.IsNullOrEmpty(resualt))
+                                    {
+                                        value = resualt;
+                                    }
+                                    //From here 25/07/2022
+                                    //refsManager.AddRef(@"<p class=""line-clamp"" title="""" style=""cursor: pointer; "" data-original-title=""https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/deny-access-to-this-computer-from-the-network"">");
+                                    //refsManager.AddRef(" ");
+                                    //refsManager.AddRef("</p>");
+                                    value += tempvalue + " ";
                                 }
-                                if (!string.IsNullOrEmpty(resualt))
-                                {
-                                    value = resualt;
-                                }
-                                refsManager.AddRef(value);
-                                refsManager.AddRef(" ");
                             }
+
+                            //09/08/2022 Add Operator to compliance
+                            refsManager.AddRef(@"<p class=""line-clamp"" title="""" style=""cursor: pointer; "" data-original-title=" + '"' + t[t.Length - 1] + '"' + ">");
+                            refsManager.AddRef(t[t.Length-1]);
+                            refsManager.AddRef("</p>");
+                            refsManager.AddRef("</td>");
+                            refsManager.AddRef("</tr>");
                         }
-                        refsManager.AddRef("</td>");
-                        refsManager.AddRef("</tr>");
-                    }
-                    if (!string.IsNullOrEmpty(custTable.MoreDetails))
-                    {
-                        string cellValueStr = (string)cellValue;
-                        string computersFile = Path.Combine(custTable.MoreDetails, cellValue + ".csv");
-                        refsManager.AddRef($@"</tbody></table><a class='moreDetailsLink' target=""_blank"" href=""{computersFile}""><b>More details</b></a></div></div>");
+                        if (!string.IsNullOrEmpty(custTable.MoreDetails))
+                        {
+                            string cellValueStr = (string)cellValue;
+                            string computersFile = Path.Combine(custTable.MoreDetails, cellValue + ".csv");
+                            refsManager.AddRef($@"</tbody></table><a class='moreDetailsLink' target=""_blank"" href=""{computersFile}""><b>More details</b></a></div></div>");
+                        }
+                        else
+                            refsManager.AddRef("</tbody></table></div></div>");
+
                     }
                     else
-                        refsManager.AddRef("</tbody></table></div></div>");
-
+                    {
+                        refsManager.AddRef(@"<p class=""line-clamp"">");
+                        refsManager.AddRef(String.Join("<br>\r\n", data.ToArray()));
+                        refsManager.AddRef("</p>");
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    refsManager.AddRef("<p>");
-                    refsManager.AddRef(String.Join("<br>\r\n", data.ToArray()));
-                    refsManager.AddRef("</p>");
+                    Console.WriteLine("Problem on 'AddCustomTableHtml' method on 'ReportHealthCheckSingle':");
+                    Console.WriteLine(e);
                 }
             }
-            catch (Exception e)
+            else
             {
-                Console.WriteLine("Problem on 'AddCustomTableHtml' method on 'ReportHealthCheckSingle':");
-                Console.WriteLine(e);
+                try
+                {
+                    if (data.Count == 0)
+                    {
+                        return;
+                    }
+                    var firstLineParts = data[0].Split(' ');
+                    if (firstLineParts.Length > 1 && firstLineParts[0].EndsWith(":"))
+                    {
+                        var tokens = new List<string>();
+                        for (int i = 0; i < firstLineParts.Length; i++)
+                        {
+                            if (!string.IsNullOrEmpty(firstLineParts[i]) && firstLineParts[i].EndsWith(":"))
+                            {
+                                tokens.Add(firstLineParts[i]);
+                            }
+                        }
+                        refsManager.AddRef(@"<div class=""row"">
+			<div class=""col-md-12 table-responsive"">
+				<table class=""table table-striped table-bordered"">
+					<thead><tr>");
+                        var headers = new List<string>();
+                        foreach (var token in tokens)
+                        {
+                            refsManager.AddRef($"<th class='customTableColumn'>");
+                            string parsedToken = token.Replace("#$%%$#", " ").Replace("#$%:%$#", ": ");
+                            var header = parsedToken.Substring(0, parsedToken.Length - 1);
+                            headers.Add(header);
+                            refsManager.AddEncodedRef(header);
+                            refsManager.AddRef("</th>");
+                        }
+                        refsManager.AddRef("</tr></thead><tbody>");
+                        foreach (var d in data)
+                        {
+                            if (string.IsNullOrEmpty(d))
+                                continue;
+                            refsManager.AddRef("<tr>");
+                            var t = d.Split(' ');
+                            t = t.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                            for (int i = 0, j = 0; i < t.Length && j <= tokens.Count; i++)
+                            {
+                                if (j < tokens.Count && t[i] == tokens[j])
+                                {
+                                    if (j != 0)
+                                    {
+                                        refsManager.AddRef("</td>");
+                                    }
+                                    j++;
+                                    refsManager.AddRef($"<td class='customTableColumn'>");
+                                }
+                                else
+                                {
+                                    var value = t[i].Replace("#$%:%$#", ": ");
+                                    var resualt = string.Empty;
+                                    if (custTable != null)
+                                    {
+                                        if (custTable.GetNestedColumnPath(headers[j - 1], value, out var spcialColumnValue))
+                                        {
+                                            foreach (var v in spcialColumnValue)
+                                            {
+                                                resualt += $@"<a target=""_blank"" href=""{v.Value}"">{v.Key}</a>";
+                                                if (!(i == t.Length - 1))
+                                                {
+                                                    resualt += ",";
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (!string.IsNullOrEmpty(resualt))
+                                    {
+                                        value = resualt;
+                                    }
+                                    //9-6-2022 Fix Nested wesng severity
+                                    //Invisible Chars are great
+                                    if (value == "Low")
+                                        value = "&#8205;    Low";
+                                    else if (value == "Medium")
+                                        value = "  Medium";
+                                    else if (value == "High")
+                                        value = " High";
+                                    refsManager.AddRef(value);
+                                    refsManager.AddRef(" ");
+                                }
+                            }
+                            refsManager.AddRef("</td>");
+                            refsManager.AddRef("</tr>");
+                        }
+                        if (!string.IsNullOrEmpty(custTable.MoreDetails))
+                        {
+                            string cellValueStr = (string)cellValue;
+                            string computersFile = Path.Combine(custTable.MoreDetails, cellValue + ".csv");
+                            refsManager.AddRef($@"</tbody></table><a class='moreDetailsLink' target=""_blank"" href=""{computersFile}""><b>More details</b></a></div></div>");
+                        }
+                        else
+                            refsManager.AddRef("</tbody></table></div></div>");
+
+                    }
+                    else
+                    {
+                        refsManager.AddRef("<p>");
+                        refsManager.AddRef(String.Join("<br>\r\n", data.ToArray()));
+                        refsManager.AddRef("</p>");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Problem on 'AddCustomTableHtml' method on 'ReportHealthCheckSingle':");
+                    Console.WriteLine(e);
+                }
             }
+            
         }
 
         public void AddGPOTableKeyCell(string tableId, IGPOReference cellValue, Dictionary<string, GPOInfo> GPOInfoDic)
@@ -850,6 +1010,7 @@ namespace PingCastle.Addition.LogicEnteties
                     refsManager.AddRef(@""">");
                     refsManager.AddEncodedRef(cellValue.GPOName);
                     refsManager.AddRef("</a>");
+
                     if (!string.IsNullOrEmpty(cellValue.GPOId))
                     {
                         if (!GPOInfoDic.ContainsKey(cellValue.GPOId))
@@ -1022,7 +1183,7 @@ namespace PingCastle.Addition.LogicEnteties
                                     refsManager.AddParagraphRef(@"<p>Analyzing file's content and classify them according to data sensitivity</p>");
                                     break;
                                 case "fuzzy_hashing_category_id":
-                                    refsManager.AddParagraphRef(@"Fuzzy hashing technic is used to find similar files, given a Source file and reference file or the proximity threshold.
+                                    refsManager.AddParagraphRef(@"Fuzzy hashing is used to find similar files, given a Source file and reference file or the proximity threshold.
                 The outcome is all the files which are at least the same level of similarity as the reference.");
                                     break;
                             }
@@ -1137,12 +1298,13 @@ namespace PingCastle.Addition.LogicEnteties
             columns = new List<string>() { "Critical", "High", "Medium", "Low" };
             switch (category.Id)
             {
+                //Compliance Severity graph fix 8/28/2022
                 case "compliance_category_id":
                     division = 3;
-
-                    values.Add(1, ComplinceScores.High);
-                    values.Add(2, ComplinceScores.Medium);
-                    values.Add(3, ComplinceScores.Low);
+                    columns = new List<string>() { "High", "Medium", "Low" };
+                    values.Add(0, ComplinceScores.High);
+                    values.Add(1, ComplinceScores.Medium);
+                    values.Add(2, ComplinceScores.Low);
                     axisX = "Severity";
                     axisY = "Configurations";
                     break;

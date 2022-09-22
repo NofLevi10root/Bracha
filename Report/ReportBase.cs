@@ -115,6 +115,8 @@ namespace PingCastle.Report
 
         private void GenerateCspMeta()
         {
+            //Security-Policy
+            /*
             Add(@"<meta http-equiv=""Content-Security-Policy"" content=""default-src 'self'; script-src ");
             foreach (var script in JSToAdd)
             {
@@ -126,6 +128,7 @@ namespace PingCastle.Report
                 ComputeCSPHash(css);
             }
             Add(@" 'unsafe-inline'; object-src 'none'; base-uri https://www.10root.com ; img-src data: https://www.10root.com;""/>");
+            */
         }
 
         private void ComputeCSPHash(string css)
@@ -730,6 +733,71 @@ namespace PingCastle.Report
 
         protected virtual void GenerateSection(string sectionId, string title, GenerateContentDelegate generateContent) // custom method
         {
+            //Embedded mini zircolite here
+            //release
+            string miniZircoLocation =  "<iframe src=" + '"' + @"./RuntimeModules\ZircoliteGUI\Index.html" + '"' + @"width = 100% id=""iFrameSucks"" scrolling=""no"" ></iframe>";
+            //debug
+            //string miniZircoLocation = "<iframe src=" + '"' + @"./ZircoliteGUI\Index.html" + '"' + @"width = 100% id=""iFrameSucks""  scrolling=""no""> </iframe>";
+            if (sectionId == "zircolite_section_id")
+            {
+                if(Globals.useZircolite)
+                {
+                    string id = "section" + sectionId;
+                    Add(@"
+<!-- Section " + title + @" -->
+<div id=""" + id + @""">
+	<div class=""row"">
+		<div class=""col-lg-12"">
+			<div class=""starter-template"">
+				<div class=""card mb-4"">
+					<div class=""card-header"">
+						<h1 class=""card-title""><a data-toggle=""collapse""  aria-expanded=""true"" href=""#panel" + id + @""">" + title + @"</a></h1>
+					</div>
+					<div class=""card-body collapse show"" id=""panel" + id + @""">
+");
+                    Add(miniZircoLocation);
+                    Add(@"
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class=""pagebreak""> </div>
+<!-- Section " + title + @" end -->
+");
+                }
+
+            }
+            else
+            {
+                string id = "section" + sectionId;
+                Add(@"
+<!-- Section " + title + @" -->
+<div id=""" + id + @""">
+	<div class=""row"">
+		<div class=""col-lg-12"">
+			<div class=""starter-template"">
+				<div class=""card mb-4"">
+					<div class=""card-header"">
+						<h1 class=""card-title""><a data-toggle=""collapse""  aria-expanded=""true"" href=""#panel" + id + @""">" + title + @"</a></h1>
+					</div>
+					<div class=""card-body collapse show"" id=""panel" + id + @""">
+");
+                generateContent();
+                Add(@"
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class=""pagebreak""> </div>
+<!-- Section " + title + @" end -->
+");
+            }
+
+/*
             string id = "section" + sectionId;
             Add(@"
 <!-- Section " + title + @" -->
@@ -753,7 +821,7 @@ namespace PingCastle.Report
 </div>
 <div class=""pagebreak""> </div>
 <!-- Section " + title + @" end -->
-");
+");*/
         }
 
         protected void GenerateSubSection(string title, string section = null)

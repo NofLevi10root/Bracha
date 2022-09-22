@@ -152,6 +152,8 @@
     <Compile Include="Exports\ExportChanges.cs" />
     <Compile Include="Exports\ExportUsers.cs" />
     <Compile Include="Exports\IExport.cs" />
+    <Compile Include="FixZircolite.cs" />
+    <Compile Include="Globals.cs" />
     <Compile Include="Graph\Database\LiveDataStorage.cs" />
     <Compile Include="Graph\Database\MappingType.cs" />
     <Compile Include="Graph\Database\RelationType.cs" />
@@ -258,6 +260,7 @@
     <Compile Include="Healthcheck\Rules\HeatlcheckRulePrivilegedDelegationKeyAdmin.cs" />
     <Compile Include="Healthcheck\Rules\HeatlcheckRulePrivilegedExchangeAdminSDHolder.cs" />
     <Compile Include="Healthcheck\Rules\HeatlcheckRulePrivilegedUnconstrainedDelegation.cs" />
+    <Compile Include="LoadWORK.cs" />
     <Compile Include="misc\DnsQuery.cs" />
     <Compile Include="misc\ROCAVulnerabilityTester.cs" />
     <Compile Include="misc\Subnet.cs" />
@@ -364,6 +367,7 @@
     <Compile Include="RPC\spool.cs" />
     <Compile Include="Rules\RuleSet.cs" />
     <Compile Include="ADWS\LinuxSidResolver.cs" />
+    <Compile Include="SaveWORK.cs" />
     <Compile Include="Scanners\AntivirusScanner.cs" />
     <Compile Include="Scanners\bluekeepscanner.cs" />
     <Compile Include="Scanners\ComputerVersion.cs" />

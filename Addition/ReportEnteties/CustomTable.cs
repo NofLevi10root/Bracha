@@ -310,7 +310,16 @@ namespace PingCastle.Addition.ReportEnteties
                         var custCol = dictCols[data[0][col]];
                         if (!custCol.Values.ContainsKey(data[row][0]))
                         {
+                            //8-30-2022 Severity Filter Fix
                             custCol.Values[data[row][0]] = data[row][col];
+                            if (data[row][col] == "Low")
+                                custCol.Values[data[row][0]] = "   Low";
+                            else if(data[row][col] == "Medium")
+                                custCol.Values[data[row][0]] = "  Medium";
+                            else if (data[row][col] == "High")
+                                custCol.Values[data[row][0]] = " High";
+                            else if (data[row][col] == "Critical")
+                                custCol.Values[data[row][0]] = "Critical";
                         }
                     }
                 }

@@ -49,6 +49,11 @@ namespace PingCastle
         {
             try
             {
+                try
+                {
+                    FixZircolite.CombineZircoliteFiles();
+                }
+                catch { }
                 AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
                 AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
                 Trace.WriteLine("Running on dotnet:" + Environment.Version);
@@ -66,6 +71,8 @@ namespace PingCastle
             {
                 Tasks.DisplayException("main program", ex);
             }
+            FixZircolite.InsertZircoliteFunc();
+            //Console.ReadLine();
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
